@@ -1,0 +1,58 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BedrockInvokeModel",
+      "Effect": "Allow",
+      "Action": "bedrock:InvokeModel",
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/*",
+        "arn:aws:bedrock:us-east-1:385927210791:inference-profile/*"
+      ]
+    },
+    {
+      "Sid": "S3ReadWriteBrandAndIncidentsObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::me-hack-media-385927210791-us-east-1/brand/*",
+        "arn:aws:s3:::me-hack-media-385927210791-us-east-1/incidents/*"
+      ]
+    },
+    {
+      "Sid": "ViewerReadOnlyBrandObjects",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::me-hack-media-385927210791-us-east-1/brand/*"
+    },
+    {
+      "Sid": "S3ListBrandAndIncidentsPrefixes",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::me-hack-media-385927210791-us-east-1",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": [
+            "brand/*",
+            "incidents/*"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "SecretsManagerReadAgentTokenSecret",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-2:385927210791:secret:ws/remangu-comfyui/team-01/agent-token-*"
+    },
+    {
+      "Sid": "CloudFormationDescribeStacksUsEast2",
+      "Effect": "Allow",
+      "Action": "cloudformation:DescribeStacks",
+      "Resource": "arn:aws:cloudformation:us-east-2:385927210791:stack/*/*"
+    }
+  ]
+}

@@ -1,0 +1,707 @@
+{
+  "pbtResults": {
+    "2.2 Escribir test de propiedad para redacción en logs": {
+      "status": "passed",
+      "lastRunTimestamp": 1793793278426
+    },
+    "1.5 Escribir test de propiedad para la validez del identificador de activo": {
+      "status": "passed",
+      "lastRunTimestamp": 1793793324604
+    }
+  },
+  "executionHistory": {
+    "1.1 Crear la estructura del proyecto y el entorno de pruebas": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792398827
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792572856
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792776597
+      }
+    ],
+    "1.2 Implementar modelos y validación del Veredicto (`models.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792402171
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792784905
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792956993
+      }
+    ],
+    "1.3 Escribir test de propiedad para validación del esquema del Veredicto": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792405056
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793236741
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793348375
+      }
+    ],
+    "1.4 Escribir test de propiedad de ida y vuelta del Veredicto": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792407922
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793238298
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793349980
+      }
+    ],
+    "1.5 Escribir test de propiedad para la validez del identificador de activo": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792410788
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793239841
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793352525
+      }
+    ],
+    "2.1 Implementar `Gestor_Secretos` y filtro de redacción (`secrets.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792413648
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792788007
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792958552
+      }
+    ],
+    "2.2 Escribir test de propiedad para redacción en logs": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792416526
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793241433
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793354090
+      }
+    ],
+    "2.3 Escribir tests unitarios del Gestor_Secretos": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792419389
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793242990
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793356696
+      }
+    ],
+    "3.1 Implementar el adaptador S3 (`s3io.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792422265
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792786456
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792960111
+      }
+    ],
+    "3.2 Implementar el comprobador de referencias (`references.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792425163
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793081437
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793227991
+      }
+    ],
+    "3.3 Escribir tests unitarios de S3 y referencias": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792428015
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793451215
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793500577
+      }
+    ],
+    "4.1 Implementar el núcleo puro del verificador (`core.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792430980
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793079839
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793229554
+      }
+    ],
+    "4.2 Escribir test de propiedad para agregación por prioridad": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792433823
+      }
+    ],
+    "4.3 Escribir test de propiedad para agregación independiente del orden": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792436691
+      }
+    ],
+    "4.4 Escribir test de propiedad para selección de evidencias de vídeo": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792439532
+      }
+    ],
+    "4.5 Escribir test de propiedad para muestreo a 1 fps": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792442390
+      }
+    ],
+    "4.6 Escribir test de propiedad para ambos logos implican INCORRECTO": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792445235
+      }
+    ],
+    "4.7 Implementar el adaptador Bedrock del verificador (`verifier.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792448105
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793446505
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793497206
+      }
+    ],
+    "4.8 Escribir test de propiedad para rechazo de imágenes no soportadas": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792450953
+      }
+    ],
+    "4.9 Escribir tests unitarios del verificador con Bedrock falso": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792453808
+      }
+    ],
+    "5. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792456697
+      }
+    ],
+    "6.1 Implementar el Manifiesto (`manifest.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792459555
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793082993
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793223300
+      }
+    ],
+    "6.2 Escribir test de propiedad para validación manual de etiquetas": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792462390
+      }
+    ],
+    "6.3 Implementar el Generador_ComfyUI (`generator.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792465241
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793448075
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793495653
+      }
+    ],
+    "6.4 Escribir test de propiedad para entrada de generación según etiqueta": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792468078
+      }
+    ],
+    "6.5 Escribir test de propiedad para registro nuevo en el Manifiesto": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792470914
+      }
+    ],
+    "6.6 Escribir tests unitarios del generador con `run_workflow` falso": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792473753
+      }
+    ],
+    "7.1 Implementar el flujo de incidencia (`incident.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792476919
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793084553
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793226439
+      }
+    ],
+    "7.2 Escribir test de propiedad para validación de Incidencia": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792480858
+      }
+    ],
+    "7.3 Escribir test de propiedad para redacción de números de tarjeta": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792483736
+      }
+    ],
+    "7.4 Escribir test de propiedad para prompt de escena sin datos sensibles": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792486573
+      }
+    ],
+    "7.5 Escribir test de propiedad de ida y vuelta de la Incidencia": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792489443
+      }
+    ],
+    "8.1 Implementar el generador de informe (`report.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792492286
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793449655
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793498758
+      }
+    ],
+    "8.2 Escribir test de propiedad para Precision_Global": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792495146
+      }
+    ],
+    "8.3 Escribir test de propiedad para el indicador de objetivo": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792497990
+      }
+    ],
+    "8.4 Escribir test de propiedad para falsos negativos separados": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792500869
+      }
+    ],
+    "8.5 Escribir test de propiedad para el contenido del informe": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792503741
+      }
+    ],
+    "8.6 Implementar la CLI y el orquestador (`cli.py`, `__main__.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792506606
+      }
+    ],
+    "8.7 Escribir tests unitarios de la CLI": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792509454
+      }
+    ],
+    "9.1 Implementar el escáner de secretos y el hook de pre-commit (`scripts/check_secrets.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792512331
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792789551
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792961673
+      }
+    ],
+    "9.2 Escribir test de propiedad para detección de secretos sin revelarlos": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792515178
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793358256
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793429741
+      }
+    ],
+    "9.3 Crear la política IAM de mínimo privilegio (`infra/iam-policy.json`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792518037
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792791121
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792963229
+      }
+    ],
+    "10.8 Extraer `bboxToStyle` y `visibleEvidences` a `web/client/src/bbox.js`": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792520896
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792574403
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792775031
+      }
+    ],
+    "10.9 Escribir test de propiedad para Precision_Global solo sobre validados, en rango": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792523775
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792976439
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793067525
+      }
+    ],
+    "10.10 Escribir test de propiedad para la coherencia del resto de estadísticas": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792526635
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793359829
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793432282
+      }
+    ],
+    "10.11 Escribir test de propiedad para consistencia de filtros entre RedisStore y MemoryStore": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792529511
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793452772
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793502895
+      }
+    ],
+    "10.12 Escribir test de propiedad para ida y vuelta de upsert y get en los almacenes": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792532414
+      }
+    ],
+    "10.13 Escribir test de propiedad para filtros inválidos ignorados": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792535325
+      }
+    ],
+    "10.14 Escribir test de propiedad para validación de identificador y etiqueta": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792538210
+      }
+    ],
+    "10.15 Escribir test de propiedad para la validación manual de un activo en la API": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792541095
+      }
+    ],
+    "10.16 Escribir test de propiedad para el mapeo de caja normalizada a porcentajes CSS": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792543943
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792978033
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793069102
+      }
+    ],
+    "10.17 Escribir test de propiedad para evidencias visibles de un vídeo según el instante": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792546809
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793362288
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793433856
+      }
+    ],
+    "10.18 Escribir test de integración de `RedisStore` contra Redis real o `ioredis-mock`": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792549664
+      }
+    ],
+    "10.19 Documentar el permiso de lectura S3 del API_Visor en la política IAM": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792552529
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793086120
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793224888
+      }
+    ],
+    "11.1 Actualizar `TEAM.md` para que coincida con lo construido": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792555363
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792979609
+      },
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793070661
+      }
+    ],
+    "11.2 Crear `/workshop/Agent.md` consolidando las especificaciones, en español": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792558206
+      }
+    ],
+    "11.3 Escribir smoke tests de documentación (`tests/test_docs.py`)": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792561055
+      }
+    ],
+    "12. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793792563902
+      }
+    ],
+    "9. Seguridad y permisos": [
+      {
+        "executionId": "0ad1dc1d-7e3e-4b9b-9193-7663564e086b",
+        "chatSessionId": "sess_d2f1d179-3484-4402-979f-ce24534be806",
+        "timestamp": 1793793436329
+      }
+    ]
+  }
+}

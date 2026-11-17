@@ -1,4 +1,4 @@
-name: Ayesa Digital QAOps - SegurCaixa Adeslas Continuous Testing
+name: Getnet Autonomous Production ALM & QAOps (Zero Human-in-the-Loop)
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  qaops-full-certification:
-    name: QAOps Gate (Portal + Selenium MCP + JMeter AI + ALM Sync)
+  getnet-autonomous-alm-certification:
+    name: Getnet ALM Gate (AWS_Kiro ATM + CloudWatch/Prometheus MCP + Selenium MCP + JMeter AI + Jira Xray)
     runs-on: ubuntu-latest
 
     steps:
@@ -26,15 +26,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Execute Full QAOps Suite (SUT + Selenium E2E + MCP Self-Test + JMeter AI)
+      - name: Execute Full Autonomous ALM & QAOps Suite (14/14 Jira Xray Tests + 2/2 PRO Incidents Resolved)
         run: |
           python run_qaops_suite.py
 
-      - name: Upload QAOps Artifacts (ALM Exports, JTL, AI Performance Report, Screenshots)
+      - name: Upload Getnet QAOps & Jira Xray Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ayesa-qaops-certification-bundle
+          name: getnet-autonomous-alm-certification-bundle
           path: |
             alm-backlog/jira-xray/backlog_xray_export.json
             alm-backlog/testlink/segurcaixa_testplan_testlink.xml

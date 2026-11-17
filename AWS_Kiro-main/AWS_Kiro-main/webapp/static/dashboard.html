@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATM Sentinel · Consumos y recursos</title>
+<style>
+  :root { --red: #b30000; --red-soft: #fde8e8; --ink: #1d1d1f; --muted: #5b5b66; --line: #e3e3e8; --bg: #f5f5f7;
+    --ok: #146c2e; --warn: #8a5300; --haiku: #0b6bcb; --sonnet: #b30000; --other: #7a7a85; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  header { background: var(--red); color: #fff; padding: 14px 24px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 20px; }
+  header nav { margin-left: auto; display: flex; gap: 16px; }
+  header a { color: #fff; font-weight: 600; }
+  header a[aria-current="page"] { text-decoration: none; border-bottom: 2px solid #fff; }
+  main { padding: 20px 24px; max-width: 1500px; margin: 0 auto; }
+  .row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .kpis { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  .two { grid-template-columns: 2fr 1fr; }
+  .three { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 1100px) { .two, .three { grid-template-columns: 1fr; } }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  h2 { font-size: 15px; margin: 0 0 10px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  h2 small { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .kpi .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .kpi .l { color: var(--muted); font-size: 13px; }
+  .kpi .s { color: var(--muted); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 6px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  td.num, th.num { text-align: right; }
+  .scroll { overflow-x: auto; }
+  .bar { height: 12px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 4px 0 2px; }
+  .bar > div { height: 100%; background: var(--haiku); transition: width .4s; }
+  .bar.hot > div { background: var(--red); }
+  .meter { margin-bottom: 10px; font-size: 13px; }
+  .meter .top { display: flex; justify-content: space-between; gap: 8px; }
+  .meter .top span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; margin-top: 4px; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #eef2f8; color: #0b4f8a; }
+  .badge.ok { background: #e3f5e8; color: var(--ok); }
+  .badge.err { background: var(--red-soft); color: var(--red); }
+  .badge.warn { background: #fff3d6; color: var(--warn); }
+  .hint { color: var(--muted); font-size: 12px; }
+  svg text { font: 11px system-ui, sans-serif; fill: var(--muted); }
+  .pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22a04b; margin-right: 6px; }
+  .pulse.stale { background: var(--warn); }
+</style>
+</head>
+<body>
+<header>
+  <h1>ATM Sentinel · Consumos y recursos</h1>
+  <span id="clock" aria-live="off"><span class="pulse" id="pulse"></span>conectando…</span>
+  <nav aria-label="Secciones"><a href="./">Operación</a><a href="dashboard" aria-current="page">Consumos</a><a href="static/presentacion.html">Presentación</a></nav>
+</header>
+
+<main>
+  <section class="row kpis" aria-label="Indicadores clave">
+    <div class="card kpi"><div class="l">Coste estimado (sesión)</div><div class="v" id="k-cost">—</div><div class="s" id="k-cost-s"></div></div>
+    <div class="card kpi"><div class="l">Llamadas a Bedrock</div><div class="v" id="k-calls">—</div><div class="s" id="k-calls-s"></div></div>
+    <div class="card kpi"><div class="l">Tokens entrada / salida</div><div class="v" id="k-tokens">—</div><div class="s" id="k-tokens-s"></div></div>
+    <div class="card kpi"><div class="l">Latencia detector (p95)</div><div class="v" id="k-lat">—</div><div class="s" id="k-lat-s"></div></div>
+    <div class="card kpi"><div class="l">Coste por incidencia</div><div class="v" id="k-inc">—</div><div class="s" id="k-inc-s"></div></div>
+    <div class="card kpi"><div class="l">Cámara en directo</div><div class="v" id="k-live">—</div><div class="s" id="k-live-s"></div></div>
+  </section>
+
+  <section class="row two">
+    <div class="card">
+      <h2>Tokens por intervalo de 15 s <small>últimos 15 min · esta aplicación · tiempo real</small></h2>
+      <div id="chart-tokens" role="img" aria-label="Gráfica de tokens consumidos por modelo"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="card">
+      <h2>Latencia media por intervalo <small>ms</small></h2>
+      <div id="chart-lat" role="img" aria-label="Gráfica de latencia media por modelo"></div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="card scroll">
+      <h2>Bedrock por modelo <small>desde el arranque del servidor · precios estimados perfil US</small></h2>
+      <table>
+        <thead><tr><th>Modelo</th><th>Función</th><th class="num">Llamadas</th><th class="num">Errores</th>
+          <th class="num">Tokens entrada</th><th class="num">Tokens salida</th><th class="num">Latencia media</th>
+          <th class="num">p95</th><th class="num">$/1M ent./sal.</th><th class="num">Coste</th></tr></thead>
+        <tbody id="t-models"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="row three">
+    <div class="card">
+      <h2>GPU ComfyUI <small id="comfy-s"></small></h2>
+      <div id="comfy"></div>
+    </div>
+    <div class="card">
+      <h2>Servidor de la app <small>IDE · us-east-2</small></h2>
+      <div id="host"></div>
+    </div>
+    <div class="card">
+      <h2>Almacenamiento S3 <small>us-east-1</small></h2>
+      <div id="storage"></div>
+    </div>
+  </section>
+
+  <section class="row two">
+    <div class="card scroll">
+      <h2>Últimas llamadas a Bedrock <small>en vivo</small></h2>
+      <table>
+        <thead><tr><th>Hora</th><th>Modelo</th><th>Función</th><th class="num">Entrada</th><th class="num">Salida</th>
+          <th class="num">Latencia</th><th class="num">Coste</th><th>Estado</th></tr></thead>
+        <tbody id="t-recent"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Pipeline de incidencias</h2>
+      <div id="pipeline"></div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="card scroll">
+      <h2>CloudWatch · AWS/Bedrock <small id="cw-s">toda la cuenta del equipo · últimos 60 min · 1-2 min de retraso</small></h2>
+      <table>
+        <thead><tr><th>Modelo</th><th>Invocaciones / min (60 min)</th><th class="num">Invocaciones</th><th class="num">Tokens entrada</th>
+          <th class="num">Tokens salida</th><th class="num">Latencia media</th><th class="num">Throttles</th><th class="num">Errores</th><th class="num">Coste est.</th></tr></thead>
+        <tbody id="t-cw"></tbody>
+      </table>
+      <p class="hint">Coste estimado con precios públicos por millón de tokens (perfil geográfico US, +10 % sobre global). La factura real de los modelos de Anthropic aparece en Cost Explorer como producto de AWS Marketplace.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const COLORS = { haiku: "var(--haiku)", sonnet: "var(--sonnet)" };
+const colorOf = (m) => m.includes("haiku") ? COLORS.haiku : m.includes("sonnet") ? COLORS.sonnet : "var(--other)";
+const nf = new Intl.NumberFormat("es-ES");
+const fmtN = (n) => n == null ? "—" : nf.format(Math.round(n));
+const fmtK = (n) => n == null ? "—" : n >= 1e6 ? (n / 1e6).toFixed(2) + " M" : n >= 1e3 ? (n / 1e3).toFixed(1) + " k" : String(Math.round(n));
+const fmtUSD = (n, d = 4) => n == null ? "—" : "$" + n.toFixed(n >= 1 ? 2 : d);
+const fmtB = (b) => b == null ? "—" : b >= 1e9 ? (b / 1e9).toFixed(1) + " GB" : b >= 1e6 ? (b / 1e6).toFixed(1) + " MB" : (b / 1e3).toFixed(0) + " KB";
+const fmtMs = (ms) => ms == null ? "—" : ms >= 1000 ? (ms / 1000).toFixed(1) + " s" : Math.round(ms) + " ms";
+const mmss = (s) => s == null ? "—" : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const hhmmss = (t) => new Date(t * 1000).toLocaleTimeString("es-ES");
+const set = (id, v) => { document.getElementById(id).textContent = v; };
+
+function el(tag, attrs = {}, ...children) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) if (v != null) k === "class" ? n.className = v : n.setAttribute(k, v);
+  for (const c of children.flat()) if (c != null) n.append(c instanceof Node ? c : String(c));
+  return n;
+}
+const SVG = "http://www.w3.org/2000/svg";
+function svg(tag, attrs = {}, ...children) {
+  const n = document.createElementNS(SVG, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  children.flat().forEach((c) => c && n.append(c));
+  return n;
+}
+
+function meter(label, used, total, fmt = fmtB, hotAt = 0.85) {
+  const pct = total ? Math.min(100, (used / total) * 100) : 0;
+  return el("div", { class: "meter" },
+    el("div", { class: "top" }, el("span", {}, label), el("span", {}, `${fmt(used)} / ${fmt(total)} · ${pct.toFixed(0)} %`)),
+    el("div", { class: `bar ${pct / 100 >= hotAt ? "hot" : ""}`, role: "progressbar", "aria-label": label,
+      "aria-valuenow": pct.toFixed(0), "aria-valuemin": 0, "aria-valuemax": 100 }, el("div", { style: `width:${pct}%` })));
+}
+const unavailable = (r) => el("p", { class: "hint" }, "No disponible: " + (r && r.error || "sin datos"));
+
+// --------------------------------------------------------------- gráficas
+function stackedBars(container, series, models, bucketS) {
+  const W = 760, H = 210, P = { l: 48, r: 8, t: 8, b: 22 };
+  const totals = series.map((b) => models.reduce((s, m) => s + (b.models[m]?.tokens || 0), 0));
+  const max = Math.max(1000, ...totals);
+  const bw = (W - P.l - P.r) / series.length;
+  const y = (v) => H - P.b - (v / max) * (H - P.t - P.b);
+  const g = svg("g");
+  [0, 0.5, 1].forEach((f) => {
+    g.append(svg("line", { x1: P.l, x2: W - P.r, y1: y(max * f), y2: y(max * f), stroke: "#e3e3e8" }));
+    g.append(svg("text", { x: P.l - 6, y: y(max * f) + 4, "text-anchor": "end" }, document.createTextNode(fmtK(max * f))));
+  });
+  series.forEach((b, i) => {
+    let acc = 0;
+    models.forEach((m) => {
+      const v = b.models[m]?.tokens || 0;
+      if (!v) return;
+      const r = svg("rect", { x: P.l + i * bw + 1, width: Math.max(1, bw - 2), y: y(acc + v), height: y(acc) - y(acc + v), fill: colorOf(m) });
+      r.append(svg("title", {}, document.createTextNode(`${hhmmss(b.t)} · ${fmtN(v)} tokens · ${b.models[m].calls} llamadas`)));
+      g.append(r);
+      acc += v;
+    });
+    if (i % 10 === 0) g.append(svg("text", { x: P.l + i * bw, y: H - 6 }, document.createTextNode(hhmmss(b.t).slice(0, 5))));
+  });
+  container.replaceChildren(svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" }, g));
+}
+
+function lines(container, series, models) {
+  const W = 380, H = 210, P = { l: 44, r: 8, t: 8, b: 22 };
+  const vals = series.flatMap((b) => models.map((m) => b.models[m]?.latency_avg_ms || 0));
+  const max = Math.max(1000, ...vals);
+  const x = (i) => P.l + (i / (series.length - 1)) * (W - P.l - P.r);
+  const y = (v) => H - P.b - (v / max) * (H - P.t - P.b);
+  const g = svg("g");
+  [0, 0.5, 1].forEach((f) => {
+    g.append(svg("line", { x1: P.l, x2: W - P.r, y1: y(max * f), y2: y(max * f), stroke: "#e3e3e8" }));
+    g.append(svg("text", { x: P.l - 6, y: y(max * f) + 4, "text-anchor": "end" }, document.createTextNode(fmtMs(max * f))));
+  });
+  models.forEach((m) => {
+    const pts = series.map((b, i) => b.models[m] ? [x(i), y(b.models[m].latency_avg_ms)] : null).filter(Boolean);
+    if (pts.length > 1) g.append(svg("polyline", { points: pts.map((p) => p.join(",")).join(" "), fill: "none", stroke: colorOf(m), "stroke-width": 2 }));
+    pts.forEach(([px, py]) => g.append(svg("circle", { cx: px, cy: py, r: 2.5, fill: colorOf(m) })));
+  });
+  container.replaceChildren(svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" }, g));
+}
+
+function spark(values, color) {
+  const W = 180, H = 28, max = Math.max(1, ...values);
+  const bw = W / values.length;
+  return svg("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img", "aria-label": "Invocaciones por minuto" },
+    values.map((v, i) => v ? svg("rect", { x: i * bw, width: Math.max(1, bw - 0.5), y: H - (v / max) * H, height: (v / max) * H, fill: color }) : null));
+}
+
+// --------------------------------------------------------------- render
+function render(d) {
+  const a = d.app, t = a.totals, live = d.live;
+  const haiku = a.models.find((m) => m.model.includes("haiku"));
+  const sonnet = a.models.find((m) => m.model.includes("sonnet"));
+
+  set("k-cost", fmtUSD(t.cost)); set("k-cost-s", `${fmtUSD(t.cost_last_min)} en el último minuto`);
+  set("k-calls", fmtN(t.calls)); set("k-calls-s", `${t.calls_last_min} en el último min · ${t.errors} errores`);
+  set("k-tokens", `${fmtK(t.in)} / ${fmtK(t.out)}`); set("k-tokens-s", `${fmtK(t.tokens_last_min)} tokens en el último min`);
+  set("k-lat", fmtMs(haiku?.latency_p95_ms)); set("k-lat-s", haiku ? `media ${fmtMs(haiku.latency_avg_ms)} · ${haiku.calls} muestras` : "sin muestras");
+  set("k-inc", sonnet ? fmtUSD(sonnet.cost / Math.max(1, sonnet.calls)) : "—");
+  set("k-inc-s", sonnet ? `informe Sonnet · ${sonnet.calls} informes · ${fmtMs(sonnet.latency_avg_ms)} de media` : "sin informes todavía");
+  set("k-live", live.ended ? "Finalizada" : live.alert === "ACTIVE" ? "¡Alerta!" : live.alert === "CLEARED" ? "Normal" :
+    { IDLE: "Parada", LIVE: "Monitorizando", STARTING: "Monitorizando", ERROR: "Error" }[live.state] || "Monitorizando");
+  set("k-live-s", live.duration_s ? `${mmss(live.position_s)} / ${mmss(live.duration_s)} · ${live.samples} muestras · ${live.positives} positivas` : "sin transmisión");
+
+  const models = [...new Set(a.series.flatMap((b) => Object.keys(b.models)).concat(a.models.map((m) => m.model)))];
+  stackedBars(document.getElementById("chart-tokens"), a.series, models, a.bucket_s);
+  lines(document.getElementById("chart-lat"), a.series, models);
+  document.getElementById("legend").replaceChildren(...models.map((m) => {
+    const info = a.models.find((x) => x.model === m);
+    return el("span", {}, el("span", { class: "dot", style: `background:${colorOf(m)}` }), info ? `${info.name} · ${info.role}` : m);
+  }));
+
+  document.getElementById("t-models").replaceChildren(...(a.models.length ? a.models.map((m) => el("tr", {},
+    el("td", {}, el("span", { class: "dot", style: `background:${colorOf(m.model)}` }), m.name), el("td", {}, m.role),
+    el("td", { class: "num" }, fmtN(m.calls)), el("td", { class: "num" }, fmtN(m.errors)),
+    el("td", { class: "num" }, fmtN(m.in)), el("td", { class: "num" }, fmtN(m.out)),
+    el("td", { class: "num" }, fmtMs(m.latency_avg_ms)), el("td", { class: "num" }, fmtMs(m.latency_p95_ms)),
+    el("td", { class: "num" }, m.price_in != null ? `$${m.price_in} / $${m.price_out}` : "—"),
+    el("td", { class: "num" }, fmtUSD(m.cost)))) : [el("tr", {}, el("td", { colspan: 10, class: "hint" }, "Sin llamadas todavía. Inicia la transmisión en directo o sube un vídeo."))]));
+
+  document.getElementById("t-recent").replaceChildren(...(a.recent.length ? a.recent.slice(0, 14).map((c) => el("tr", {},
+    el("td", {}, hhmmss(c.ts)), el("td", {}, el("span", { class: "dot", style: `background:${colorOf(c.model)}` }), c.name),
+    el("td", {}, c.role), el("td", { class: "num" }, fmtN(c.in)), el("td", { class: "num" }, fmtN(c.out)),
+    el("td", { class: "num" }, fmtMs(c.latency_ms)), el("td", { class: "num" }, fmtUSD(c.cost, 5)),
+    el("td", {}, el("span", { class: `badge ${c.ok ? "ok" : "err"}` }, c.ok ? "OK" : c.error || "error")))) :
+    [el("tr", {}, el("td", { colspan: 8, class: "hint" }, "Sin llamadas todavía."))]));
+
+  // GPU ComfyUI
+  const c = d.comfy;
+  if (c && c.ok) {
+    const cd = c.data, dev = cd.devices[0] || {};
+    set("comfy-s", `${(dev.name || "").replace(/^cuda:\d\s*/, "").replace(/ : .*/, "")} · ComfyUI ${cd.version} · ping ${cd.ping_ms} ms`);
+    document.getElementById("comfy").replaceChildren(
+      meter("VRAM GPU", dev.vram_total - dev.vram_free, dev.vram_total),
+      meter("RAM estación", cd.ram_total - cd.ram_free, cd.ram_total),
+      el("div", {}, "Cola: ", el("span", { class: `badge ${cd.queue_running ? "warn" : "ok"}` }, cd.queue_running ? "trabajando" : "libre"),
+        ` · ${cd.queue_running} en ejecución · ${cd.queue_pending} pendientes`),
+      el("p", { class: "hint" }, "GPU compartida por el equipo: los trabajos se encolan."));
+  } else { set("comfy-s", ""); document.getElementById("comfy").replaceChildren(unavailable(c)); }
+
+  // Servidor
+  const h = d.host;
+  if (h && h.ok) {
+    const hd = h.data;
+    document.getElementById("host").replaceChildren(
+      meter(`CPU (${hd.cores} núcleos)`, hd.cpu_pct ?? 0, 100, (v) => v.toFixed(0) + " %"),
+      meter("Memoria", hd.mem_used, hd.mem_total),
+      meter("Disco /tmp", hd.tmp_used, hd.tmp_total),
+      el("div", { class: "hint" }, `Proceso del servidor: ${fmtB(hd.proc_rss)} · ${hd.proc_threads} hilos · carga ${hd.load.map((x) => x.toFixed(2)).join(" / ")}`));
+  } else document.getElementById("host").replaceChildren(unavailable(h));
+
+  // S3
+  const s = d.storage;
+  document.getElementById("storage").replaceChildren(...(s && s.ok ? [
+    el("table", {}, el("thead", {}, el("tr", {}, el("th", {}, "Prefijo"), el("th", { class: "num" }, "Objetos"), el("th", { class: "num" }, "Vídeos"),
+      el("th", { class: "num" }, "Capturas"), el("th", { class: "num" }, "Tamaño"))),
+      el("tbody", {}, Object.entries(s.data).map(([p, v]) => el("tr", {}, el("td", {}, p), el("td", { class: "num" }, fmtN(v.objects)),
+        el("td", { class: "num" }, fmtN(v.videos)), el("td", { class: "num" }, fmtN(v.frames)), el("td", { class: "num" }, fmtB(v.bytes)))))),
+    el("h2", { style: "margin-top:12px" }, "Operaciones S3 de la app", el("small", {}, `${a.s3_errors} errores`)),
+    el("div", { class: "hint" }, Object.entries(a.s3_ops).sort((x, y) => y[1] - x[1]).map(([k, v]) => `${k}: ${fmtN(v)}`).join(" · ") || "ninguna"),
+  ] : [unavailable(s)]));
+
+  // Pipeline
+  const p = d.pipeline;
+  const LBL = { COMPLETADO: "Completadas", FALLIDO: "Fallidas", ANALIZANDO: "Analizando", EXTRAYENDO_FOTOGRAMAS: "Extrayendo", RECIBIDO: "Recibidas", EN_COLA: "En cola" };
+  document.getElementById("pipeline").replaceChildren(...(p && p.ok ? [
+    el("div", { class: "kpi" }, el("div", { class: "v" }, fmtN(p.data.total)), el("div", { class: "l" }, "incidencias registradas")),
+    el("p", {}, Object.entries(p.data.by_status).map(([k, v]) => `${LBL[k] || k}: ${v}`).join(" · ")),
+    el("p", {}, "Por riesgo: ", Object.entries(p.data.by_risk).map(([k, v]) => `${k} ${v}`).join(" · ") || "—"),
+    el("p", {}, "Tiempo medio vídeo recibido → informe: ", el("strong", {}, p.data.avg_processing_s != null ? `${p.data.avg_processing_s} s` : "—")),
+    p.data.last ? el("p", { class: "hint" }, `Última: ${p.data.last.id} · ${p.data.last.risk_level || p.data.last.status}`) : null,
+  ] : [unavailable(p)]));
+
+  // CloudWatch
+  const cw = d.cloudwatch;
+  document.getElementById("t-cw").replaceChildren(...(cw && cw.ok ? cw.data.models.map((m) => el("tr", {},
+    el("td", {}, el("span", { class: "dot", style: `background:${colorOf(m.model)}` }), m.name),
+    el("td", {}, spark(m.per_min, colorOf(m.model))),
+    el("td", { class: "num" }, fmtN(m.Invocations)), el("td", { class: "num" }, fmtN(m.InputTokenCount)),
+    el("td", { class: "num" }, fmtN(m.OutputTokenCount)), el("td", { class: "num" }, fmtMs(m.latency_avg_ms)),
+    el("td", { class: "num" }, fmtN(m.InvocationThrottles)), el("td", { class: "num" }, fmtN((m.InvocationClientErrors || 0) + (m.InvocationServerErrors || 0))),
+    el("td", { class: "num" }, fmtUSD(m.cost)))) : [el("tr", {}, el("td", { colspan: 9 }, unavailable(cw)))]));
+  if (cw && cw.ok) set("cw-s", `toda la cuenta del equipo · últimos 60 min · 1-2 min de retraso · actualizado ${hhmmss(cw.fetched_at)}`);
+}
+
+let lastOk = 0;
+async function poll() {
+  try {
+    const r = await fetch("api/metrics", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.statusText);
+    render(await r.json());
+    lastOk = Date.now();
+  } catch (e) { console.warn(e); }
+  setTimeout(poll, 2000);
+}
+setInterval(() => {
+  const stale = Date.now() - lastOk > 6000;
+  document.getElementById("pulse").className = "pulse" + (stale ? " stale" : "");
+  document.getElementById("clock").lastChild.textContent = lastOk
+    ? `${stale ? "sin conexión · " : "en vivo · "}${new Date().toLocaleTimeString("es-ES")}` : "conectando…";
+}, 1000);
+poll();
+</script>
+</body>
+</html>

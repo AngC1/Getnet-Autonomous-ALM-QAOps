@@ -1,0 +1,20 @@
+.env
+.env.*
+*.pem
+node_modules/
+.venv/
+__pycache__/
+cdk.out/
+.DS_Store
+*.mp4
+*.mov
+
+# brand_verifier: salidas locales
+.pytest_cache/
+.hypothesis/
+*.pyc
+brand/generated/
+brand/verdicts/
+brand/reports/
+brand/metrics/
+brand/audio/

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Hook versionable: bloquea commits con posibles secretos (Req. 10.6).
+root="$(git rev-parse --show-toplevel)"
+exec python3 "$root/scripts/check_secrets.py"

@@ -1,8 +1,8 @@
 """
-Servidor MCP (Model Context Protocol) de Selenium para QAOps — Ayesa Digital.
-Permite a Agentes de IA (Antigravity, Claude Desktop, Cursor) controlar Selenium WebDriver,
-inspeccionar el DOM con auto-curación (Self-Healing Locators), ejecutar flujos de negocio de
-SegurCaixa Adeslas (/servicios-para-clientes) y reportar ejecuciones al Hub ALM (Jira/Xray, TestLink, Redmine).
+Servidor MCP (Model Context Protocol) de Selenium para QAOps & Autonomous ALM — Getnet (Grupo Santander).
+Permite a Agentes de IA controlar Selenium WebDriver, inspeccionar el DOM con auto-curación (Self-Healing Locators),
+ejecutar flujos funcionales y de bloqueo de tarjetas ATM de Getnet (/servicios-para-clientes) y reportar
+ejecuciones al Hub ALM en Jira Xray, TestLink y Redmine.
 
 Modos de uso:
   1. Modo Estándar MCP (JSON-RPC 2.0 sobre stdio):
@@ -35,7 +35,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class SeleniumMcpController:
-    """Controlador de sesión Selenium WebDriver gestionado por el Servidor MCP."""
+    """Controlador de sesión Selenium WebDriver gestionado por el Servidor MCP de Getnet."""
 
     def __init__(self, base_url: str = "http://127.0.0.1:8080") -> None:
         self.base_url = base_url.rstrip("/")
@@ -88,7 +88,7 @@ class SeleniumMcpController:
         drv = self.ensure_driver()
         elements = drv.find_elements(By.CSS_SELECTOR, "button, input, select, a, [data-testid]")
         catalog: List[Dict[str, str]] = []
-        for el in elements[:40]:
+        for el in elements[:48]:
             el_id = el.get_attribute("id") or ""
             testid = el.get_attribute("data-testid") or ""
             tag = el.tag_name
@@ -114,7 +114,7 @@ class SeleniumMcpController:
         }
 
     def execute_adeslas_flow(self, flow_name: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Ejecuta un flujo E2E de SegurCaixa Adeslas y devuelve evidencias."""
+        """Ejecuta un flujo E2E del Portal Getnet y devuelve evidencias."""
         params = params or {}
         drv = self.ensure_driver()
         drv.get(f"{self.base_url}/servicios-para-clientes")
@@ -153,6 +153,19 @@ class SeleniumMcpController:
             return {
                 "flow": flow_name,
                 "status": "PASSED" if "AUTORIZADA" in alert_text else "FAILED",
+                "alertText": alert_text,
+                "durationMs": elapsed,
+            }
+
+        if flow_name == "bloqueo_atm":
+            drv.find_element(By.ID, "btn-tab-bloqueo-atm").click()
+            drv.find_element(By.ID, "btn-ejecutar-bloqueo-atm").click()
+            time.sleep(0.25)
+            alert_text = drv.find_element(By.ID, "atm-bloqueo-alert").text
+            elapsed = int((time.perf_counter() - start_t) * 1000)
+            return {
+                "flow": flow_name,
+                "status": "PASSED" if "REV-EMV-2026-" in alert_text else "FAILED",
                 "alertText": alert_text,
                 "durationMs": elapsed,
             }
@@ -201,7 +214,7 @@ class SeleniumMcpController:
 MCP_TOOLS_SCHEMA = [
     {
         "name": "selenium_start_session",
-        "description": "Inicia una sesión de Selenium WebDriver apuntando al portal /servicios-para-clientes de SegurCaixa Adeslas.",
+        "description": "Inicia una sesión de Selenium WebDriver apuntando al portal Getnet (/servicios-para-clientes).",
         "inputSchema": {
             "type": "object",
             "properties": {"headless": {"type": "boolean", "default": True}},
@@ -209,7 +222,7 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "selenium_navigate",
-        "description": "Navega a una URL o ruta del portal SegurCaixa Adeslas o del Hub ALM.",
+        "description": "Navega a una URL o ruta del portal Getnet o del Cuadro de Mando Jira Xray.",
         "inputSchema": {
             "type": "object",
             "properties": {"path_or_url": {"type": "string"}},
@@ -218,16 +231,16 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "selenium_inspect_dom_locators",
-        "description": "Extrae elementos interactivos del DOM y propone selectores CSS primarios y de respaldo (Self-Healing) para automatización con IA.",
+        "description": "Extrae elementos interactivos del DOM y propone selectores CSS primarios y de respaldo (Self-Healing).",
         "inputSchema": {"type": "object", "properties": {}},
     },
     {
         "name": "selenium_execute_adeslas_flow",
-        "description": "Ejecuta un flujo funcional E2E de SegurCaixa Adeslas (cuadro_medico, autorizacion, reembolso).",
+        "description": "Ejecuta un flujo funcional E2E de Getnet (cuadro_medico, autorizacion, reembolso, bloqueo_atm).",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "flow_name": {"type": "string", "enum": ["cuadro_medico", "autorizacion", "reembolso"]},
+                "flow_name": {"type": "string", "enum": ["cuadro_medico", "autorizacion", "reembolso", "bloqueo_atm"]},
                 "params": {"type": "object"},
             },
             "required": ["flow_name"],
@@ -243,7 +256,7 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "alm_sync_test_result",
-        "description": "Actualiza el resultado de un Test Case (ej. SCA-TC-002) en el Hub ALM (Jira Xray / TestLink / Redmine).",
+        "description": "Actualiza el resultado de un Test Case (ej. GTN-TC-002) en el Hub ALM (Jira Xray / TestLink / Redmine).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -273,7 +286,7 @@ def handle_mcp_request(controller: SeleniumMcpController, req: Dict[str, Any]) -
             "id": req_id,
             "result": {
                 "protocolVersion": "2024-11-05",
-                "serverInfo": {"name": "ayesa-selenium-qaops-mcp", "version": "1.0.0"},
+                "serverInfo": {"name": "getnet-selenium-qaops-mcp", "version": "1.0.0"},
                 "capabilities": {"tools": {}, "resources": {}, "prompts": {}},
             },
         }
@@ -341,7 +354,7 @@ def run_stdio_server(base_url: str) -> None:
 
 
 def run_selftest(base_url: str) -> int:
-    print("=== [Ayesa Digital QAOps] Self-Test del Servidor MCP de Selenium ===")
+    print("=== [Getnet QAOps] Self-Test del Servidor MCP de Selenium ===")
     controller = SeleniumMcpController(base_url=base_url)
     try:
         info = controller.start_session(headless=True)
@@ -351,24 +364,27 @@ def run_selftest(base_url: str) -> int:
         print(f"2. Inspección DOM Self-Healing: {dom_info['interactiveElementsCount']} selectores extraídos.")
 
         flow_cm = controller.execute_adeslas_flow("cuadro_medico", {"provincia": "Madrid", "especialidad": "Cardiología"})
-        print(f"3. Flujo MCP Cuadro Médico: {flow_cm['status']} ({flow_cm['centrosEncontrados']} centros, {flow_cm['durationMs']} ms)")
+        print(f"3. Flujo MCP Red ATM Getnet: {flow_cm['status']} ({flow_cm['centrosEncontrados']} nodos, {flow_cm['durationMs']} ms)")
 
         flow_aut = controller.execute_adeslas_flow("autorizacion")
-        print(f"4. Flujo MCP Autorizaciones: {flow_aut['status']} ({flow_aut['durationMs']} ms)")
+        print(f"4. Flujo MCP Autorizaciones ISO-8583: {flow_aut['status']} ({flow_aut['durationMs']} ms)")
+
+        flow_blk = controller.execute_adeslas_flow("bloqueo_atm")
+        print(f"5. Flujo MCP Bloqueo Tarjeta ATM (AWS_Kiro): {flow_blk['status']} ({flow_blk['durationMs']} ms)")
 
         shot = controller.take_screenshot("mcp_selftest_servicios_clientes.png")
-        print(f"5. Evidencia PNG generada: {shot['path']}")
+        print(f"6. Evidencia PNG generada: {shot['path']}")
 
-        sync = controller.sync_alm_result("SCA-TC-002", "PASSED", flow_cm["durationMs"])
-        print(f"6. Sincronización ALM Jira/Xray/TestLink: {sync}")
+        sync = controller.sync_alm_result("GTN-TC-002", "PASSED", flow_cm["durationMs"])
+        print(f"7. Sincronización ALM Jira Xray / TestLink: {sync}")
         return 0
     finally:
         controller.close_session()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Servidor MCP de Selenium - Ayesa Digital QAOps")
-    parser.add_argument("--base-url", default=os.environ.get("ADESLAS_BASE_URL", "http://127.0.0.1:8080"))
+    parser = argparse.ArgumentParser(description="Servidor MCP de Selenium - Getnet QAOps")
+    parser.add_argument("--base-url", default=os.environ.get("GETNET_BASE_URL", "http://127.0.0.1:8080"))
     parser.add_argument("--selftest", action="store_true", help="Ejecuta prueba de autodiagnóstico MCP contra el portal")
     args = parser.parse_args()
 

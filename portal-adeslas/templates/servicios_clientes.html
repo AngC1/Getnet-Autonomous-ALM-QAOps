@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Servicios para Clientes | SegurCaixa Adeslas (Simulador QAOps Ayesa Digital)</title>
+  <title>Getnet (Grupo Santander) | Portal de Servicios para Clientes, Comercios, Tarjetas &amp; Red ATM (ALM Zero-Touch)</title>
   <style>
     :root {
-      --adeslas-blue: #0072ce;
-      --adeslas-dark: #003b71;
-      --adeslas-light: #e8f3fc;
-      --adeslas-green: #00965e;
-      --ayesa-accent: #ec008c;
+      --getnet-red: #ec0000;
+      --getnet-dark: #111827;
+      --getnet-navy: #0f172a;
+      --getnet-light: #fef2f2;
+      --getnet-blue: #0052cc;
+      --getnet-green: #059669;
       --text-main: #1e293b;
-      --text-muted: #526071;
-      --border: #d8e2ee;
-      --bg: #f5f8fc;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -23,40 +24,44 @@
       color: var(--text-main);
       line-height: 1.5;
     }
-    /* Barra Superior QAOps Ayesa Digital */
+    /* Barra Superior QAOps & Autonomous ALM (Ayesa Digital · Getnet) */
     .qaops-banner {
-      background: linear-gradient(90deg, #0b192c 0%, #003b71 100%);
+      background: linear-gradient(90deg, #090d16 0%, #7f1d1d 100%);
       color: #fff;
       font-size: 0.82rem;
-      padding: 8px 24px;
+      padding: 9px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid var(--adeslas-blue);
+      border-bottom: 2px solid var(--getnet-red);
+      flex-wrap: wrap;
+      gap: 10px;
     }
     .qaops-banner a {
-      color: #7dd3fc;
+      color: #fecaca;
       text-decoration: none;
-      font-weight: 600;
-      margin-left: 14px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.1);
+      font-weight: 700;
+      margin-left: 10px;
+      padding: 5px 11px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255,255,255,0.2);
     }
-    .qaops-banner a:hover { background: rgba(255, 255, 255, 0.22); }
+    .qaops-banner a:hover { background: rgba(255, 255, 255, 0.25); color: #fff; }
 
-    /* Cabecera Corporativa SegurCaixa Adeslas */
+    /* Cabecera Corporativa Getnet (PagoNxt / Santander) */
     header.site-header {
       background: #ffffff;
-      box-shadow: 0 2px 10px rgba(0, 59, 113, 0.08);
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
       position: sticky;
       top: 0;
       z-index: 50;
+      border-bottom: 3px solid var(--getnet-red);
     }
     .header-inner {
-      max-width: 1240px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 16px 24px;
+      padding: 15px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -69,43 +74,46 @@
       gap: 12px;
     }
     .brand-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 8px;
-      background: var(--adeslas-blue);
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ec0000 0%, #991b1b 100%);
       color: #fff;
-      font-weight: 800;
-      font-size: 1.3rem;
+      font-weight: 900;
+      font-size: 1.25rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 4px 10px rgba(236, 0, 0, 0.25);
     }
     .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--adeslas-dark);
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--getnet-dark);
       letter-spacing: -0.3px;
     }
     .brand-subtitle {
       font-size: 0.78rem;
-      color: var(--adeslas-blue);
-      font-weight: 600;
+      color: var(--getnet-red);
+      font-weight: 700;
     }
     .header-actions {
       display: flex;
       gap: 10px;
       align-items: center;
+      flex-wrap: wrap;
     }
     .phone-pill {
-      background: var(--adeslas-light);
-      color: var(--adeslas-dark);
+      background: var(--getnet-light);
+      color: #991b1b;
       padding: 8px 14px;
       border-radius: 999px;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       font-weight: 700;
+      border: 1px solid #fecaca;
     }
     .btn-primary {
-      background: var(--adeslas-blue);
+      background: var(--getnet-red);
       color: #fff;
       border: none;
       padding: 10px 18px;
@@ -113,32 +121,32 @@
       font-weight: 700;
       cursor: pointer;
       transition: background 0.15s;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
-    .btn-primary:hover { background: var(--adeslas-dark); }
+    .btn-primary:hover { background: #b91c1c; }
     .btn-outline {
       background: #fff;
-      color: var(--adeslas-blue);
-      border: 1.5px solid var(--adeslas-blue);
-      padding: 9px 16px;
+      color: var(--getnet-red);
+      border: 1.5px solid var(--getnet-red);
+      padding: 9px 15px;
       border-radius: 6px;
       font-weight: 700;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
-    .btn-outline:hover { background: var(--adeslas-light); }
+    .btn-outline:hover { background: var(--getnet-light); }
 
-    /* Hero Banner /servicios-para-clientes */
+    /* Hero Principal Getnet */
     .hero {
-      background: linear-gradient(125deg, var(--adeslas-dark) 0%, var(--adeslas-blue) 100%);
+      background: linear-gradient(125deg, #0f172a 0%, #7f1d1d 60%, #dc2626 100%);
       color: #fff;
-      padding: 40px 24px;
+      padding: 36px 24px;
     }
     .hero-inner {
-      max-width: 1240px;
+      max-width: 1280px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 1.8fr 1.2fr;
       gap: 28px;
       align-items: center;
     }
@@ -148,17 +156,17 @@
       margin-bottom: 8px;
     }
     .hero h1 {
-      font-size: 2.1rem;
+      font-size: 2.0rem;
       margin-bottom: 12px;
-      line-height: 1.2;
+      line-height: 1.22;
     }
     .hero p {
-      font-size: 1.02rem;
+      font-size: 0.98rem;
       opacity: 0.94;
-      max-width: 680px;
+      max-width: 720px;
     }
     .hero-kpis {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 12px;
       padding: 18px;
@@ -167,38 +175,39 @@
       gap: 12px;
     }
     .kpi-box {
-      background: rgba(0, 29, 61, 0.35);
+      background: rgba(15, 23, 42, 0.55);
       padding: 10px 12px;
       border-radius: 8px;
     }
     .kpi-box strong {
       display: block;
-      font-size: 1.35rem;
-      color: #7dd3fc;
+      font-size: 1.3rem;
+      color: #fca5a5;
     }
-    .kpi-box span { font-size: 0.78rem; }
+    .kpi-box span { font-size: 0.77rem; }
 
     /* Contenedor Principal */
     .main-container {
-      max-width: 1240px;
+      max-width: 1280px;
       margin: 26px auto 60px;
       padding: 0 24px;
     }
 
-    /* Tarjetas del Catálogo de Servicios para Clientes */
+    /* Tarjetas del Catálogo de Servicios Getnet */
     .section-heading {
-      font-size: 1.35rem;
-      color: var(--adeslas-dark);
+      font-size: 1.32rem;
+      color: var(--getnet-dark);
       margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
     .services-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 16px;
-      margin-bottom: 32px;
+      margin-bottom: 30px;
     }
     .service-card {
       background: #fff;
@@ -213,8 +222,8 @@
     }
     .service-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 59, 113, 0.1);
-      border-color: var(--adeslas-blue);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+      border-color: var(--getnet-red);
     }
     .service-card-header {
       display: flex;
@@ -224,7 +233,7 @@
     }
     .service-icon {
       font-size: 1.7rem;
-      background: var(--adeslas-light);
+      background: var(--getnet-light);
       width: 46px;
       height: 46px;
       border-radius: 10px;
@@ -233,11 +242,11 @@
       justify-content: center;
     }
     .service-card h3 {
-      font-size: 1.08rem;
-      color: var(--adeslas-dark);
+      font-size: 1.05rem;
+      color: var(--getnet-dark);
     }
     .service-card p {
-      font-size: 0.9rem;
+      font-size: 0.89rem;
       color: var(--text-muted);
       margin-bottom: 14px;
     }
@@ -245,12 +254,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.84rem;
-      color: var(--adeslas-blue);
+      font-size: 0.83rem;
+      color: var(--getnet-red);
       font-weight: 700;
     }
 
-    /* Pestañas Interactivas de Gestión Online */
+    /* Pestañas Interactivas */
     .tabs-bar {
       display: flex;
       flex-wrap: wrap;
@@ -259,17 +268,17 @@
       margin-bottom: 22px;
     }
     .tab-btn {
-      background: #e9eff6;
-      color: var(--adeslas-dark);
+      background: #e2e8f0;
+      color: var(--getnet-dark);
       border: none;
-      padding: 12px 20px;
+      padding: 11px 16px;
       border-radius: 8px 8px 0 0;
       font-weight: 700;
       cursor: pointer;
-      font-size: 0.93rem;
+      font-size: 0.88rem;
     }
     .tab-btn.active {
-      background: var(--adeslas-blue);
+      background: var(--getnet-red);
       color: #fff;
     }
     .tab-panel {
@@ -278,11 +287,11 @@
       border: 1px solid var(--border);
       border-radius: 0 10px 10px 10px;
       padding: 26px;
-      box-shadow: 0 4px 14px rgba(0, 59, 113, 0.05);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
     }
     .tab-panel.active { display: block; }
 
-    /* Formularios y Controles */
+    /* Formularios */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -295,9 +304,9 @@
       gap: 6px;
     }
     .form-group label {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
-      color: var(--adeslas-dark);
+      color: var(--getnet-dark);
     }
     .form-group input,
     .form-group select,
@@ -305,18 +314,11 @@
       padding: 10px 12px;
       border: 1.5px solid #cbd5e1;
       border-radius: 6px;
-      font-size: 0.93rem;
+      font-size: 0.92rem;
       color: var(--text-main);
     }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--adeslas-blue);
-      box-shadow: 0 0 0 3px rgba(0, 114, 206, 0.15);
-    }
 
-    /* Resultados Cuadro Médico */
+    /* Resultados Red ATM / Centros */
     .results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
@@ -325,35 +327,35 @@
     }
     .center-card {
       border: 1px solid var(--border);
-      border-left: 4px solid var(--adeslas-blue);
+      border-left: 4px solid var(--getnet-red);
       border-radius: 8px;
       padding: 16px;
-      background: #fafcff;
+      background: #fff;
     }
     .center-card h4 {
-      color: var(--adeslas-dark);
+      color: var(--getnet-dark);
       margin-bottom: 4px;
-      font-size: 1rem;
+      font-size: 0.98rem;
     }
     .badge {
       display: inline-block;
       padding: 3px 8px;
       border-radius: 99px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 700;
       margin-right: 6px;
       margin-top: 6px;
     }
-    .badge-blue { background: var(--adeslas-light); color: var(--adeslas-dark); }
+    .badge-blue { background: #eff6ff; color: #1d4ed8; }
     .badge-green { background: #dcfce7; color: #166534; }
     .badge-red { background: #fee2e2; color: #991b1b; }
 
-    /* Alertas de Respuesta */
+    /* Alertas */
     .alert-box {
       margin-top: 18px;
       padding: 16px 18px;
       border-radius: 8px;
-      font-size: 0.94rem;
+      font-size: 0.93rem;
       display: none;
     }
     .alert-box.show { display: block; }
@@ -373,80 +375,83 @@
       color: #92400e;
     }
 
-    /* Tarjeta Digital Simulada */
+    /* Tarjeta Digital Getnet */
     .digital-card {
-      background: linear-gradient(135deg, #003b71 0%, #0072ce 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #991b1b 60%, #ec0000 100%);
       color: #fff;
       border-radius: 14px;
       padding: 22px;
-      max-width: 440px;
+      max-width: 450px;
       margin-top: 16px;
-      box-shadow: 0 10px 24px rgba(0, 59, 113, 0.25);
+      box-shadow: 0 10px 24px rgba(153, 27, 27, 0.3);
     }
     .digital-card-num {
       font-family: 'Consolas', monospace;
       font-size: 1.25rem;
       letter-spacing: 2px;
       margin: 14px 0;
-      color: #7dd3fc;
+      color: #fecaca;
     }
   </style>
 </head>
 <body>
 
-  <!-- Barra de Control QAOps Ayesa Digital -->
+  <!-- Barra de Control QAOps & Autonomous ALM (Getnet CIO Demo) -->
   <div class="qaops-banner" data-testid="qaops-banner">
     <div>
-      <strong>AYESA DIGITAL QAOps Suite</strong> · Simulación activa de <code>segurcaixaadeslas.es/servicios-para-clientes</code>
+      <strong>GETNET (GRUPO SANTANDER) · AUTONOMOUS PRODUCTION ALM</strong> · Ciclo Zero Human-in-the-Loop (<code>AWS_Kiro ATM Sentinel</code> + <code>AWS CloudWatch / Prometheus MCP</code> + <code>Jira Xray</code>)
     </div>
     <div>
-      <a href="/alm-dashboard" id="link-alm-dashboard" data-testid="link-alm-dashboard">📊 Abrir Hub ALM (Jira Xray / TestLink / Redmine / JMeter IA)</a>
-      <a href="/api/v1/health" target="_blank" id="link-api-health">⚡ Estado API</a>
+      <a href="/alm-dashboard" id="link-alm-dashboard" data-testid="link-alm-dashboard">📊 Cuadro de Mando CIO en Jira Xray (Ciclo ALM Autónomo)</a>
+      <a href="/presentacion" id="link-presentacion">📽️ Presentación CIO Getnet</a>
+      <a href="/api/v1/observability/status" target="_blank" id="link-api-obs">🔭 Estado CloudWatch &amp; Kiro</a>
+      <a href="/api/v1/health" target="_blank" id="link-api-health">⚡ API Health</a>
     </div>
   </div>
 
-  <!-- Cabecera SegurCaixa Adeslas -->
+  <!-- Cabecera Corporativa Getnet -->
   <header class="site-header">
     <div class="header-inner">
       <div class="brand">
-        <div class="brand-logo">A+</div>
+        <div class="brand-logo">G</div>
         <div>
-          <div class="brand-title" id="header-brand-title">SegurCaixa Adeslas</div>
-          <div class="brand-subtitle">Servicios Digitales para Asegurados · Grupo Mutua Madrileña &amp; CaixaBank</div>
+          <div class="brand-title" id="header-brand-title">Getnet · Grupo Santander</div>
+          <div class="brand-subtitle">Portal de Servicios para Comercios, Tarjetas, Pasarela ISO-8583 &amp; Red de Cajeros ATM</div>
         </div>
       </div>
       <div class="header-actions">
-        <span class="phone-pill">📞 Atención 24h: 900 50 50 40</span>
-        <button class="btn-outline" onclick="activateTab('tab-cuadro')" data-testid="header-btn-cuadro">Cuadro Médico</button>
-        <button class="btn-primary" onclick="activateTab('tab-area-cliente')" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">🔐 Área Cliente</button>
+        <span class="phone-pill">🚨 SOC &amp; ATM Sentinel 24h: 900 50 50 40 · Release: {{ system_state.currentRelease }}</span>
+        <button class="btn-outline" onclick="activateTab('tab-bloqueo-atm')" data-testid="header-btn-bloqueo">🚨 Simulador Bloqueo Tarjeta ATM</button>
+        <button class="btn-outline" onclick="activateTab('tab-cuadro')" data-testid="header-btn-cuadro">🏧 Red ATM &amp; Centros</button>
+        <button class="btn-primary" onclick="activateTab('tab-area-cliente')" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">🔐 Área Cliente Getnet</button>
       </div>
     </div>
   </header>
 
-  <!-- Hero Principal /servicios-para-clientes -->
+  <!-- Hero Principal -->
   <section class="hero">
     <div class="hero-inner">
       <div>
-        <div class="breadcrumb">Inicio &gt; Particulares &gt; <strong>Servicios para Clientes</strong></div>
-        <h1 id="hero-title" data-testid="hero-title">Todos tus servicios de salud y gestiones online en un único lugar</h1>
-        <p>Consulta el Cuadro Médico de SegurCaixa Adeslas, solicita autorizaciones médicas al instante, tramita el reembolso de tus facturas y accede a orientación médica y videoconsulta 24 horas.</p>
+        <div class="breadcrumb">Inicio &gt; Getnet Production Core &gt; <strong>Servicios para Clientes, Comercios y Red ATM</strong></div>
+        <h1 id="hero-title" data-testid="hero-title">Getnet · Todos tus servicios de salud transaccional, tarjetas, cajeros ATM y gestiones online en un único lugar</h1>
+        <p>Consulta la red de cajeros ATM y nodos SmartPOS de Getnet, tramita autorizaciones operativas ISO-8583, solicita liquidaciones y reembolsos instantáneos, y simula el ciclo autónomo de bloqueo de tarjetas con <strong>AWS Kiro</strong> y <strong>AWS CloudWatch / Prometheus MCP</strong> sin Human-in-the-Loop.</p>
       </div>
       <div class="hero-kpis" data-testid="hero-kpis">
         <div class="kpi-box">
           <strong>+43.000</strong>
-          <span>Profesionales Sanitarios</span>
+          <span>Cajeros ATM &amp; SmartPOS</span>
         </div>
         <div class="kpi-box">
-          <strong>1.300+</strong>
-          <span>Centros Médicos y Hospitales</span>
+          <strong>Zero-Touch</strong>
+          <span>ALM sin Human-in-the-Loop</span>
         </div>
         <div class="kpi-box">
-          <strong>24/7</strong>
-          <span>Urgencias y Videoconsulta</span>
+          <strong>&lt; 7 seg</strong>
+          <span>MTTR Auto-Fix &amp; Re-Deploy</span>
         </div>
         <div class="kpi-box">
-          <strong>&lt; 2 min</strong>
-          <span>Autorización Digital Online</span>
+          <strong>14 / 14</strong>
+          <span>Tests Certificados Jira Xray</span>
         </div>
       </div>
     </div>
@@ -456,8 +461,8 @@
   <main class="main-container">
     <!-- Catálogo de 6 Servicios Principales -->
     <div class="section-heading">
-      <h2>Catálogo de Servicios para Clientes</h2>
-      <span style="font-size:0.85rem;color:var(--text-muted);">Selecciona un servicio para iniciar tu gestión online</span>
+      <h2>Catálogo de Servicios Operativos Getnet &amp; Control ATM</h2>
+      <span style="font-size:0.85rem;color:var(--text-muted);">Selecciona un módulo operativo o el simulador de bloqueo de tarjetas en producción</span>
     </div>
 
     <div class="services-grid" id="catalogo-servicios-grid" data-testid="catalogo-servicios-grid">
@@ -471,7 +476,7 @@
           <p>{{ srv.descripcion }}</p>
         </div>
         <div class="service-card-footer">
-          <span>Acceder al servicio →</span>
+          <span>Abrir módulo operativo →</span>
           <span>SLA &lt; {{ srv.sla_respuesta_ms }}ms</span>
         </div>
       </article>
@@ -480,17 +485,18 @@
 
     <!-- Pestañas de Gestión Interactiva -->
     <div class="tabs-bar" role="tablist">
-      <button class="tab-btn active" id="btn-tab-cuadro" data-testid="btn-tab-cuadro" onclick="activateTab('tab-cuadro')">🏥 1. Buscador Cuadro Médico</button>
-      <button class="tab-btn" id="btn-tab-autorizaciones" data-testid="btn-tab-autorizaciones" onclick="activateTab('tab-autorizaciones')">📋 2. Autorizaciones Médicas</button>
-      <button class="tab-btn" id="btn-tab-reembolsos" data-testid="btn-tab-reembolsos" onclick="activateTab('tab-reembolsos')">💶 3. Solicitud de Reembolsos</button>
-      <button class="tab-btn" id="btn-tab-area-cliente" data-testid="btn-tab-area-cliente" onclick="activateTab('tab-area-cliente')">🪪 4. Área Cliente y Tarjeta Digital</button>
-      <button class="tab-btn" id="btn-tab-videoconsulta" data-testid="btn-tab-videoconsulta" onclick="activateTab('tab-videoconsulta')">🩺 5. Videoconsulta y Orientación 24h</button>
+      <button class="tab-btn active" id="btn-tab-cuadro" data-testid="btn-tab-cuadro" onclick="activateTab('tab-cuadro')">🏧 1. Red ATM &amp; Centros Getnet</button>
+      <button class="tab-btn" id="btn-tab-autorizaciones" data-testid="btn-tab-autorizaciones" onclick="activateTab('tab-autorizaciones')">💳 2. Autorizaciones ISO-8583</button>
+      <button class="tab-btn" id="btn-tab-reembolsos" data-testid="btn-tab-reembolsos" onclick="activateTab('tab-reembolsos')">💶 3. Liquidaciones &amp; Reembolsos</button>
+      <button class="tab-btn" id="btn-tab-area-cliente" data-testid="btn-tab-area-cliente" onclick="activateTab('tab-area-cliente')">🪪 4. Área Cliente &amp; Tarjeta Digital</button>
+      <button class="tab-btn" id="btn-tab-videoconsulta" data-testid="btn-tab-videoconsulta" onclick="activateTab('tab-videoconsulta')">🛠️ 5. Soporte Remoto 24h</button>
+      <button class="tab-btn" id="btn-tab-bloqueo-atm" data-testid="btn-tab-bloqueo-atm" onclick="activateTab('tab-bloqueo-atm')">🚨 6. Simulador Bloqueo Tarjeta ATM (AWS Kiro + CloudWatch)</button>
     </div>
 
-    <!-- PANEL 1: CUADRO MÉDICO -->
+    <!-- PANEL 1: RED ATM & CENTROS GETNET (Compatible con selectores #cm-*) -->
     <section class="tab-panel active" id="tab-cuadro" data-testid="panel-cuadro-medico">
-      <h3 style="color:var(--adeslas-dark);margin-bottom:6px;">Buscador de Cuadro Médico y Centros de Urgencias</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Filtra por provincia, especialidad o modalidad de seguro para encontrar tu centro médico concertado.</p>
+      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Buscador de Red de Cajeros ATM, Nodos SmartPOS y Centros de Guardia 24h</h3>
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Filtra por provincia, unidad operativa o modalidad de contrato Getnet.</p>
 
       <form id="form-cuadro-medico" onsubmit="buscarCuadroMedico(event)">
         <div class="form-grid">
@@ -506,7 +512,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="cm-especialidad">Especialidad Médica</label>
+            <label for="cm-especialidad">Servicio / Unidad Operativa</label>
             <select id="cm-especialidad" name="especialidad" data-testid="select-especialidad">
               <option value="Todas">Todas las especialidades</option>
               <option value="Cardiología">Cardiología</option>
@@ -518,7 +524,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="cm-poliza">Modalidad de Póliza / Colectivo</label>
+            <label for="cm-poliza">Modalidad de Contrato / Red</label>
             <select id="cm-poliza" name="poliza" data-testid="select-poliza">
               <option value="Todas">Todas las modalidades</option>
               <option value="Adeslas Plena Plus">Adeslas Plena Plus</option>
@@ -529,12 +535,12 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="cm-query">Hospital, Médico o Calle (Opcional)</label>
-            <input type="text" id="cm-query" name="q" placeholder="Ej. Ruber, Teknon, Goya..." data-testid="input-busqueda-texto" />
+            <label for="cm-query">Cajero ATM, Centro o Dirección (Opcional)</label>
+            <input type="text" id="cm-query" name="q" placeholder="Ej. ATM-GTN-MAD-0042, Ruber, Goya..." data-testid="input-busqueda-texto" />
           </div>
         </div>
-        <button type="submit" class="btn-primary" id="btn-buscar-cuadro" data-testid="btn-buscar-cuadro">🔍 Buscar en Cuadro Médico</button>
-        <span id="cm-contador" data-testid="cm-contador" style="margin-left:14px;font-weight:700;color:var(--adeslas-dark);">
+        <button type="submit" class="btn-primary" id="btn-buscar-cuadro" data-testid="btn-buscar-cuadro">🔍 Buscar en Red Getnet</button>
+        <span id="cm-contador" data-testid="cm-contador" style="margin-left:14px;font-weight:700;color:var(--getnet-dark);">
           Mostrando {{ cuadro_inicial|length }} centros concertados
         </span>
       </form>
@@ -543,45 +549,45 @@
         {% for c in cuadro_inicial %}
         <div class="center-card" data-testid="center-card-item">
           <h4>{{ c.nombre }}</h4>
-          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:4px;">👨‍⚕️ {{ c.facultativo }}</div>
+          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:4px;">👨‍💻 {{ c.facultativo }}</div>
           <div style="font-size:0.86rem;">📍 {{ c.direccion }} ({{ c.provincia }}) · 📞 <strong>{{ c.telefono }}</strong></div>
           <div>
-            <span class="badge badge-blue">{{ c.especialidad }}</span>
-            {% if c.cita_online %}<span class="badge badge-green">Cita Online Disponible</span>{% endif %}
-            {% if c.urgencias_24h %}<span class="badge badge-red">Urgencias 24h</span>{% endif %}
+            <span class="badge badge-blue">{{ c.servicio_getnet or c.especialidad }}</span>
+            {% if c.cita_online %}<span class="badge badge-green">Telemetría Online Activa</span>{% endif %}
+            {% if c.urgencias_24h %}<span class="badge badge-red">Guardia 24h</span>{% endif %}
           </div>
         </div>
         {% endfor %}
       </div>
     </section>
 
-    <!-- PANEL 2: AUTORIZACIONES MÉDICAS -->
+    <!-- PANEL 2: AUTORIZACIONES ISO-8583 Y TARJETAS -->
     <section class="tab-panel" id="tab-autorizaciones" data-testid="panel-autorizaciones">
-      <h3 style="color:var(--adeslas-dark);margin-bottom:6px;">Solicitud de Autorizaciones Médicas Online</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Introduce los datos de tu Tarjeta Sanitaria Adeslas y el número de volante o prescripción entregada por tu facultativo.</p>
+      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Pasarela de Autorizaciones Operativas ISO-8583 y Tarjetas Getnet</h3>
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Introduce el PAN de la Tarjeta Getnet (12-16 dígitos) y el código de operación para validación instantánea.</p>
 
       <form id="form-autorizaciones" onsubmit="enviarAutorizacion(event)">
         <div class="form-grid">
           <div class="form-group">
-            <label for="aut-tarjeta">Nº Tarjeta Adeslas (12-16 dígitos) *</label>
+            <label for="aut-tarjeta">Nº Tarjeta Getnet / PAN (12-16 dígitos) *</label>
             <input type="text" id="aut-tarjeta" placeholder="8000123456789012" data-testid="input-aut-tarjeta" />
           </div>
           <div class="form-group">
-            <label for="aut-tipo-acto">Tipo de Prueba / Acto Médico *</label>
+            <label for="aut-tipo-acto">Tipo de Operación / Autorización *</label>
             <select id="aut-tipo-acto" data-testid="select-aut-tipo">
               <option value="Resonancia Magnética Nuclear (RMN)">Resonancia Magnética Nuclear (RMN)</option>
               <option value="TAC / Escáner Diagnóstico">TAC / Escáner Diagnóstico</option>
               <option value="Sesiones de Rehabilitación y Fisioterapia">Sesiones de Rehabilitación y Fisioterapia</option>
               <option value="Cirugía Ambulatoria Oftalmológica">Cirugía Ambulatoria Oftalmológica</option>
-              <option value="Estudio Genético Oncológico">Estudio Genético Oncológico (Requiere Inspección)</option>
+              <option value="Estudio Genético Oncológico">Estudio Genético Oncológico (Inspección Antifraude)</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="aut-prescripcion">Código de Volante / Prescripción *</label>
+            <label for="aut-prescripcion">Código de Operación / Terminal *</label>
             <input type="text" id="aut-prescripcion" placeholder="Ej. RX-99281" data-testid="input-aut-prescripcion" />
           </div>
           <div class="form-group">
-            <label for="aut-centro">Centro Médico / Hospital Realizador *</label>
+            <label for="aut-centro">Nodo ATM / Comercio Solicitante *</label>
             <input type="text" id="aut-centro" placeholder="Ej. Hospital Ruber Internacional" data-testid="input-aut-centro" />
           </div>
         </div>
@@ -591,26 +597,26 @@
       <div id="aut-resultado-alert" class="alert-box" role="alert" data-testid="aut-resultado-alert"></div>
     </section>
 
-    <!-- PANEL 3: REEMBOLSOS DE GASTOS MÉDICOS -->
+    <!-- PANEL 3: LIQUIDACIONES, REEMBOLSOS Y CHARGEBACKS -->
     <section class="tab-panel" id="tab-reembolsos" data-testid="panel-reembolsos">
-      <h3 style="color:var(--adeslas-dark);margin-bottom:6px;">Tramitación de Reembolso de Facturas Médicas</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Para pólizas de Reembolso (Adeslas Premier 90% y Adeslas Extra 80%). Registra tu factura y calcula tu abono al instante.</p>
+      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Liquidación de Comercios, Reembolsos TPV y Chargebacks</h3>
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Modalidades Getnet Premier (90% abono inmediato) y Getnet Extra (80% abono). Registra la operación y calcula el abono en cuenta IBAN.</p>
 
       <form id="form-reembolsos" onsubmit="enviarReembolso(event)">
         <div class="form-grid">
           <div class="form-group">
-            <label for="rmb-nif">NIF / NIE del Titular *</label>
+            <label for="rmb-nif">NIF / NIE / CIF del Titular *</label>
             <input type="text" id="rmb-nif" placeholder="12345678Z" data-testid="input-rmb-nif" />
           </div>
           <div class="form-group">
-            <label for="rmb-modalidad">Modalidad de Póliza de Reembolso *</label>
+            <label for="rmb-modalidad">Modalidad de Contrato Getnet *</label>
             <select id="rmb-modalidad" data-testid="select-rmb-modalidad">
               <option value="Adeslas Premier (90%)">Adeslas Premier (90% Cobertura)</option>
               <option value="Adeslas Extra (80%)">Adeslas Extra (80% Cobertura)</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="rmb-importe">Importe Total Factura (€) *</label>
+            <label for="rmb-importe">Importe de Liquidación / Disputa (€) *</label>
             <input type="number" step="0.01" id="rmb-importe" placeholder="250.00" data-testid="input-rmb-importe" />
           </div>
           <div class="form-group">
@@ -624,15 +630,15 @@
       <div id="rmb-resultado-alert" class="alert-box" role="alert" data-testid="rmb-resultado-alert"></div>
     </section>
 
-    <!-- PANEL 4: ÁREA CLIENTE Y TARJETA DIGITAL -->
+    <!-- PANEL 4: ÁREA CLIENTE Y TARJETA DIGITAL GETNET -->
     <section class="tab-panel" id="tab-area-cliente" data-testid="panel-area-cliente">
-      <h3 style="color:var(--adeslas-dark);margin-bottom:6px;">Acceso al Área Cliente y Tarjeta Sanitaria Digital</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Accede con tus credenciales de prueba QAOps (NIF: <code>12345678Z</code> / Clave: <code>Adeslas2026!</code>) para consultar tus pólizas y tarjeta digital.</p>
+      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Acceso al Área Cliente / Comercio y Tarjeta Corporativa Digital Getnet</h3>
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Accede con credenciales de prueba QAOps (NIF: <code>12345678Z</code> / Clave: <code>Adeslas2026!</code> o <code>Getnet2026!</code>).</p>
 
       <form id="form-login-cliente" onsubmit="loginAreaCliente(event)">
         <div class="form-grid" style="max-width:620px;">
           <div class="form-group">
-            <label for="login-nif">NIF / NIE / Tarjeta *</label>
+            <label for="login-nif">NIF / NIE / CIF *</label>
             <input type="text" id="login-nif" placeholder="12345678Z" data-testid="input-login-nif" />
           </div>
           <div class="form-group">
@@ -646,15 +652,15 @@
       <div id="login-resultado-alert" class="alert-box" role="alert" data-testid="login-resultado-alert"></div>
     </section>
 
-    <!-- PANEL 5: VIDEOCONSULTA Y ORIENTACIÓN MÉDICA -->
+    <!-- PANEL 5: SOPORTE TÉCNICO REMOTO / VIDEOCONSULTA 24H -->
     <section class="tab-panel" id="tab-videoconsulta" data-testid="panel-videoconsulta">
-      <h3 style="color:var(--adeslas-dark);margin-bottom:6px;">Salud Digital: Videoconsulta y Orientación Médica 24h</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Solicita asistencia médica inmediata por videollamada o llamada telefónica con nuestros especialistas.</p>
+      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Soporte Técnico Remoto y Orientación Operativa 24h</h3>
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Solicita asistencia técnica inmediata por videollamada o teléfono 24h con ingeniería de pasarela Getnet.</p>
 
       <form id="form-videoconsulta" onsubmit="reservarVideoconsulta(event)">
         <div class="form-grid">
           <div class="form-group">
-            <label for="vc-especialidad">Especialidad de Orientación *</label>
+            <label for="vc-especialidad">Área de Soporte / Especialidad *</label>
             <select id="vc-especialidad" data-testid="select-vc-especialidad">
               <option value="Medicina General">Medicina General (24h)</option>
               <option value="Pediatría">Orientación Pediátrica</option>
@@ -670,14 +676,60 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="vc-motivo">Motivo de la consulta *</label>
-            <input type="text" id="vc-motivo" placeholder="Ej. Revisión de analítica y ajuste de medicación" data-testid="input-vc-motivo" />
+            <label for="vc-motivo">Motivo de la consulta / incidencia *</label>
+            <input type="text" id="vc-motivo" placeholder="Ej. Verificación de liquidación TPV y terminal ATM" data-testid="input-vc-motivo" />
           </div>
         </div>
-        <button type="submit" class="btn-primary" id="btn-reservar-vc" data-testid="btn-reservar-vc">🩺 Solicitar Videoconsulta / Orientación</button>
+        <button type="submit" class="btn-primary" id="btn-reservar-vc" data-testid="btn-reservar-vc">🛠️ Solicitar Soporte / Videoconsulta</button>
       </form>
 
       <div id="vc-resultado-alert" class="alert-box" role="alert" data-testid="vc-resultado-alert"></div>
+    </section>
+
+    <!-- PANEL 6: APLICATIVO DE SISTEMA DE BLOQUEO DE TARJETAS EN ATM (AWS_KIRO) & CLOUDWATCH -->
+    <section class="tab-panel" id="tab-bloqueo-atm" data-testid="panel-bloqueo-atm">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+        <div>
+          <h3 style="color:var(--getnet-dark);">🚨 Aplicativo de Sistema: Bloqueo de Tarjetas en Cajero ATM (<code>AWS_Kiro-main</code>) &amp; Monitor CloudWatch</h3>
+          <p style="font-size:0.89rem;color:var(--text-muted);">Simula en vivo una incidencia funcional de bloqueo de tarjeta desde el cajero <code>ATM-GTN-MAD-0042</code> y su resolución autónoma sin Human-in-the-Loop.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn-outline" id="btn-portal-inject-incident" onclick="simularFalloProduccion()">🔥 1. Inyectar Fallo en PRO (ATM + CloudWatch)</button>
+          <button type="button" class="btn-primary" id="btn-portal-autofix" onclick="ejecutarAutoRemediacionAlm()">🤖 2. Ejecutar Auto-Fix &amp; Re-Deploy (Zero Human-in-the-Loop)</button>
+        </div>
+      </div>
+
+      <form id="form-bloqueo-atm" onsubmit="ejecutarBloqueoTarjetaAtm(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="blk-tarjeta">PAN de Tarjeta en Cajero ATM (Se enmascarará con <code>redact_pan</code> de AWS_Kiro) *</label>
+            <input type="text" id="blk-tarjeta" value="4548 1234 5678 9012" data-testid="input-blk-tarjeta" />
+          </div>
+          <div class="form-group">
+            <label for="blk-atm-id">Identificador del Cajero ATM *</label>
+            <input type="text" id="blk-atm-id" value="ATM-GTN-MAD-0042" data-testid="input-blk-atm-id" />
+          </div>
+          <div class="form-group">
+            <label for="blk-ubicacion">Ubicación del Cajero *</label>
+            <input type="text" id="blk-ubicacion" value="Sucursal Getnet Gran Vía 28, Madrid" data-testid="input-blk-ubicacion" />
+          </div>
+          <div class="form-group">
+            <label for="blk-motivo">Evento Detectado por Cámara / Sensor ATM Sentinel *</label>
+            <select id="blk-motivo" data-testid="select-blk-motivo">
+              <option value="SOSPECHA_SKIMMING_RANURA">SOSPECHA_SKIMMING_RANURA (ATM Sentinel Video)</option>
+              <option value="PIN_TRIES_EXCEEDED">PIN_TRIES_EXCEEDED (3 Reintentos Fallidos)</option>
+              <option value="CARD_TRAPPING_MECHANICAL">CARD_TRAPPING_MECHANICAL (Retención en Obturador)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-ejecutar-bloqueo-atm" data-testid="btn-ejecutar-bloqueo-atm">🏧 Procesar Bloqueo de Tarjeta en ATM</button>
+      </form>
+
+      <div id="atm-bloqueo-alert" class="alert-box show alert-success" role="alert" data-testid="atm-bloqueo-alert" style="margin-top:16px;">
+        <strong>Estado Actual del Motor de Bloqueo (<code>getnet-card-blocker-svc</code>):</strong> Release <code>{{ system_state.currentRelease }}</code> ·
+        Reverso EMV 0420: <strong>{{ 'ACTIVO (Hotfix Aplicado)' if system_state.enable_emv_reversal_0420 else 'INACTIVO (BUG EN PRO)' }}</strong> ·
+        Redis Lock TTL: <strong>{{ system_state.redis_lock_ttl_ms }} ms</strong>
+      </div>
     </section>
   </main>
 
@@ -692,7 +744,8 @@
         'tab-autorizaciones': 'btn-tab-autorizaciones',
         'tab-reembolsos': 'btn-tab-reembolsos',
         'tab-area-cliente': 'btn-tab-area-cliente',
-        'tab-videoconsulta': 'btn-tab-videoconsulta'
+        'tab-videoconsulta': 'btn-tab-videoconsulta',
+        'tab-bloqueo-atm': 'btn-tab-bloqueo-atm'
       };
       const btn = document.getElementById(mapBtn[tabId]);
       if (btn) btn.classList.add('active');
@@ -712,18 +765,18 @@
       document.getElementById('cm-contador').textContent = `Mostrando ${data.total} centros concertados`;
       const container = document.getElementById('cm-resultados');
       if (data.resultados.length === 0) {
-        container.innerHTML = `<div class="alert-box show alert-warning" data-testid="cm-sin-resultados">No se encontraron centros con los criterios seleccionados.</div>`;
+        container.innerHTML = `<div class="alert-box show alert-warning" data-testid="cm-sin-resultados">No se encontraron nodos ATM o centros con los criterios seleccionados.</div>`;
         return;
       }
       container.innerHTML = data.resultados.map(c => `
         <div class="center-card" data-testid="center-card-item">
           <h4>${c.nombre}</h4>
-          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:4px;">👨‍⚕️ ${c.facultativo}</div>
+          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:4px;">👨‍💻 ${c.facultativo}</div>
           <div style="font-size:0.86rem;">📍 ${c.direccion} (${c.provincia}) · 📞 <strong>${c.telefono}</strong></div>
           <div>
-            <span class="badge badge-blue">${c.especialidad}</span>
-            ${c.cita_online ? '<span class="badge badge-green">Cita Online Disponible</span>' : ''}
-            ${c.urgencias_24h ? '<span class="badge badge-red">Urgencias 24h</span>' : ''}
+            <span class="badge badge-blue">${c.servicio_getnet || c.especialidad}</span>
+            ${c.cita_online ? '<span class="badge badge-green">Telemetría Online Activa</span>' : ''}
+            ${c.urgencias_24h ? '<span class="badge badge-red">Guardia 24h</span>' : ''}
           </div>
         </div>
       `).join('');
@@ -755,7 +808,7 @@
       alertBox.innerHTML = `
         <strong>Estado: <span data-testid="aut-estado-valor">${aut.estado}</span></strong><br/>
         Código de Autorización: <strong data-testid="aut-codigo-valor">${aut.codigoAutorizacion}</strong><br/>
-        Centro: ${aut.centroMedico} · Acto: ${aut.tipoActo}<br/>
+        Nodo/Centro: ${aut.centroMedico} · Operación: ${aut.tipoActo}<br/>
         <span>${aut.mensaje}</span>
       `;
     }
@@ -810,15 +863,15 @@
       const c = data.cliente;
       alertBox.className = 'alert-box show alert-success';
       alertBox.innerHTML = `
-        <div><strong>Bienvenido/a al Área Cliente, <span data-testid="cliente-nombre-titular">${c.nombre}</span></strong></div>
-        <div>Póliza Activa: <strong data-testid="cliente-num-poliza">${c.num_poliza}</strong> · Modalidad: ${c.modalidad}</div>
+        <div><strong>Bienvenido/a al Área Cliente Getnet, <span data-testid="cliente-nombre-titular">${c.nombre}</span></strong></div>
+        <div>Contrato Activo: <strong data-testid="cliente-num-poliza">${c.num_poliza}</strong> (${c.contrato_getnet}) · Modalidad: ${c.modalidad}</div>
         <div>Estado: ${c.estado_poliza}</div>
         <div class="digital-card" data-testid="tarjeta-digital-adeslas">
-          <div style="font-size:0.8rem;opacity:0.9;">TARJETA SANITARIA DIGITAL · SEGURCAIXA ADESLAS</div>
+          <div style="font-size:0.8rem;opacity:0.9;">TARJETA CORPORATIVA DIGITAL · GETNET (GRUPO SANTANDER)</div>
           <div class="digital-card-num" data-testid="tarjeta-digital-numero">${c.num_tarjeta}</div>
           <div style="display:flex;justify-content:space-between;font-size:0.86rem;">
             <span>TITULAR: ${c.nombre}</span>
-            <span>PÓLIZA: ${c.num_poliza}</span>
+            <span>CONTRATO: ${c.num_poliza}</span>
           </div>
         </div>
       `;
@@ -846,9 +899,69 @@
       const cita = data.cita;
       alertBox.className = 'alert-box show alert-success';
       alertBox.innerHTML = `
-        <strong>Cita Confirmada: <span data-testid="vc-codigo-cita">${cita.codigoCita}</span></strong><br/>
-        Facultativo asignado: <strong>${cita.facultativoAsignado}</strong> (${cita.especialidad})<br/>
-        Sala Virtual: <code>${cita.salaVirtualUrl}</code>
+        <strong>Sesión Confirmada: <span data-testid="vc-codigo-cita">${cita.codigoCita}</span></strong><br/>
+        Especialista asignado: <strong>${cita.facultativoAsignado}</strong> (${cita.especialidad})<br/>
+        Sala Remota: <code>${cita.salaVirtualUrl}</code>
+      `;
+    }
+
+    async function ejecutarBloqueoTarjetaAtm(e) {
+      e.preventDefault();
+      const payload = {
+        numTarjeta: document.getElementById('blk-tarjeta').value,
+        atmId: document.getElementById('blk-atm-id').value,
+        ubicacion: document.getElementById('blk-ubicacion').value,
+        motivoBloqueo: document.getElementById('blk-motivo').value
+      };
+      const alertBox = document.getElementById('atm-bloqueo-alert');
+      const res = await fetch('/api/v1/tarjetas/bloqueo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alertBox.className = 'alert-box show alert-error';
+        alertBox.innerHTML = `
+          <strong>🚨 ${data.errorCode} (${data.incidentKey}):</strong><br/>
+          ${data.mensaje}<br/>
+          <small>PAN Enmascarado (AWS_Kiro redact_pan): <code>${data.operacion.panEnmascarado}</code> · Estado: <code>${data.operacion.estado}</code></small>
+        `;
+        return;
+      }
+      const op = data.operacion;
+      alertBox.className = 'alert-box show alert-success';
+      alertBox.innerHTML = `
+        <strong>✅ ${op.estado} (${op.operacionId})</strong><br/>
+        ${data.mensaje}<br/>
+        PAN Enmascarado (AWS_Kiro): <code>${op.panEnmascarado}</code> · Reverso EMV: <strong>${op.codigoReverso}</strong> · Token Digital: <code>${op.tokenDigitalReemplazo}</code>
+      `;
+    }
+
+    async function simularFalloProduccion() {
+      const alertBox = document.getElementById('atm-bloqueo-alert');
+      await fetch('/api/v1/alm/inject-incidents', { method: 'POST' });
+      alertBox.className = 'alert-box show alert-error';
+      alertBox.innerHTML = `
+        <strong>🔥 MODO INCIDENCIA EN PRODUCCIÓN ACTIVADO:</strong><br/>
+        1. <code>GTN-INC-ATM-001</code>: Flag <code>enable_emv_reversal_0420=False</code> en <code>ATM-GTN-MAD-0042</code> (Retención de tarjeta sin reverso).<br/>
+        2. <code>GTN-INC-SYS-002</code>: Alarma <code>CW-ALARM-GTN-CARDLOCK-P99</code> en AWS CloudWatch &amp; Prometheus (Deadlock Redis TTL=0, P95=1840ms).<br/>
+        <em>Pulsa ahora en "Procesar Bloqueo de Tarjeta en ATM" para reproducir el error HTTP 409 o en "Ejecutar Auto-Fix &amp; Re-Deploy" para repararlo sin Human-in-the-Loop.</em>
+      `;
+    }
+
+    async function ejecutarAutoRemediacionAlm() {
+      const alertBox = document.getElementById('atm-bloqueo-alert');
+      alertBox.className = 'alert-box show alert-warning';
+      alertBox.innerHTML = `⏳ Ejecutando Ciclo Autónomo ALM sin Human-in-the-Loop (Detección AWS_Kiro + CloudWatch MCP -> Triage -> RCA -> Re-Fixing -> Re-Deploy)...`;
+      const res = await fetch('/api/v1/alm/autonomous-cycle', { method: 'POST' });
+      const data = await res.json();
+      alertBox.className = 'alert-box show alert-success';
+      alertBox.innerHTML = `
+        <strong>🤖 CICLO AUTÓNOMO ALM COMPLETADO (${data.deployedRelease}):</strong><br/>
+        • Incidente Funcional ATM (<code>${data.atmIncidentKey}</code>): <strong>${data.atmIncidentStatus}</strong> · Reverso EMV: <code>${data.emvReversalCode}</code><br/>
+        • Incidente Sistemas CloudWatch (<code>${data.sysIncidentKey}</code>): <strong>${data.sysIncidentStatus}</strong> · Redis Lock TTL=1500ms<br/>
+        • <a href="/alm-dashboard" style="font-weight:700;color:#065f46;">Ver Cuadro de Mando Ejecutivo en Jira Xray (14/14 Tests PASSED) →</a>
       `;
     }
   </script>

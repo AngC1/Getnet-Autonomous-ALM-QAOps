@@ -1,6 +1,6 @@
 """
 Page Object Model (POM) con Motor de Auto-Curación (Self-Healing Locators)
-para el portal SegurCaixa Adeslas (/servicios-para-clientes) — Ayesa Digital QAOps.
+para el portal Getnet (Grupo Santander) (/servicios-para-clientes) — Ayesa Digital QAOps & Autonomous ALM.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 
 class ServiciosClientesPage:
-    """Page Object del portal /servicios-para-clientes con soporte Self-Healing."""
+    """Page Object del portal Getnet (/servicios-para-clientes) con soporte Self-Healing."""
 
     def __init__(self, driver: WebDriver, base_url: str = "http://127.0.0.1:8080") -> None:
         self.driver = driver
@@ -67,7 +67,7 @@ class ServiciosClientesPage:
         )
         btn.click()
 
-    # --- 1. Flujo Cuadro Médico ---
+    # --- 1. Flujo Red ATM & Centros Getnet ---
     def buscar_cuadro_medico(
         self,
         provincia: str = "Todas",
@@ -95,7 +95,7 @@ class ServiciosClientesPage:
         cards = self.driver.find_elements(By.CSS_SELECTOR, "[data-testid='center-card-item']")
         return len(cards)
 
-    # --- 2. Flujo Autorizaciones Médicas ---
+    # --- 2. Flujo Autorizaciones ISO-8583 ---
     def solicitar_autorizacion(
         self,
         num_tarjeta: str,
@@ -126,7 +126,7 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 3. Flujo Reembolsos ---
+    # --- 3. Flujo Liquidaciones y Reembolsos ---
     def solicitar_reembolso(
         self,
         nif: str,
@@ -157,7 +157,7 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 4. Flujo Área Cliente ---
+    # --- 4. Flujo Área Cliente & Tarjeta Digital Getnet ---
     def login_area_cliente(self, nif: str, password: str) -> str:
         self.switch_tab("btn-tab-area-cliente")
         nif_el = self.find_healed([(By.ID, "login-nif")])
@@ -176,7 +176,7 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 5. Flujo Videoconsulta ---
+    # --- 5. Flujo Soporte Técnico Remoto / Videoconsulta ---
     def reservar_videoconsulta(self, especialidad_visible: str, motivo: str) -> str:
         self.switch_tab("btn-tab-videoconsulta")
         Select(self.find_healed([(By.ID, "vc-especialidad")])).select_by_visible_text(especialidad_visible)
@@ -189,6 +189,35 @@ class ServiciosClientesPage:
         alert = self.wait.until(
             lambda d: d.find_element(By.ID, "vc-resultado-alert")
             if "show" in d.find_element(By.ID, "vc-resultado-alert").get_attribute("class")
+            else False
+        )
+        return alert.text
+
+    # --- 6. Flujo Bloqueo de Tarjeta en Cajero ATM (AWS_Kiro) ---
+    def procesar_bloqueo_tarjeta_atm(
+        self,
+        num_tarjeta: str = "4548 1234 5678 9012",
+        atm_id: str = "ATM-GTN-MAD-0042",
+        ubicacion: str = "Sucursal Getnet Gran Vía 28, Madrid",
+    ) -> str:
+        self.switch_tab("btn-tab-bloqueo-atm")
+        pan_el = self.find_healed([(By.ID, "blk-tarjeta"), (By.CSS_SELECTOR, "[data-testid='input-blk-tarjeta']")])
+        pan_el.clear()
+        pan_el.send_keys(num_tarjeta)
+
+        atm_el = self.find_healed([(By.ID, "blk-atm-id"), (By.CSS_SELECTOR, "[data-testid='input-blk-atm-id']")])
+        atm_el.clear()
+        atm_el.send_keys(atm_id)
+
+        ubic_el = self.find_healed([(By.ID, "blk-ubicacion"), (By.CSS_SELECTOR, "[data-testid='input-blk-ubicacion']")])
+        ubic_el.clear()
+        ubic_el.send_keys(ubicacion)
+
+        self.find_healed([(By.ID, "btn-ejecutar-bloqueo-atm"), (By.CSS_SELECTOR, "[data-testid='btn-ejecutar-bloqueo-atm']")]).click()
+        alert = self.wait.until(
+            lambda d: d.find_element(By.ID, "atm-bloqueo-alert")
+            if "REV-EMV-2026-" in d.find_element(By.ID, "atm-bloqueo-alert").text
+            or "ATM_CARD_TRAPPED" in d.find_element(By.ID, "atm-bloqueo-alert").text
             else False
         )
         return alert.text

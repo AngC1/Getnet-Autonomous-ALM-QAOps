@@ -1,10 +1,12 @@
 """
-Orquestador Maestro QAOps — Ayesa Digital para SegurCaixa Adeslas (/servicios-para-clientes).
-Levanta el portal simulado (si no está ya activo), ejecuta:
-  1. Diagnóstico del Servidor MCP de Selenium (Self-Healing DOM + Flujos MCP).
-  2. Suite completa Pytest + Selenium E2E (SCA-TC-001 a SCA-TC-010).
-  3. Motor de Rendimiento JMeter Asistido por IA (SCA-TC-011 y SCA-TC-012).
-  4. Verificación del Hub ALM (Jira Xray, TestLink, Redmine).
+Orquestador Maestro QAOps & Autonomous Production ALM — Getnet (Grupo Santander).
+Levanta el portal Getnet y el Cuadro de Mando Jira Xray (si no está ya activo) y ejecuta sin Human-in-the-Loop:
+  1. Diagnóstico del Servidor MCP de Observabilidad (AWS CloudWatch + Prometheus OpenSource + AWS_Kiro ATM Sentinel)
+     y ejecución completa del ciclo de Auto-Remediación de las 2 incidencias de Producción (GTN-INC-ATM-001 y GTN-INC-SYS-002).
+  2. Diagnóstico del Servidor MCP de Selenium (Self-Healing DOM + Flujos E2E + Evidencia PNG).
+  3. Suite completa Pytest + Selenium E2E (GTN-TC-001..010 y GTN-TC-013..014).
+  4. Motor de Rendimiento JMeter Asistido por IA (GTN-TC-011 y GTN-TC-012).
+  5. Certificación del Cuadro de Mando Ejecutivo en Jira Xray (14/14 Test Cases PASSED y 2/2 Incidencias RESOLVED).
 """
 
 from __future__ import annotations
@@ -32,7 +34,7 @@ def main() -> int:
     server_proc = None
     try:
         if not is_portal_up():
-            print("[1/4] Iniciando Simulador Portal SegurCaixa Adeslas y Hub ALM en http://127.0.0.1:8080 ...")
+            print("[1/5] Iniciando Simulador Portal Getnet y Hub ALM Jira Xray en http://127.0.0.1:8080 ...")
             server_proc = subprocess.Popen(
                 [sys.executable, str(ROOT / "portal-adeslas" / "app.py")],
                 cwd=str(ROOT),
@@ -44,12 +46,20 @@ def main() -> int:
                     break
                 time.sleep(0.3)
             if not is_portal_up():
-                print("ERROR: No se pudo iniciar el servidor en el puerto 8080.")
+                print("ERROR: No se pudo iniciar el servidor Getnet en el puerto 8080.")
                 return 1
         else:
-            print("[1/4] Portal SegurCaixa Adeslas detectado activo en http://127.0.0.1:8080")
+            print("[1/5] Portal Getnet detectado activo en http://127.0.0.1:8080")
 
-        print("\n[2/4] Ejecutando Self-Test del Servidor MCP de Selenium (Inspección DOM + Flujos IA)...")
+        print("\n[2/5] Ejecutando Servidor MCP de Observabilidad (CloudWatch + Prometheus + AWS_Kiro ATM) y Ciclo ALM Zero-Touch...")
+        rc_obs = subprocess.call(
+            [sys.executable, str(ROOT / "mcp-observability-server" / "server.py"), "--selftest"],
+            cwd=str(ROOT),
+        )
+        if rc_obs != 0:
+            return rc_obs
+
+        print("\n[3/5] Ejecutando Self-Test del Servidor MCP de Selenium (Inspección DOM + Flujos Getnet + Bloqueo ATM)...")
         rc_mcp = subprocess.call(
             [sys.executable, str(ROOT / "mcp-selenium-server" / "server.py"), "--selftest"],
             cwd=str(ROOT),
@@ -57,7 +67,7 @@ def main() -> int:
         if rc_mcp != 0:
             return rc_mcp
 
-        print("\n[3/4] Ejecutando Suite Automatizada Pytest + Selenium POM (SCA-TC-001 .. SCA-TC-010)...")
+        print("\n[4/5] Ejecutando Suite Automatizada Pytest + Selenium POM (GTN-TC-001 .. GTN-TC-014)...")
         rc_pytest = subprocess.call(
             [sys.executable, "-m", "pytest", "selenium-qaops/tests/test_servicios_clientes_e2e.py", "-v"],
             cwd=str(ROOT),
@@ -65,7 +75,7 @@ def main() -> int:
         if rc_pytest != 0:
             return rc_pytest
 
-        print("\n[4/4] Ejecutando Prueba de Carga y Diagnóstico con JMeter Asistido por IA (SCA-TC-011 .. SCA-TC-012)...")
+        print("\n[5/5] Ejecutando Prueba de Carga y Diagnóstico con JMeter Asistido por IA (GTN-TC-011 .. GTN-TC-012)...")
         rc_jmeter = subprocess.call(
             [sys.executable, str(ROOT / "jmeter-ai" / "ai_jmeter_assistant.py"), "--vus", "12", "--iterations", "5"],
             cwd=str(ROOT),
@@ -73,13 +83,16 @@ def main() -> int:
         if rc_jmeter != 0:
             return rc_jmeter
 
-        alm = requests.get(f"{BASE_URL}/api/v1/alm/backlog", timeout=5).json()["backlog"]
+        alm_resp = requests.get(f"{BASE_URL}/api/v1/alm/backlog", timeout=5).json()
+        alm = alm_resp["backlog"]
         passed = sum(1 for tc in alm["testCases"] if tc["status"] == "PASSED")
         total = len(alm["testCases"])
+        inc_resolved = sum(1 for inc in alm.get("productionIncidents", []) if "RESOLVED" in inc["status"])
         print("\n================================================================================")
-        print(f"CERTIFICACIÓN QAOPS COMPLETADA: {passed}/{total} Test Cases PASSED en Hub ALM")
-        print(f" - Portal Servicios para Clientes : {BASE_URL}/servicios-para-clientes")
-        print(f" - Hub ALM (Jira/TestLink/Redmine): {BASE_URL}/alm-dashboard")
+        print(f"DEMO CIO GETNET CERTIFICADA: {passed}/{total} Test Cases PASSED | {inc_resolved}/2 Incidencias PRO Resueltas")
+        print(f" - Portal Getnet & Bloqueo ATM    : {BASE_URL}/servicios-para-clientes")
+        print(f" - Cuadro de Mando CIO Jira Xray  : {BASE_URL}/alm-dashboard")
+        print(f" - Presentación Ejecutiva CIO     : {BASE_URL}/presentacion")
         print("================================================================================")
         return 0
     finally:

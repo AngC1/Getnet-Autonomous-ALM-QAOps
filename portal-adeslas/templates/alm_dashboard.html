@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hub ALM &amp; QAOps | Ayesa Digital - SegurCaixa Adeslas</title>
+  <title>Cuadro de Mando Jira Xray &amp; ALM Autónomo | Getnet (Grupo Santander) · Demo CIO</title>
   <style>
     :root {
       --bg-dark: #0f172a;
-      --card-bg: #ffffff;
+      --getnet-red: #ec0000;
+      --getnet-dark-red: #991b1b;
       --jira-blue: #0052cc;
       --testlink-teal: #0d9488;
       --redmine-red: #b91c1c;
       --selenium-green: #15803d;
       --jmeter-purple: #6d28d9;
-      --adeslas-blue: #0072ce;
       --pass-green: #16a34a;
       --fail-red: #dc2626;
       --warn-amber: #d97706;
@@ -27,7 +27,7 @@
       line-height: 1.5;
     }
     header {
-      background: linear-gradient(90deg, #0f172a 0%, #003b71 100%);
+      background: linear-gradient(90deg, #090d16 0%, #7f1d1d 60%, #b91c1c 100%);
       color: #fff;
       padding: 18px 28px;
       display: flex;
@@ -35,29 +35,53 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 14px;
+      border-bottom: 3px solid var(--getnet-red);
     }
-    .header-left h1 { font-size: 1.32rem; }
-    .header-left p { font-size: 0.84rem; color: #94a3b8; }
+    .header-left h1 { font-size: 1.28rem; }
+    .header-left p { font-size: 0.83rem; color: #fecaca; margin-top: 2px; }
     .header-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .btn-link {
       background: rgba(255,255,255,0.12);
       color: #fff;
       text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.22);
+      cursor: pointer;
+    }
+    .btn-link:hover { background: rgba(255,255,255,0.25); }
+    .btn-inject {
+      background: #dc2626;
+      color: #fff;
+      border: 1px solid #fca5a5;
       padding: 8px 13px;
       border-radius: 6px;
       font-size: 0.82rem;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.2);
+      font-weight: 700;
       cursor: pointer;
     }
-    .btn-link:hover { background: rgba(255,255,255,0.24); }
+    .btn-inject:hover { background: #991b1b; }
+    .btn-autonomous {
+      background: #0284c7;
+      color: #fff;
+      border: 1px solid #7dd3fc;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+    .btn-autonomous:hover { background: #0369a1; }
     .btn-run-selenium {
       background: #16a34a;
       color: #fff;
       border: none;
-      padding: 8px 14px;
+      padding: 8px 13px;
       border-radius: 6px;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -66,16 +90,16 @@
       background: #7c3aed;
       color: #fff;
       border: none;
-      padding: 8px 14px;
+      padding: 8px 13px;
       border-radius: 6px;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-run-jmeter:hover { background: #6d28d9; }
 
     .container {
-      max-width: 1360px;
+      max-width: 1400px;
       margin: 22px auto 60px;
       padding: 0 24px;
     }
@@ -83,18 +107,18 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
     .kpi-card {
       background: #fff;
       border-radius: 10px;
-      padding: 16px 18px;
+      padding: 15px 17px;
       border: 1px solid var(--border);
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
     }
-    .kpi-card .label { font-size: 0.76rem; text-transform: uppercase; color: #64748b; font-weight: 700; }
-    .kpi-card .value { font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-top: 4px; }
-    .kpi-card .sub { font-size: 0.79rem; color: #16a34a; font-weight: 600; }
+    .kpi-card .label { font-size: 0.74rem; text-transform: uppercase; color: #64748b; font-weight: 700; }
+    .kpi-card .value { font-size: 1.45rem; font-weight: 800; color: #0f172a; margin-top: 4px; }
+    .kpi-card .sub { font-size: 0.78rem; color: #16a34a; font-weight: 600; margin-top: 2px; }
 
     .alm-tabs {
       display: flex;
@@ -103,15 +127,16 @@
       flex-wrap: wrap;
     }
     .alm-tab-btn {
-      padding: 11px 18px;
+      padding: 10px 16px;
       border: none;
       border-radius: 8px;
       font-weight: 700;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       background: #e2e8f0;
       color: #334155;
     }
+    .alm-tab-btn.active-cio { background: var(--getnet-red); color: #fff; }
     .alm-tab-btn.active-selenium { background: var(--selenium-green); color: #fff; }
     .alm-tab-btn.active-jira { background: var(--jira-blue); color: #fff; }
     .alm-tab-btn.active-testlink { background: var(--testlink-teal); color: #fff; }
@@ -125,11 +150,11 @@
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 22px;
+      padding: 20px 22px;
       margin-bottom: 20px;
     }
     .panel-box h2 {
-      font-size: 1.12rem;
+      font-size: 1.08rem;
       margin-bottom: 12px;
       color: #0f172a;
       display: flex;
@@ -138,10 +163,45 @@
       flex-wrap: wrap;
       gap: 8px;
     }
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .stage-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-top: 4px solid #16a34a;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .stage-card h4 { font-size: 0.86rem; color: #0f172a; margin-bottom: 4px; }
+    .stage-card .actor { font-size: 0.74rem; color: #0284c7; font-weight: 700; margin-bottom: 6px; }
+    .stage-card p { font-size: 0.78rem; color: #334155; }
+
+    .dual-incidents {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 1050px) { .dual-incidents { grid-template-columns: 1fr; } }
+
+    .inc-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--jira-blue);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .inc-card.atm { border-top-color: var(--getnet-red); }
+    .inc-card.sys { border-top-color: #0284c7; }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
     }
     th, td {
       text-align: left;
@@ -153,7 +213,7 @@
       background: #f8fafc;
       color: #475569;
       font-weight: 700;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       text-transform: uppercase;
     }
     .status-pill {
@@ -161,10 +221,10 @@
       padding: 3px 9px;
       border-radius: 99px;
       font-weight: 700;
-      font-size: 0.74rem;
+      font-size: 0.73rem;
     }
-    .status-PASSED { background: #dcfce7; color: #166534; }
-    .status-FAILED { background: #fee2e2; color: #991b1b; }
+    .status-PASSED, .status-RESOLVED { background: #dcfce7; color: #166534; }
+    .status-FAILED, .status-ALARM { background: #fee2e2; color: #991b1b; }
     .status-OPEN { background: #fef3c7; color: #92400e; }
     .key-tag {
       font-family: 'Consolas', monospace;
@@ -179,7 +239,7 @@
       color: #e2e8f0;
       padding: 8px 10px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       white-space: pre-wrap;
       margin-top: 4px;
     }
@@ -188,7 +248,7 @@
       background: #ecfdf5;
       border: 1.5px solid #10b981;
       color: #065f46;
-      padding: 12px 18px;
+      padding: 13px 18px;
       border-radius: 8px;
       margin-bottom: 16px;
       font-weight: 600;
@@ -206,14 +266,16 @@
 <body>
   <header>
     <div class="header-left">
-      <h1 data-testid="alm-header-title">Ayesa Digital QAOps · Hub ALM &amp; Ejecuciones (Selenium MCP | Jira Xray | TestLink | Redmine | JMeter IA)</h1>
-      <p>Proyecto: <strong>{{ alm.project.name }}</strong> · Versión: <code>{{ alm.project.version }}</code> · Plan Maestro: <code>{{ alm.testPlan.key }}</code></p>
+      <h1 data-testid="alm-header-title">Getnet (Grupo Santander) · Cuadro de Mando Jira Xray &amp; Ciclo ALM en PRO Sin Human-in-the-Loop</h1>
+      <p>Proyecto: <strong>{{ alm.project.name }}</strong> · Release en PRO: <code>{{ system_state.currentRelease }}</code> · Plan Xray: <code>{{ alm.testPlan.key }}</code></p>
     </div>
     <div class="header-right">
-      <button class="btn-run-selenium" id="btn-trigger-selenium" onclick="runLiveSelenium()">▶️ Ejecutar Selenium + MCP en Vivo</button>
-      <button class="btn-run-jmeter" id="btn-trigger-jmeter" onclick="runLiveJmeter()">⚡ Ejecutar JMeter IA en Vivo</button>
-      <a class="btn-link" href="/servicios-para-clientes" data-testid="btn-volver-portal">🏥 Portal SCA</a>
-      <a class="btn-link" href="/presentacion">📽️ Presentación</a>
+      <button class="btn-inject" id="btn-inject-incidents" onclick="runInjectIncidents()">🔥 1. Simular Fallo PRO (ATM + CloudWatch)</button>
+      <button class="btn-autonomous" id="btn-autonomous-cycle" onclick="runAutonomousCycle()">🤖 2. Ciclo ALM Sin Human-in-the-Loop (Auto-Fix &amp; Re-Deploy)</button>
+      <button class="btn-run-selenium" id="btn-trigger-selenium" onclick="runLiveSelenium()">▶️ Selenium + MCP</button>
+      <button class="btn-run-jmeter" id="btn-trigger-jmeter" onclick="runLiveJmeter()">⚡ JMeter IA</button>
+      <a class="btn-link" href="/servicios-para-clientes" data-testid="btn-volver-portal">🏧 Portal Getnet</a>
+      <a class="btn-link" href="/presentacion">📽️ Presentación CIO</a>
       <a class="btn-link" href="/api/v1/alm/export/jira-xray">⬇ Jira (.json)</a>
       <a class="btn-link" href="/api/v1/alm/export/testlink">⬇ TestLink (.xml)</a>
       <a class="btn-link" href="/api/v1/alm/export/redmine">⬇ Redmine (.csv)</a>
@@ -223,22 +285,36 @@
   <div class="container">
     <div id="live-exec-banner" class="live-banner"></div>
 
-    <!-- KPIs Ejecutivos QAOps -->
+    <!-- KPIs Ejecutivos CIO Getnet -->
     <div class="kpi-row">
       <div class="kpi-card">
-        <div class="label">Selenium E2E (Pytest POM)</div>
-        <div class="value" style="color:var(--pass-green);">{{ selenium.passed }}/{{ selenium.total }} PASSED</div>
-        <div class="sub">Tiempo suite: {{ selenium.totalDurationMs }} ms ({{ selenium.browser[:22] }})</div>
+        <div class="label">Modo Operativo ALM en PRO</div>
+        <div class="value" style="color:var(--getnet-red);">ZERO-TOUCH</div>
+        <div class="sub">Sin Human-in-the-Loop · {{ system_state.autonomousCyclesCount }} ciclos</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Servidor MCP Selenium (DOM Pruning)</div>
-        <div class="value" style="color:#0284c7;">{{ selenium.domLocatorsExtracted }} Selectores</div>
-        <div class="sub">-{{ selenium.domPruningSavingPct }}% tokens · Self-Healing Activo</div>
+        <div class="label">Incidencia Funcional ATM (AWS_Kiro)</div>
+        <div class="value" style="color:{{ '#dc2626' if system_state.atm_functional_bug_active else '#16a34a' }};">
+          {{ 'OPEN (P1)' if system_state.atm_functional_bug_active else 'RESOLVED' }}
+        </div>
+        <div class="sub"><code>GTN-INC-ATM-001</code> · EMV 0420 Reversal</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Total Test Cases (Xray / TestLink)</div>
-        <div class="value" data-testid="alm-total-tests">{{ alm.testCases|length }}/12 PASSED</div>
-        <div class="sub">{{ executions|length }} Ciclos de Ejecución Registrados</div>
+        <div class="label">Incidencia Sistemas (CloudWatch MCP)</div>
+        <div class="value" style="color:{{ '#dc2626' if system_state.systems_cloudwatch_bug_active else '#16a34a' }};">
+          {{ 'ALARM (P0)' if system_state.systems_cloudwatch_bug_active else 'RESOLVED' }}
+        </div>
+        <div class="sub"><code>GTN-INC-SYS-002</code> · Redis TTL={{ system_state.redis_lock_ttl_ms }}ms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Total Test Cases (Jira Xray)</div>
+        <div class="value" data-testid="alm-total-tests">{{ alm.testCases|selectattr('status', 'equalto', 'PASSED')|list|length }}/{{ alm.testCases|length }} PASSED</div>
+        <div class="sub">{{ executions|length }} Ciclos de Ejecución Auditados</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">MTTR Autónomo (Detección → Re-Deploy)</div>
+        <div class="value" style="color:#0284c7;">{{ autonomous.mttrSeconds }} seg</div>
+        <div class="sub">Release: <code>{{ system_state.currentRelease }}</code></div>
       </div>
       <div class="kpi-card">
         <div class="label">JMeter AI · P95 / Apdex</div>
@@ -247,18 +323,145 @@
       </div>
     </div>
 
-    <!-- Selector de Herramienta ALM y Telemetría -->
+    <!-- Selector de Vistas del Cuadro de Mando -->
     <div class="alm-tabs">
-      <button class="alm-tab-btn active-selenium" id="tabbtn-selenium" onclick="switchAlmView('selenium')">🤖 1. Resultados Selenium E2E, MCP Server &amp; Ejecuciones</button>
-      <button class="alm-tab-btn" id="tabbtn-jira" onclick="switchAlmView('jira')">🔷 2. Vista Jira + Xray Test Management</button>
-      <button class="alm-tab-btn" id="tabbtn-testlink" onclick="switchAlmView('testlink')">🌲 3. Vista TestLink / TestPlan XML</button>
-      <button class="alm-tab-btn" id="tabbtn-redmine" onclick="switchAlmView('redmine')">📕 4. Vista Redmine Backlog &amp; Issues</button>
-      <button class="alm-tab-btn" id="tabbtn-jmeter" onclick="switchAlmView('jmeter')">⚡ 5. Vista JMeter AI Performance</button>
+      <button class="alm-tab-btn active-cio" id="tabbtn-cio" onclick="switchAlmView('cio')">🚀 1. Cuadro de Mando CIO Getnet (ALM Sin Human-in-the-Loop)</button>
+      <button class="alm-tab-btn" id="tabbtn-jira" onclick="switchAlmView('jira')">🔷 2. Jira Software + Xray Test Management (14 Tests)</button>
+      <button class="alm-tab-btn" id="tabbtn-selenium" onclick="switchAlmView('selenium')">🤖 3. Telemetría Selenium E2E &amp; MCP Servers</button>
+      <button class="alm-tab-btn" id="tabbtn-testlink" onclick="switchAlmView('testlink')">🌲 4. Vista TestLink XML</button>
+      <button class="alm-tab-btn" id="tabbtn-redmine" onclick="switchAlmView('redmine')">📕 5. Vista Redmine Issues</button>
+      <button class="alm-tab-btn" id="tabbtn-jmeter" onclick="switchAlmView('jmeter')">⚡ 6. Vista JMeter AI Performance</button>
     </div>
 
-    <!-- VISTA 1: RESULTADOS SELENIUM E2E, MCP SERVER Y EJECUCIONES -->
-    <section class="alm-view active" id="view-selenium" data-testid="view-selenium-mcp">
-      <!-- Historial de Ciclos de Ejecución (Test Executions / Builds) -->
+    <!-- VISTA 0: CUADRO DE MANDO EJECUTIVO CIO GETNET (ZERO HUMAN-IN-THE-LOOP) -->
+    <section class="alm-view active" id="view-cio" data-testid="view-cio-command-center">
+      <div class="panel-box">
+        <h2>
+          <span>🔄 Pipeline Autónomo de Producción Sin Human-in-the-Loop (Detección → Triage → Análisis RCA → Re-Fixing → Re-Deploy → Jira Xray)</span>
+          <span class="status-pill {{ 'status-FAILED' if system_state.atm_functional_bug_active else 'status-PASSED' }}">{{ autonomous.overallStatus }}</span>
+        </h2>
+        <div class="pipeline-grid">
+          {% for stg in autonomous.pipelineStages %}
+          <div class="stage-card">
+            <h4>{{ stg.step }}</h4>
+            <div class="actor">{{ stg.actor }} ({{ stg.durationMs }} ms)</div>
+            <p>{{ stg.detail }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Comparativa Detallada de las 2 Incidencias de Producción (Funcional ATM vs Sistemas CloudWatch/Prometheus) -->
+      <div class="dual-incidents">
+        <!-- INCIDENCIA 1: FUNCIONAL ATM (AWS_Kiro-main) -->
+        <div class="inc-card atm" data-testid="card-incidencia-atm-kiro">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="key-tag" style="background:#fef2f2;color:#991b1b;">{{ autonomous.atmKiroDetail.incidentKey }}</span>
+            <span class="status-pill {{ 'status-FAILED' if system_state.atm_functional_bug_active else 'status-PASSED' }}">{{ autonomous.atmKiroDetail.status }}</span>
+          </div>
+          <h3 style="font-size:1.02rem;color:#0f172a;margin-bottom:6px;">🏧 Incidencia 1: Funcional desde Cajero ATM (<code>AWS_Kiro-main</code>)</h3>
+          <p style="font-size:0.84rem;color:#475569;margin-bottom:10px;">
+            <strong>Cajero:</strong> <code>{{ autonomous.atmKiroDetail.atmId }}</code> ({{ autonomous.atmKiroDetail.location }})<br/>
+            <strong>Motor IA:</strong> <code>{{ autonomous.atmKiroDetail.engine }}</code>
+          </p>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px;font-size:0.81rem;margin-bottom:10px;">
+            <div><strong>PAN Redactado PCI-DSS (<code>redact_pan</code>):</strong> <code>{{ autonomous.atmKiroDetail.panRedacted }}</code></div>
+            <div style="margin-top:4px;"><strong>Triaje Cognitivo AWS_Kiro:</strong> Categoría <code>{{ autonomous.atmKiroDetail.triage.categoria }}</code> · Severidad <code>{{ autonomous.atmKiroDetail.triage.severidad }}</code> · Riesgo Vídeo: <code>{{ autonomous.atmKiroDetail.sentinelRisk }} ({{ autonomous.atmKiroDetail.sentinelThreat }})</code></div>
+            <div style="margin-top:4px;"><strong>Causa Raíz (RCA):</strong> {{ autonomous.atmKiroDetail.triage.causa_probable }}</div>
+            <div style="margin-top:4px;color:#166534;"><strong>Re-Fixing &amp; Re-Deploy:</strong> Activado <code>enable_emv_reversal_0420=True</code>, expulsión segura de tarjeta y emisión de Token Digital en Wallet Getnet. Verificado por <code>GTN-TC-013</code>.</div>
+          </div>
+          <div style="font-size:0.78rem;color:#334155;">
+            <strong>Evidencia Fotogramas Clave (<code>atm_sentinel.py</code>):</strong>
+            <ul style="padding-left:18px;margin-top:4px;">
+              {% for fr in autonomous.atmKiroDetail.framesAnalyzed %}
+              <li><code>{{ fr.frame }}</code> (t={{ fr.time_s }}s): {{ fr.obs }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+        <!-- INCIDENCIA 2: SISTEMAS EN PRODUCCIÓN (AWS CloudWatch + Prometheus MCP) -->
+        <div class="inc-card sys" data-testid="card-incidencia-sistemas-cloudwatch">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="key-tag">{{ autonomous.cloudwatchSysDetail.incidentKey }}</span>
+            <span class="status-pill {{ 'status-FAILED' if system_state.systems_cloudwatch_bug_active else 'status-PASSED' }}">{{ autonomous.cloudwatchSysDetail.status }}</span>
+          </div>
+          <h3 style="font-size:1.02rem;color:#0f172a;margin-bottom:6px;">☁️ Incidencia 2: Sistemas en PRO (<code>AWS CloudWatch</code> + <code>Prometheus MCP</code>)</h3>
+          <p style="font-size:0.84rem;color:#475569;margin-bottom:10px;">
+            <strong>Microservicio:</strong> <code>{{ autonomous.cloudwatchSysDetail.service }}</code><br/>
+            <strong>Monitor MCP:</strong> <code>{{ autonomous.cloudwatchSysDetail.mcpServer }}</code>
+          </p>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px;font-size:0.81rem;margin-bottom:10px;">
+            <div><strong>Alarma CloudWatch:</strong> <code>{{ autonomous.cloudwatchSysDetail.alarmName }}</code> en <code>{{ autonomous.cloudwatchSysDetail.logGroup }}</code></div>
+            <div style="margin-top:4px;"><strong>Traza CloudWatch Logs Insights:</strong> <code>{{ autonomous.cloudwatchSysDetail.errorSignature }}</code></div>
+            <div style="margin-top:4px;color:#166534;"><strong>Re-Fixing &amp; Re-Deploy:</strong> Commit <code>{{ autonomous.cloudwatchSysDetail.hotfixCommit }}</code>. Verificado por <code>GTN-TC-014</code>.</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Métrica CloudWatch / Prometheus</th>
+                <th>Durante Incidencia (PRO)</th>
+                <th>Tras Auto-Fix &amp; Re-Deploy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Latencia P95 (<code>getnet_card_block_latency_p95_ms</code>)</td>
+                <td style="color:#dc2626;font-weight:700;">{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.p95LatencyMs }} ms</td>
+                <td style="color:#16a34a;font-weight:700;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.p95LatencyMs }} ms</td>
+              </tr>
+              <tr>
+                <td>Uso Pool DB (<code>getnet_db_hikaricp_utilization_pct</code>)</td>
+                <td style="color:#dc2626;font-weight:700;">{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.hikariPoolUsagePct }}%</td>
+                <td style="color:#16a34a;font-weight:700;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.hikariPoolUsagePct }}%</td>
+              </tr>
+              <tr>
+                <td>Deadlocks Redis (<code>getnet_redis_mutex_deadlocks_total</code>)</td>
+                <td style="color:#dc2626;font-weight:700;">{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.redisMutexDeadlocks }}</td>
+                <td style="color:#16a34a;font-weight:700;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.redisMutexDeadlocks }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabla de Incidentes de Producción en Jira Xray -->
+      <div class="panel-box">
+        <h2><span>📋 Registro de Incidencias de Producción en Jira Service Management &amp; Xray</span></h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Jira Key</th>
+              <th>Tipo / Origen</th>
+              <th>Resumen del Incidente</th>
+              <th>Causa Raíz (RCA) &amp; Hotfix Aplicado</th>
+              <th>Test Xray</th>
+              <th>MTTR</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inc in alm.productionIncidents %}
+            <tr>
+              <td><span class="key-tag">{{ inc.key }}</span></td>
+              <td><strong>{{ inc.type }}</strong><br/><small>{{ inc.source }}</small></td>
+              <td>{{ inc.summary }}</td>
+              <td>
+                <div><strong>RCA:</strong> {{ inc.rootCause }}</div>
+                <div style="color:#166534;margin-top:3px;"><strong>Auto-Fix:</strong> {{ inc.autoFixApplied }} (<code>{{ inc.redeployVersion }}</code>)</div>
+              </td>
+              <td><code>{{ inc.linkedTestCase }}</code></td>
+              <td><strong>{{ inc.mttrSeconds }} s</strong></td>
+              <td><span class="status-pill status-PASSED">{{ inc.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VISTA 1: RESULTADOS SELENIUM E2E, MCP SERVERS Y EJECUCIONES -->
+    <section class="alm-view" id="view-selenium" data-testid="view-selenium-mcp">
       <div class="panel-box">
         <h2>
           <span>🚀 Historial de Ejecuciones en Vivo (Test Executions / Builds en Jira Xray &amp; TestLink)</span>
@@ -294,10 +497,9 @@
         </table>
       </div>
 
-      <!-- Detalle de los 10 Tests de Selenium E2E (Pytest + Self-Healing POM) -->
       <div class="panel-box">
         <h2>
-          <span>🧪 Resultados Detallados de la Suite Selenium WebDriver + Self-Healing POM (<code>SCA-TC-001</code> a <code>SCA-TC-010</code>)</span>
+          <span>🧪 Resultados Detallados de la Suite Pytest + Selenium POM &amp; Auto-Remediation (<code>GTN-TC-001</code> a <code>GTN-TC-014</code>)</span>
           <span style="font-size:0.84rem;color:#475569;">Navegador: <code>{{ selenium.browser }}</code> · Estado Self-Healing: <strong>{{ selenium.selfHealingStatus }}</strong></span>
         </h2>
         <table>
@@ -332,10 +534,9 @@
         </table>
       </div>
 
-      <!-- Telemetría del Servidor MCP de Selenium + Captura de Evidencia -->
       <div class="panel-box">
         <h2>
-          <span>🤖 Telemetría del Servidor MCP de Selenium (<code>{{ selenium.mcpServer }}</code>)</span>
+          <span>🤖 Telemetría de los Servidores MCP (<code>{{ selenium.mcpServer }}</code>)</span>
           <span style="font-size:0.84rem;color:#0284c7;">Context Engineering: -{{ selenium.domPruningSavingPct }}% tokens vía DOM Pruning</span>
         </h2>
         <table>
@@ -363,7 +564,7 @@
 
         <div style="margin-top:20px;">
           <h3 style="font-size:0.98rem;color:#0f172a;margin-bottom:6px;">📸 Evidencia Visual Generada por Selenium MCP (<code>selenium-qaops/reports/mcp_selftest_servicios_clientes.png</code>)</h3>
-          <img class="screenshot-frame" id="mcp-screenshot-img" src="{{ selenium.screenshotUrl }}" alt="Captura de evidencia Selenium MCP del portal SegurCaixa Adeslas" />
+          <img class="screenshot-frame" id="mcp-screenshot-img" src="{{ selenium.screenshotUrl }}" alt="Captura de evidencia Selenium MCP del portal Getnet" />
         </div>
       </div>
     </section>
@@ -371,7 +572,7 @@
     <!-- VISTA 2: JIRA + XRAY -->
     <section class="alm-view" id="view-jira" data-testid="view-jira-xray">
       <div class="panel-box">
-        <h2><span>📌 Épicas e Historias de Usuario en Backlog (Jira Software)</span><span>Sprint 2026.Q4</span></h2>
+        <h2><span>📌 Épicas e Historias de Usuario en Backlog (Jira Software · Getnet)</span><span>Sprint 2026.Q4</span></h2>
         <table>
           <thead>
             <tr>
@@ -397,7 +598,7 @@
       </div>
 
       <div class="panel-box">
-        <h2><span>🧪 Test Plan <code>{{ alm.testPlan.key }}</code> · Casos de Prueba en Xray (BDD / Gherkin + Automatización)</span></h2>
+        <h2><span>🧪 Test Plan <code>{{ alm.testPlan.key }}</code> · Casos de Prueba en Jira Xray (BDD / Gherkin + Automatización)</span></h2>
         <table>
           <thead>
             <tr>
@@ -429,10 +630,10 @@
       </div>
     </section>
 
-    <!-- VISTA 3: TESTLINK / TESTPLAN -->
+    <!-- VISTA 3: TESTLINK -->
     <section class="alm-view" id="view-testlink" data-testid="view-testlink">
       <div class="panel-box">
-        <h2><span>🌲 Estructura Jerárquica de Test Suites en TestLink (<code>segurcaixa_testplan_testlink.xml</code>)</span></h2>
+        <h2><span>🌲 Estructura Jerárquica de Test Suites en TestLink (<code>getnet_testplan_testlink.xml</code>)</span></h2>
         <table>
           <thead>
             <tr>
@@ -495,12 +696,12 @@
             {% for bug in alm.defects %}
             <tr>
               <td><strong style="color:var(--fail-red);">#{{ bug.redmineIssueId }}</strong></td>
-              <td><strong>Bug / Defecto</strong></td>
+              <td><strong>Bug / Incidente PRO</strong></td>
               <td><code>{{ bug.key }}</code></td>
               <td>{{ bug.summary }} <br/><small>Detectado por: {{ bug.detectedBy }} (Vinculado a {{ bug.linkedTestCase }})</small></td>
               <td>{{ bug.severity }}</td>
               <td>—</td>
-              <td><span class="status-pill status-OPEN">{{ bug.status }}</span></td>
+              <td><span class="status-pill status-PASSED">{{ bug.status }}</span></td>
             </tr>
             {% endfor %}
           </tbody>
@@ -553,29 +754,55 @@
       document.getElementById('view-' + view).classList.add('active');
 
       const btns = {
-        selenium: ['tabbtn-selenium', 'active-selenium'],
+        cio: ['tabbtn-cio', 'active-cio'],
         jira: ['tabbtn-jira', 'active-jira'],
+        selenium: ['tabbtn-selenium', 'active-selenium'],
         testlink: ['tabbtn-testlink', 'active-testlink'],
         redmine: ['tabbtn-redmine', 'active-redmine'],
         jmeter: ['tabbtn-jmeter', 'active-jmeter']
       };
       Object.values(btns).forEach(([id, cls]) => {
-        document.getElementById(id).className = 'alm-tab-btn';
+        const el = document.getElementById(id);
+        if (el) el.className = 'alm-tab-btn';
       });
       const [activeId, activeCls] = btns[view];
       document.getElementById(activeId).classList.add(activeCls);
+    }
+
+    async function runInjectIncidents() {
+      const banner = document.getElementById('live-exec-banner');
+      banner.style.display = 'block';
+      banner.style.background = '#fef2f2';
+      banner.style.borderColor = '#ef4444';
+      banner.style.color = '#991b1b';
+      banner.textContent = '🔥 Inyectando en Producción Incidencia Funcional ATM (AWS_Kiro) e Incidencia de Sistemas (AWS CloudWatch + Prometheus MCP)...';
+      await fetch('/api/v1/alm/inject-incidents', { method: 'POST' });
+      setTimeout(() => window.location.reload(), 700);
+    }
+
+    async function runAutonomousCycle() {
+      const banner = document.getElementById('live-exec-banner');
+      banner.style.display = 'block';
+      banner.style.background = '#ecfdf5';
+      banner.style.borderColor = '#10b981';
+      banner.style.color = '#065f46';
+      banner.textContent = '🤖 Ejecutando Ciclo Completo ALM Sin Human-in-the-Loop: [1] Detección ATM Kiro & CloudWatch -> [2] Triage PCI-DSS -> [3] RCA -> [4] Re-Fixing Hotfix -> [5] Re-Deploy Canary PRO -> [6] Certificación Jira Xray...';
+      const res = await fetch('/api/v1/alm/autonomous-cycle', { method: 'POST' });
+      const data = await res.json();
+      banner.textContent = `✅ Ciclo Autónomo Completado (${data.deployedRelease}): ${data.atmIncidentKey} & ${data.sysIncidentKey} RESUELTOS (Reverso EMV ${data.emvReversalCode} + Redis Lock TTL=1500ms). Recargando Cuadro de Mando...`;
+      setTimeout(() => window.location.reload(), 900);
     }
 
     async function runLiveSelenium() {
       const banner = document.getElementById('live-exec-banner');
       const btn = document.getElementById('btn-trigger-selenium');
       banner.style.display = 'block';
-      banner.textContent = '⏳ Ejecutando en vivo Servidor MCP de Selenium (--selftest) + Suite Pytest E2E (10 casos en Chrome Headless)...';
+      banner.textContent = '⏳ Ejecutando en vivo Servidor MCP de Selenium (--selftest) + Suite Pytest E2E (12 casos en Chrome Headless)...';
       btn.disabled = true;
       try {
         const res = await fetch('/api/v1/qaops/trigger-selenium', { method: 'POST' });
         const data = await res.json();
-        banner.textContent = `✅ Ejecución Selenium + MCP completada en ${data.totalElapsedMs} ms (10/10 PASSED). Recargando telemetría...`;
+        banner.textContent = `✅ Ejecución Selenium + MCP completada en ${data.totalElapsedMs} ms. Recargando telemetría...`;
         setTimeout(() => window.location.reload(), 900);
       } catch (e) {
         banner.textContent = '❌ Error al lanzar ejecución: ' + e;

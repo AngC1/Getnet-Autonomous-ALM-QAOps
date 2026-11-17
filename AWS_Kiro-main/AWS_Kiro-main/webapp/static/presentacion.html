@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATM Sentinel · Presentación</title>
+<style>
+  :root { --red: #b30000; --red2: #ec0000; --ink: #1d1d1f; --muted: #5b5b66; --line: #e3e3e8; --soft: #fde8e8;
+    --blue: #0b6bcb; --green: #146c2e; --bg: #f5f5f7; }
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y mandatory; }
+  body { margin: 0; font: 22px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: #2a2a2e; }
+  .slide { scroll-snap-align: start; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2vh 2vw; }
+  .frame { width: min(96vw, calc(96vh * 16 / 9)); aspect-ratio: 16 / 9; background: #fff; border-radius: 10px; position: relative;
+    padding: 4.5% 5.5%; display: flex; flex-direction: column; overflow: hidden; font-size: clamp(12px, 1.55vw, 26px); }
+  .frame::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: .6%; background: var(--red); }
+  .num { position: absolute; right: 3%; bottom: 3.5%; color: var(--muted); font-size: .7em; }
+  .brand { position: absolute; left: 5.5%; bottom: 3.5%; color: var(--muted); font-size: .7em; }
+  h1 { font-size: 2.6em; line-height: 1.1; margin: 0 0 .3em; }
+  h2 { font-size: 1.75em; margin: 0 0 .6em; line-height: 1.15; }
+  h2 small { display: block; font-size: .5em; color: var(--muted); font-weight: 500; margin-top: .3em; }
+  p { margin: 0 0 .6em; }
+  .lead { font-size: 1.3em; color: var(--muted); }
+  .red { color: var(--red); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4%; flex: 1; align-items: start; }
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; }
+  .box { border: 2px solid var(--line); border-radius: 10px; padding: 4% 5%; }
+  .box h3 { margin: 0 0 .4em; font-size: 1.1em; }
+  .box.r { border-color: var(--red); background: var(--soft); }
+  ul { margin: 0; padding-left: 1.1em; } li { margin-bottom: .35em; }
+  .kpi { text-align: center; padding: 6% 4%; border-radius: 10px; background: var(--bg); }
+  .kpi b { display: block; font-size: 2.3em; line-height: 1.1; color: var(--red); font-variant-numeric: tabular-nums; }
+  .kpi span { color: var(--muted); font-size: .85em; }
+  .note { color: var(--muted); font-size: .72em; margin-top: auto; }
+  code { font-size: .85em; background: var(--bg); padding: .05em .3em; border-radius: 4px; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: system-ui, sans-serif; }
+  table { border-collapse: collapse; width: 100%; font-size: .85em; }
+  th, td { text-align: left; padding: .35em .5em; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .title-slide .frame { justify-content: center; background: linear-gradient(135deg, #fff 60%, var(--soft)); }
+  .tag { display: inline-block; background: var(--red); color: #fff; padding: .15em .6em; border-radius: 4px; font-size: .75em; font-weight: 700; letter-spacing: .04em; }
+  @media print { html { scroll-snap-type: none; } body { background: #fff; } .slide { height: auto; page-break-after: always; padding: 0; } }
+</style>
+</head>
+<body>
+
+<!-- 1 · Portada -->
+<section class="slide title-slide" aria-label="Portada"><div class="frame">
+  <span class="tag">HACKATHON AWS M&amp;E AGENTIC AI · MADRID · 4 NOV 2026</span>
+  <h1 style="margin-top:.5em">ATM Sentinel</h1>
+  <p class="lead">Detección en tiempo real de manipulación de cajeros con IA,<br>del vídeo de la cámara al informe de riesgo en segundos.</p>
+  <p style="margin-top:1.5em">Caso de uso: <strong>Banco Santander</strong> · Equipo 4 (Ayesa + Minsait)</p>
+  <span class="num">1 / 8</span>
+</div></section>
+
+<!-- 2 · Problema -->
+<section class="slide" aria-label="El problema"><div class="frame">
+  <h2>El problema</h2>
+  <div class="cols">
+    <div>
+      <p class="lead">Un skimmer instalado en un cajero copia tarjetas y PIN de cada cliente que lo usa, hasta que alguien lo descubre.</p>
+      <ul>
+        <li>La instalación dura <strong>segundos</strong>; el daño, horas o días.</li>
+        <li>Las cámaras ya graban, pero <strong>nadie las mira en directo</strong>: el vídeo se revisa a mano después de la denuncia.</li>
+        <li>Unas reglas fijas (“hay movimiento”) no distinguen a un cliente de un delincuente.</li>
+      </ul>
+    </div>
+    <div class="box r">
+      <h3>¿Por qué un agente de IA?</h3>
+      <p>Hay que <strong>entender la escena</strong>: capucha, guantes, mirar alrededor, manos en la ranura en lugar de en la pantalla.</p>
+      <p>Y después <strong>explicarla</strong>: tipo de amenaza, nivel de riesgo, evidencias y qué hacer.</p>
+    </div>
+  </div>
+  <span class="brand">ATM Sentinel</span><span class="num">2 / 8</span>
+</div></section>
+
+<!-- 3 · Solución -->
+<section class="slide" aria-label="La solución"><div class="frame">
+  <h2>La solución: vigilar → detectar → informar</h2>
+  <div class="cols3" style="flex:1">
+    <div class="box"><h3>1 · Vigilar</h3>
+      <p>La cámara del cajero emite en directo. Cada <strong>2 s</strong> un modelo rápido compara la escena con el cajero en reposo.</p>
+      <p class="red"><strong>Claude Haiku 4.5</strong></p></div>
+    <div class="box r"><h3>2 · Detectar</h3>
+      <p><strong>2 positivos seguidos</strong> → alerta. Se corta el vídeo: <strong>10 s antes</strong> + la manipulación.</p>
+      <p>Tras 2 negativos seguidos: <strong>“comportamiento normal”</strong>, y se sigue vigilando.</p></div>
+    <div class="box"><h3>3 · Informar</h3>
+      <p>El corte se analiza con 6 fotogramas clave y los metadatos del cajero → <strong>informe JSON</strong> con riesgo, amenaza, evidencias y acciones.</p>
+      <p class="red"><strong>Claude Sonnet 4.5</strong></p></div>
+  </div>
+  <p class="note">Todo en Amazon Bedrock, us-east-1 · artefactos en Amazon S3 · web de operación y dashboard de consumos en tiempo real.</p>
+  <span class="num">3 / 8</span>
+</div></section>
+
+<!-- 4 · Arquitectura y flujos -->
+<section class="slide" aria-label="Arquitectura y flujos de información"><div class="frame">
+  <h2>Arquitectura y flujos de información</h2>
+  <svg viewBox="0 0 1200 520" role="img" aria-label="Diagrama: cámara, servidor ATM Sentinel, Bedrock Haiku y Sonnet, S3, web y dashboard">
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b5b66"/></marker>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b30000"/></marker>
+    </defs>
+    <style>
+      .n rect { fill: #fff; stroke: #c4c4cc; stroke-width: 2; rx: 12; }
+      .n.k rect { fill: #fde8e8; stroke: #b30000; }
+      .n.b rect { fill: #eaf3fc; stroke: #0b6bcb; }
+      .t { font-size: 21px; font-weight: 700; fill: #1d1d1f; }
+      .s { font-size: 16px; fill: #5b5b66; }
+      .l { stroke: #5b5b66; stroke-width: 2.5; fill: none; marker-end: url(#a); }
+      .lr { stroke: #b30000; stroke-width: 3; fill: none; marker-end: url(#ar); }
+      .e { font-size: 15px; fill: #1d1d1f; }
+      .er { font-size: 15px; fill: #b30000; font-weight: 700; }
+    </style>
+    <!-- Nodos -->
+    <g class="n"><rect x="10" y="40" width="230" height="110"/><text class="t" x="125" y="85" text-anchor="middle">Cámara del cajero</text><text class="s" x="125" y="112" text-anchor="middle">CAM-01 · ES_MAD_0482</text><text class="s" x="125" y="134" text-anchor="middle">(simulada con ComfyUI)</text></g>
+    <g class="n k"><rect x="420" y="40" width="360" height="190"/><text class="t" x="600" y="80" text-anchor="middle">Servidor ATM Sentinel</text>
+      <text class="s" x="600" y="110" text-anchor="middle">emisión en directo sincronizada</text>
+      <text class="s" x="600" y="135" text-anchor="middle">muestreo cada 2 s · referencia + t-1 + t</text>
+      <text class="s" x="600" y="160" text-anchor="middle">alerta: 2 positivos / normal: 2 negativos</text>
+      <text class="s" x="600" y="185" text-anchor="middle">corte ffmpeg [detección −10 s, +8 s]</text>
+      <text class="s" x="600" y="210" text-anchor="middle">pipeline de incidencias</text></g>
+    <g class="n b"><rect x="990" y="20" width="200" height="100"/><text class="t" x="1090" y="60" text-anchor="middle">Claude Haiku 4.5</text><text class="s" x="1090" y="86" text-anchor="middle">detector · ~1 s/llamada</text><text class="s" x="1090" y="106" text-anchor="middle">Bedrock us-east-1</text></g>
+    <g class="n b"><rect x="990" y="160" width="200" height="100"/><text class="t" x="1090" y="200" text-anchor="middle">Claude Sonnet 4.5</text><text class="s" x="1090" y="226" text-anchor="middle">analista · informe ~14 s</text><text class="s" x="1090" y="246" text-anchor="middle">Bedrock us-east-1</text></g>
+    <g class="n"><rect x="420" y="330" width="360" height="110"/><text class="t" x="600" y="370" text-anchor="middle">Amazon S3 (us-east-1)</text><text class="s" x="600" y="397" text-anchor="middle">incidents/&lt;id&gt;/ video · metadata · status</text><text class="s" x="600" y="420" text-anchor="middle">frames/ · report.json</text></g>
+    <g class="n"><rect x="10" y="330" width="230" height="110"/><text class="t" x="125" y="372" text-anchor="middle">Web de operación</text><text class="s" x="125" y="398" text-anchor="middle">directo · alertas</text><text class="s" x="125" y="420" text-anchor="middle">informes · capturas</text></g>
+    <g class="n"><rect x="990" y="330" width="200" height="110"/><text class="t" x="1090" y="372" text-anchor="middle">Dashboard</text><text class="s" x="1090" y="398" text-anchor="middle">tokens · coste · latencia</text><text class="s" x="1090" y="420" text-anchor="middle">GPU · S3 · CloudWatch</text></g>
+    <!-- Flujos -->
+    <path class="l" d="M240,95 H415"/><text class="e" x="252" y="85">① vídeo en directo</text>
+    <path class="lr" d="M780,70 H985"/><text class="er" x="790" y="60">② 3 imágenes</text>
+    <path class="l" d="M985,100 H785"/><text class="e" x="800" y="122">③ veredicto JSON</text>
+    <path class="lr" d="M780,190 H985"/><text class="er" x="790" y="180">⑤ 6 fotogramas + datos</text>
+    <path class="l" d="M985,225 H785"/><text class="e" x="800" y="250">⑥ informe JSON</text>
+    <path class="lr" d="M600,230 V325"/><text class="er" x="612" y="290">④ corte + metadatos · ⑦ informe</text>
+    <path class="l" d="M415,385 H245"/><text class="e" x="262" y="375">⑧ URLs firmadas</text>
+    <path class="l" d="M420,175 C330,175 300,250 160,325"/><text class="e" x="250" y="230">estado en vivo</text>
+    <path class="l" d="M780,385 H985"/><text class="e" x="810" y="375">métricas de uso</text>
+    <path class="l" d="M125,150 V325" stroke-dasharray="6 6"/><text class="e" x="135" y="250">vídeo</text>
+  </svg>
+  <p class="note">La alerta (②③) va por Haiku, que es rápido y barato. El informe (⑤⑥) va por Sonnet, que razona mejor. S3 es la única fuente de verdad: la web solo lee de ahí.</p>
+  <span class="num">4 / 8</span>
+</div></section>
+
+<!-- 5 · Flujo temporal -->
+<section class="slide" aria-label="Flujo en directo"><div class="frame">
+  <h2>Qué pasa en la emisión de 2 minutos <small>tiempos medidos en el vídeo de la demo</small></h2>
+  <svg viewBox="0 0 1200 330" role="img" aria-label="Línea temporal de la emisión: normal hasta 1:30, alerta en 1:32, corte 1:22 a 1:40, normal desde 1:38">
+    <style>
+      .tx { font-size: 18px; fill: #1d1d1f; } .ts { font-size: 15px; fill: #5b5b66; } .tb { font-size: 19px; font-weight: 700; }
+    </style>
+    <rect x="40" y="130" width="1120" height="26" rx="6" fill="#e3f5e8"/>
+    <!-- 0..120 s -> 40..1160 (9.333 px/s) -->
+    <rect x="805" y="118" width="168" height="50" rx="5" fill="rgba(179,0,0,.18)" stroke="#b30000" stroke-width="2.5"/>
+    <rect x="880" y="130" width="56" height="26" fill="#b30000"/>
+    <text class="ts" x="40" y="190">0:00</text><text class="ts" x="1160" y="190" text-anchor="end">2:00</text>
+    <text class="tx" x="60" y="110">Clientes y peatones → <tspan class="tb" fill="#146c2e">normal</tspan></text>
+    <g><line x1="880" y1="60" x2="880" y2="128" stroke="#1d1d1f" stroke-width="2"/><text class="tb" x="872" y="52" text-anchor="end">1:30 aparece el sospechoso</text></g>
+    <g><line x1="899" y1="170" x2="899" y2="235" stroke="#b30000" stroke-width="3"/><text class="tb" x="905" y="225" fill="#b30000">1:32 primer positivo</text><text class="ts" x="905" y="247">1:34 confirmado → ALERTA</text></g>
+    <g><line x1="954" y1="88" x2="954" y2="128" stroke="#146c2e" stroke-width="3"/><text class="tb" x="962" y="82" fill="#146c2e">1:38 vuelve a normal</text></g>
+    <text class="ts" x="805" y="290">corte enviado 1:22 – 1:40</text>
+    <text class="ts" x="805" y="312">(10 s antes + manipulación)</text>
+    <text class="ts" x="1000" y="290">+ ~16 s → informe</text>
+    <text class="ts" x="1000" y="312">ALTO · SKIMMING</text>
+  </svg>
+  <div class="cols3" style="margin-top:auto">
+    <div class="kpi"><b>2 s</b><span>desde que aparece hasta el primer positivo</span></div>
+    <div class="kpi"><b>~16 s</b><span>del corte recibido al informe (media de 11)</span></div>
+    <div class="kpi"><b>9 / 9</b><span>emisiones con manipulación detectada e informe</span></div>
+  </div>
+  <span class="num">5 / 8</span>
+</div></section>
+
+<!-- 6 · Datos -->
+<section class="slide" aria-label="Qué entra y qué sale de cada modelo"><div class="frame">
+  <h2>Qué entra y qué sale de cada modelo</h2>
+  <table>
+    <thead><tr><th style="width:14%"></th><th style="width:43%">Detector · Claude Haiku 4.5</th><th>Analista · Claude Sonnet 4.5</th></tr></thead>
+    <tbody>
+      <tr><th>Cuándo</th><td>Cada 2 s de vídeo, durante toda la emisión</td><td>Una vez por incidencia, con el corte</td></tr>
+      <tr><th>Entrada</th><td>3 imágenes: <strong>referencia</strong> (cajero vacío), hace 1 s y actual + criterios de manipulación frente a uso legítimo</td>
+        <td>6 fotogramas clave (los de más cambio visual) + ID de cajero, ubicación, evento y fecha-hora</td></tr>
+      <tr><th>Salida</th><td><code>{manipulation, confidence, observation}</code></td>
+        <td><code>{risk_level, threat_type, confidence, summary, evidence[], recommended_actions[]}</code></td></tr>
+      <tr><th>Control</th><td>2 positivos ≥ 0,6 → alerta · 2 negativos → normal</td><td>Esquema validado; si el JSON es inválido, se reintenta una vez</td></tr>
+      <tr><th>Latencia</th><td>~1,0 s media · 1,7 s p95</td><td>~14 s</td></tr>
+      <tr><th>Coste</th><td>~$0,0018 por muestra</td><td>~$0,025 por informe</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Riesgo: BAJO · MEDIO · ALTO · CRÍTICO. Amenazas: skimming, shimming, card trapping, cash trapping, ataque físico, observación de PIN… Los números de tarjeta se enmascaran antes de guardarlos. No hay secretos en el código.</p>
+  <span class="num">6 / 8</span>
+</div></section>
+
+<!-- 7 · Coste y siguientes pasos -->
+<section class="slide" aria-label="Coste y siguientes pasos"><div class="frame">
+  <h2>Coste y siguientes pasos</h2>
+  <div class="cols">
+    <div>
+      <div class="cols" style="grid-template-columns:1fr 1fr;gap:6%">
+        <div class="kpi"><b>$0,13</b><span>una demo completa de 2 min (≈59 muestras + 1 informe)</span></div>
+        <div class="kpi"><b>~$3,3/h</b><span>por cajero 24/7 con el muestreo actual</span></div>
+      </div>
+      <p style="margin-top:1em">El coste lo marca el detector. Para escalar a una red de cajeros:</p>
+      <ul>
+        <li><strong>Prefiltro de movimiento local</strong>: llamar a la IA solo cuando alguien se acerca al cajero.</li>
+        <li>Muestrear más despacio con el cajero vacío.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Hacia producción</h3>
+      <ul>
+        <li>Cámaras reales vía <strong>Kinesis Video Streams</strong>.</li>
+        <li>Alertas al centro de seguridad y <strong>bloqueo remoto</strong> del cajero.</li>
+        <li>Agente en <strong>Bedrock AgentCore</strong> con herramientas de actuación.</li>
+        <li>Validar con grabaciones reales y medir falsos positivos.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Costes estimados con precios públicos de Bedrock (perfil US) y tokens medidos en la demo. La estimación 24/7 no está probada.</p>
+  <span class="num">7 / 8</span>
+</div></section>
+
+<!-- 8 · Demo -->
+<section class="slide title-slide" aria-label="Demo"><div class="frame">
+  <span class="tag">DEMO EN DIRECTO</span>
+  <h1 style="margin-top:.5em">Veámoslo funcionar</h1>
+  <ul style="font-size:1.15em">
+    <li><strong>Operación</strong>: cámara en directo, registro del detector, alerta, corte e informe.</li>
+    <li><strong>Consumos</strong>: tokens, coste, latencia, GPU y S3 en tiempo real.</li>
+  </ul>
+  <p class="note">Vídeo de cámara generado con ComfyUI (Wan2.2, GPU NVIDIA L40S) y emitido en tiempo real. La detección, el corte y el informe ocurren durante la demo.</p>
+  <span class="num">8 / 8</span>
+</div></section>
+
+<script>
+  // ← → / Re Pág · Av Pág / espacio para cambiar de diapositiva
+  const slides = [...document.querySelectorAll(".slide")];
+  const current = () => slides.reduce((best, s, i) => Math.abs(s.getBoundingClientRect().top) < Math.abs(slides[best].getBoundingClientRect().top) ? i : best, 0);
+  document.addEventListener("keydown", (e) => {
+    const k = e.key, i = current();
+    if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(k)) { e.preventDefault(); slides[Math.min(i + 1, slides.length - 1)].scrollIntoView(); }
+    if (["ArrowLeft", "ArrowUp", "PageUp"].includes(k)) { e.preventDefault(); slides[Math.max(i - 1, 0)].scrollIntoView(); }
+    if (k === "Home") slides[0].scrollIntoView();
+    if (k === "End") slides[slides.length - 1].scrollIntoView();
+  });
+</script>
+</body>
+</html>

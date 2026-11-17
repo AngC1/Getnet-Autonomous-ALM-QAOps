@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATM Sentinel · Banco Santander</title>
+<style>
+  :root {
+    --red: #b30000; --red-soft: #fde8e8; --ink: #1d1d1f; --muted: #5b5b66; --line: #e3e3e8;
+    --bg: #f5f5f7; --card: #fff; --ok: #146c2e; --warn: #8a5300; --info: #0b4f8a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  header { background: var(--red); color: #fff; padding: 14px 24px; display: flex; align-items: baseline; gap: 14px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header span { opacity: .9; font-size: 14px; }
+  main { display: grid; grid-template-columns: 360px 1fr; gap: 20px; padding: 20px 24px; max-width: 1500px; margin: 0 auto; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 20px; }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  h3 { font-size: 14px; margin: 18px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  label { display: block; font-weight: 600; font-size: 13px; margin: 10px 0 4px; }
+  input, textarea { width: 100%; padding: 8px 10px; border: 1px solid #c4c4cc; border-radius: 6px; font: inherit; }
+  input:focus, textarea:focus, button:focus-visible, .inc:focus-visible { outline: 3px solid #0b57d0; outline-offset: 1px; }
+  textarea { min-height: 64px; resize: vertical; }
+  button { background: var(--red); color: #fff; border: 0; border-radius: 6px; padding: 9px 16px; font: inherit; font-weight: 600; cursor: pointer; margin-top: 14px; }
+  button.secondary { background: #fff; color: var(--red); border: 1px solid var(--red); }
+  button:disabled { opacity: .55; cursor: progress; }
+  .hint { color: var(--muted); font-size: 12px; }
+  .msg { margin-top: 10px; font-size: 13px; }
+  .msg.err { color: var(--red); }
+  .msg.ok { color: var(--ok); }
+  ul.list { list-style: none; margin: 0; padding: 0; }
+  .inc { display: block; width: 100%; text-align: left; background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 0 0 8px; font-weight: 400; }
+  .inc[aria-current="true"] { border-color: var(--red); box-shadow: inset 4px 0 0 var(--red); }
+  .inc strong { display: block; font-size: 14px; }
+  .inc small { color: var(--muted); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid transparent; }
+  .r-CRITICO { background: #7a0000; color: #fff; }
+  .r-ALTO { background: var(--red-soft); color: var(--red); border-color: #f3b4b4; }
+  .r-MEDIO { background: #fff3d6; color: var(--warn); border-color: #f0d190; }
+  .r-BAJO { background: #e3f5e8; color: var(--ok); border-color: #a9dcb7; }
+  .s { background: #eef2f8; color: var(--info); }
+  .s-COMPLETADO { background: #e3f5e8; color: var(--ok); }
+  .s-FALLIDO { background: var(--red-soft); color: var(--red); }
+  .empty { color: var(--muted); padding: 40px; text-align: center; }
+  .steps { display: flex; gap: 0; list-style: none; padding: 0; margin: 4px 0 0; flex-wrap: wrap; }
+  .steps li { flex: 1; min-width: 120px; padding: 8px 10px; border-top: 4px solid var(--line); font-size: 13px; color: var(--muted); }
+  .steps li.done { border-color: var(--ok); color: var(--ok); }
+  .steps li.active { border-color: var(--info); color: var(--info); font-weight: 700; }
+  .steps li.failed { border-color: var(--red); color: var(--red); font-weight: 700; }
+  .steps time { display: block; font-size: 11px; font-weight: 400; }
+  .grid2 { display: grid; grid-template-columns: minmax(280px, 1fr) 1fr; gap: 20px; }
+  @media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
+  video { width: 100%; border-radius: 8px; background: #000; }
+  dl { display: grid; grid-template-columns: 150px 1fr; gap: 6px 12px; margin: 0; }
+  dt { color: var(--muted); font-size: 13px; }
+  dd { margin: 0; word-break: break-word; }
+  .risk { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .risk .badge { font-size: 18px; padding: 6px 16px; }
+  .threat { font-size: 18px; font-weight: 700; }
+  .conf { flex: 1; min-width: 180px; }
+  .bar { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--info); }
+  .frames { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .frames figure { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fafafa; }
+  .frames img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; cursor: zoom-in; }
+  .frames figcaption { font-size: 12px; padding: 4px 8px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); word-break: break-all; }
+  pre { background: #1d1d1f; color: #e6e6e6; padding: 12px; border-radius: 8px; overflow: auto; font-size: 12px; max-height: 420px; }
+  dialog { border: 0; border-radius: 10px; padding: 0; max-width: 92vw; background: #000; }
+  dialog img { max-width: 92vw; max-height: 86vh; display: block; }
+  dialog button { position: absolute; top: 8px; right: 8px; margin: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  /* Cámara en directo */
+  .live-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr); gap: 16px; }
+  @media (max-width: 1100px) { .live-grid { grid-template-columns: 1fr; } }
+  .cam { position: relative; border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 832/480; }
+  .cam video { border-radius: 0; height: 100%; object-fit: cover; }
+  .cam.alert { outline: 5px solid var(--red); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { outline-color: #ff6b6b; } }
+  @media (prefers-reduced-motion: reduce) { .cam.alert { animation: none; } }
+  .cam .tag { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.65); color: #fff;
+    padding: 3px 10px; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: .05em; }
+  .cam .tag.on::before { content: "● "; color: #ff3b30; }
+  .cam [hidden] { display: none !important; }
+  .banner { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(179,0,0,.92); color: #fff; padding: 8px 12px; font-weight: 700; }
+  .tl { position: relative; height: 18px; background: var(--line); border-radius: 4px; margin-top: 10px; }
+  .tl .played { position: absolute; left: 0; top: 0; bottom: 0; background: #9db7d6; border-radius: 4px 0 0 4px; }
+  .tl .win { position: absolute; top: -3px; bottom: -3px; background: rgba(179,0,0,.35); border: 2px solid var(--red); border-radius: 3px; }
+  .tl .mark { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--red); }
+  .tl-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .log { list-style: none; margin: 0; padding: 0; max-height: 330px; overflow: auto; font-size: 13px; }
+  .log li { padding: 5px 8px; border-left: 4px solid var(--line); margin-bottom: 4px; background: #fafafa; }
+  .log li.pos { border-color: var(--red); background: var(--red-soft); }
+  .log li.neg { border-color: #9ccfa9; }
+  .log li.err { border-color: var(--warn); }
+  .log b { font-variant-numeric: tabular-nums; }
+  .det { border: 2px solid var(--red); border-radius: 8px; padding: 10px 12px; background: var(--red-soft); margin-bottom: 10px; }
+  .det h3 { margin: 0 0 6px; color: var(--red); }
+  .det.cleared { border-color: #9ccfa9; background: #f1faf3; }
+  .det.cleared h3 { color: var(--ok); }
+  .det .events { margin: 6px 0; padding-left: 0; list-style: none; font-size: 13px; }
+  .det .events li { padding: 2px 0 2px 8px; border-left: 3px solid var(--red); margin-bottom: 2px; }
+  .det .events li.n { border-color: var(--ok); }
+  .banner.ok { background: rgba(20,108,46,.92); }
+  .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .toolbar button { margin: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ATM Sentinel</h1>
+  <span>Detección de manipulación en cajeros · Banco Santander · Amazon Bedrock (us-east-1)</span>
+  <nav aria-label="Secciones" style="margin-left:auto;display:flex;gap:16px">
+    <a href="./" aria-current="page" style="color:#fff;font-weight:600;text-decoration:none;border-bottom:2px solid #fff">Operación</a>
+    <a href="dashboard" style="color:#fff;font-weight:600">Consumos</a>
+    <a href="static/presentacion.html" style="color:#fff;font-weight:600">Presentación</a>
+  </nav>
+</header>
+
+<main>
+  <aside>
+    <section class="card" aria-labelledby="upload-title">
+      <h2 id="upload-title">Recepcionar vídeo</h2>
+      <form id="upload">
+        <label for="video">Vídeo del cajero (.mp4)</label>
+        <input id="video" name="video" type="file" accept="video/*" required>
+        <label for="atm_id">ID del cajero</label>
+        <input id="atm_id" name="atm_id" required maxlength="50" pattern="[A-Za-z0-9_\-]+" value="ES_MAD_0482">
+        <label for="location">Ubicación</label>
+        <input id="location" name="location" required maxlength="200" value="Sucursal Principal - Calle Alcalá, Madrid (ejemplo)">
+        <label for="event">Evento de manipulación</label>
+        <textarea id="event" name="event" required maxlength="2000">Manipulación de tarjetero y teclado (evento simulado)</textarea>
+        <label for="timestamp">Fecha-hora del evento <span class="hint">(ISO 8601, vacío = ahora)</span></label>
+        <input id="timestamp" name="timestamp" placeholder="2026-11-04T12:00:00+01:00">
+        <button type="submit" id="send">Enviar y analizar</button>
+        <div id="upload-msg" class="msg" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="list-title">
+      <h2 id="list-title">Incidencias</h2>
+      <ul id="incidents" class="list" aria-live="polite"><li class="hint">Cargando…</li></ul>
+    </section>
+  </aside>
+
+  <div>
+  <section class="card" aria-labelledby="live-title">
+    <div class="toolbar">
+      <h2 id="live-title" style="margin:0">Cámara en directo · CAM-01 · ES_MAD_0482</h2>
+      <span id="live-state"></span>
+      <span style="flex:1"></span>
+      <button type="button" id="live-start">Iniciar transmisión</button>
+      <button type="button" id="live-stop" class="secondary">Detener</button>
+    </div>
+    <div class="live-grid" style="margin-top:12px">
+      <div>
+        <div class="cam" id="cam">
+          <video id="live-video" muted playsinline preload="auto" aria-label="Cámara de seguridad del cajero en directo"></video>
+          <div class="tag" id="live-tag">SIN SEÑAL</div>
+          <div class="banner" id="live-banner" hidden role="alert"></div>
+        </div>
+        <div class="tl" id="tl" aria-hidden="true"><div class="played" id="tl-played"></div></div>
+        <div class="tl-labels"><span>0:00</span><span id="tl-pos">—</span><span id="tl-dur">2:00</span></div>
+      </div>
+      <div>
+        <div id="live-detection"></div>
+        <p class="hint" id="live-model"></p>
+        <h3 style="margin-top:0">Registro del detector IA</h3>
+        <ul class="log" id="live-log" aria-live="off"><li class="hint">Sin muestras todavía.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="detail" aria-live="polite">
+    <div class="card empty">Selecciona una incidencia o recepciona un vídeo nuevo.</div>
+  </section>
+  </div>
+</main>
+
+<dialog id="zoom" aria-label="Fotograma ampliado">
+  <button type="button" class="secondary" id="zoom-close">Cerrar</button>
+  <img id="zoom-img" alt="">
+</dialog>
+
+<script>
+const STEPS = [
+  ["RECIBIDO", "Vídeo recibido"],
+  ["EXTRAYENDO_FOTOGRAMAS", "Fotogramas clave"],
+  ["ANALIZANDO", "Análisis Bedrock"],
+  ["COMPLETADO", "Informe listo"],
+];
+const LABEL = { EN_COLA: "En cola", RECIBIDO: "Recibido", EXTRAYENDO_FOTOGRAMAS: "Extrayendo fotogramas",
+  ANALIZANDO: "Analizando", COMPLETADO: "Completado", FALLIDO: "Fallido" };
+const RUNNING = new Set(["EN_COLA", "RECIBIDO", "EXTRAYENDO_FOTOGRAMAS", "ANALIZANDO"]);
+
+let selected = new URLSearchParams(location.hash.slice(1)).get("id");
+let timer = null;
+
+// Pequeño helper para crear nodos sin innerHTML con datos externos.
+function el(tag, attrs = {}, ...children) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null) continue;
+    if (k === "class") n.className = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const c of children.flat()) if (c != null) n.append(c instanceof Node ? c : String(c));
+  return n;
+}
+const fmtTime = (s) => s ? new Date(s).toLocaleString("es-ES") : "—";
+const fmtSize = (b) => b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : (b / 1024).toFixed(1) + " KB";
+const statusBadge = (s) => el("span", { class: `badge s s-${s}` }, LABEL[s] || s || "—");
+const riskBadge = (r) => r ? el("span", { class: `badge r-${r}` }, r) : null;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(data.error || r.statusText), { details: data.details });
+  return data;
+}
+
+async function loadList() {
+  const ul = document.getElementById("incidents");
+  try {
+    const items = await api("api/incidents");
+    ul.replaceChildren(...(items.length ? items.map((i) => el("li", {},
+      el("button", { class: "inc", type: "button", "aria-current": String(i.id === selected), onclick: () => select(i.id) },
+        el("strong", {}, i.atm_id || i.id),
+        el("small", {}, i.location || ""), el("br"),
+        statusBadge(i.status), " ", riskBadge(i.risk_level), " ",
+        el("small", {}, i.threat_type || ""), el("br"),
+        el("small", {}, fmtTime(i.updated_at))))) : [el("li", { class: "hint" }, "Sin incidencias todavía.")]));
+  } catch (e) {
+    ul.replaceChildren(el("li", { class: "msg err" }, "Error cargando incidencias: " + e.message));
+  }
+}
+
+function select(id) {
+  selected = id;
+  location.hash = "id=" + encodeURIComponent(id);
+  loadList();
+  loadDetail();
+}
+
+function stepper(status) {
+  const hist = Object.fromEntries((status.history || []).map((h) => [h.status, h.at]));
+  const cur = status.status;
+  const curIdx = STEPS.findIndex(([k]) => k === cur);
+  const failed = cur === "FALLIDO";
+  // Si falló, la etapa fallida es la siguiente a la última completada.
+  const lastDone = failed ? Math.max(...STEPS.map(([k], i) => (hist[k] ? i : -1))) : curIdx;
+  return el("ol", { class: "steps", "aria-label": "Progreso del análisis" }, STEPS.map(([k, label], i) => {
+    let cls = "";
+    if (failed) cls = i <= lastDone ? "done" : i === lastDone + 1 ? "failed" : "";
+    else if (cur === "COMPLETADO" || i < curIdx) cls = "done";
+    else if (i === curIdx) cls = "active";
+    return el("li", { class: cls }, label, cls === "failed" ? " — fallido" : "",
+      el("time", {}, hist[k] ? fmtTime(hist[k]) : ""));
+  }));
+}
+
+function renderDetail(d) {
+  const root = document.getElementById("detail");
+  const s = d.status || {};
+  const m = d.metadata || {};
+  const r = d.report;
+  const running = RUNNING.has(s.status);
+
+  const head = el("section", { class: "card" },
+    el("div", { class: "risk" },
+      el("h2", { style: "margin:0" }, `Incidencia ${d.id}`), statusBadge(s.status),
+      el("span", { style: "flex:1" }),
+      el("button", { type: "button", class: "secondary", style: "margin:0", disabled: running ? "" : null,
+        onclick: () => reanalyze(d.id) }, running ? "Procesando…" : "Analizar de nuevo")),
+    stepper(s),
+    s.error ? el("p", { class: "msg err" }, "Error: " + s.error) : null);
+
+  const video = el("section", { class: "card" }, el("h2", {}, "Vídeo recibido"),
+    d.video ? [
+      el("video", { controls: "", preload: "metadata", src: d.video.url, "aria-label": "Vídeo del incidente" }),
+      el("p", { class: "hint" }, d.video.uri)] : el("p", { class: "hint" }, "Sin vídeo."));
+
+  const meta = el("section", { class: "card" }, el("h2", {}, "Datos del incidente"),
+    el("dl", {},
+      el("dt", {}, "ID cajero"), el("dd", {}, m.atm_id || "—"),
+      el("dt", {}, "Ubicación"), el("dd", {}, m.location || "—"),
+      el("dt", {}, "Evento"), el("dd", {}, m.tamper_event || "—"),
+      el("dt", {}, "Fecha-hora evento"), el("dd", {}, fmtTime(m.event_timestamp)),
+      el("dt", {}, "Recibido"), el("dd", {}, fmtTime(m.received_at || (s.history || [])[0]?.at)),
+      el("dt", {}, "Archivo original"), el("dd", {}, m.original_filename || "—"),
+      el("dt", {}, "Cliente"), el("dd", {}, m.client || "Banco Santander"),
+      el("dt", {}, "Origen"), el("dd", {}, m.source || "—"),
+      m.detection ? [
+        el("dt", {}, "Detectado en"), el("dd", {}, `${mmss(m.detection.detected_at_s)} del directo (confirmado en ${mmss(m.detection.confirmed_at_s)})`),
+        el("dt", {}, "Ventana del corte"), el("dd", {}, `${mmss(m.detection.clip_start_s)} – ${mmss(m.detection.clip_end_s)} (${PRE_LABEL(m.detection)})`),
+        el("dt", {}, "Detector"), el("dd", {}, `${m.detection.detector_model} · confianza ${Math.round(m.detection.confidence * 100)}%`),
+      ] : null));
+
+  const parts = [head, el("div", { class: "grid2" }, video, meta)];
+
+  if (r && s.status === "COMPLETADO") {
+    const pct = Math.round((r.confidence || 0) * 100);
+    parts.push(el("section", { class: "card", "aria-labelledby": "rep-title" },
+      el("h2", { id: "rep-title" }, "Informe de riesgo"),
+      el("div", { class: "risk" },
+        el("div", {}, el("div", { class: "hint" }, "Nivel de riesgo"), riskBadge(r.risk_level)),
+        el("div", {}, el("div", { class: "hint" }, "Tipo de amenaza"), el("div", { class: "threat" }, r.threat_type)),
+        el("div", { class: "conf" }, el("div", { class: "hint" }, `Confianza: ${pct}%`),
+          el("div", { class: "bar", role: "progressbar", "aria-valuenow": pct, "aria-valuemin": 0, "aria-valuemax": 100,
+            "aria-label": "Confianza del modelo" }, el("div", { style: `width:${pct}%` })))),
+      el("h3", {}, "Resumen"), el("p", {}, r.summary),
+      el("h3", {}, "Evidencias"), el("ul", {}, (r.evidence || []).map((x) => el("li", {}, x))),
+      el("h3", {}, "Acciones recomendadas"), el("ol", {}, (r.recommended_actions || []).map((x) => el("li", {}, x)))));
+  }
+
+  parts.push(el("section", { class: "card" },
+    el("h2", {}, `Fotogramas clave analizados (${d.frames.length})`),
+    d.frames.length ? el("div", { class: "frames" }, d.frames.map((f, i) => el("figure", {},
+      el("img", { src: f.url, loading: "lazy", alt: `Fotograma ${i + 1} en el segundo ${f.time_s}`,
+        tabindex: "0", onclick: () => zoom(f, i), onkeydown: (e) => e.key === "Enter" && zoom(f, i) }),
+      el("figcaption", {}, `#${i + 1} · t = ${f.time_s ?? "?"} s`,
+        m.detection && f.time_s != null ? ` · ${mmss(m.detection.clip_start_s + f.time_s)} del directo` : "",
+        f.index != null ? ` · frame ${f.index}` : ""))))
+      : el("p", { class: "hint" }, running ? "Extrayendo fotogramas…" : "No hay fotogramas guardados. Pulsa «Analizar de nuevo».")));
+
+  const a = r?.analysis || {};
+  parts.push(el("section", { class: "card" }, el("h2", {}, "Trazabilidad técnica"),
+    el("dl", {},
+      el("dt", {}, "Modelo"), el("dd", {}, a.model_id || s.model_id || "—"),
+      el("dt", {}, "Región"), el("dd", {}, a.region || "us-east-1"),
+      el("dt", {}, "Informe generado"), el("dd", {}, fmtTime(a.generated_at)),
+      el("dt", {}, "Vídeo analizado"), el("dd", {}, a.video || d.video?.uri || "—")),
+    el("h3", {}, "Historial de estados"),
+    el("table", {}, el("thead", {}, el("tr", {}, el("th", {}, "Estado"), el("th", {}, "Hora"))),
+      el("tbody", {}, (s.history || []).map((h) => el("tr", {}, el("td", {}, LABEL[h.status] || h.status), el("td", {}, fmtTime(h.at)))))),
+    el("h3", {}, "Artefactos en S3"),
+    el("table", {}, el("thead", {}, el("tr", {}, el("th", {}, "URI"), el("th", {}, "Tamaño"))),
+      el("tbody", {}, d.objects.map((o) => el("tr", {}, el("td", {}, o.uri), el("td", {}, fmtSize(o.size)))))),
+    r ? el("details", {}, el("summary", {}, "Ver report.json"), el("pre", {}, JSON.stringify(r, null, 2))) : null));
+
+  root.replaceChildren(...parts);
+}
+
+async function loadDetail() {
+  clearTimeout(timer);
+  if (!selected) return;
+  try {
+    const d = await api("api/incidents/" + encodeURIComponent(selected));
+    // Evita recargar el vídeo en cada sondeo si nada cambió.
+    const sig = JSON.stringify([d.status?.status, d.status?.updated_at, d.frames.length]);
+    if (sig !== loadDetail.sig) { renderDetail(d); loadDetail.sig = sig; }
+    if (RUNNING.has(d.status?.status)) { timer = setTimeout(() => { loadDetail(); loadList(); }, 3000); }
+  } catch (e) {
+    document.getElementById("detail").replaceChildren(el("div", { class: "card msg err" }, "Error: " + e.message));
+  }
+}
+
+async function reanalyze(id) {
+  try { await api(`api/incidents/${encodeURIComponent(id)}/analyze`, { method: "POST" }); loadDetail.sig = null; select(id); }
+  catch (e) { alert("No se pudo relanzar: " + e.message); }
+}
+
+function zoom(f, i) {
+  const img = document.getElementById("zoom-img");
+  img.src = f.url; img.alt = `Fotograma ${i + 1} ampliado, segundo ${f.time_s}`;
+  document.getElementById("zoom").showModal();
+}
+document.getElementById("zoom-close").onclick = () => document.getElementById("zoom").close();
+
+document.getElementById("upload").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const form = ev.target, msg = document.getElementById("upload-msg"), btn = document.getElementById("send");
+  btn.disabled = true; msg.className = "msg"; msg.textContent = "Subiendo vídeo…";
+  try {
+    const res = await api("api/incidents", { method: "POST", body: new FormData(form) });
+    msg.className = "msg ok"; msg.textContent = `Vídeo recibido (${res.id}). Analizando…`;
+    form.video.value = "";
+    loadDetail.sig = null; select(res.id);
+  } catch (e) {
+    msg.className = "msg err";
+    msg.textContent = e.message + (e.details ? ": " + e.details.join("; ") : "");
+  } finally { btn.disabled = false; }
+});
+
+// ------------------------------------------------------------------ cámara en directo
+function mmss(s) { if (s == null) return "—"; s = Math.max(0, s); return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`; }
+function PRE_LABEL(d) { return `${Math.round(d.detected_at_s - d.clip_start_s)} s antes + ${Math.round(d.clip_end_s - d.detected_at_s)} s después`; }
+const LIVE_LABEL = { IDLE: "Sin transmisión", STARTING: "Monitorizando", LIVE: "Monitorizando", DETECTED: "¡Manipulación detectada!",
+  CUTTING: "Cortando clip", ANALYZING: "Clip enviado · analizando", FINISHED: "Transmisión finalizada", ERROR: "Error" };
+const LIVE_ON = new Set(["STARTING", "LIVE", "DETECTED", "CUTTING", "ANALYZING"]);
+const live = { snap: null, offset: 0, shownIncident: null, logSig: "" };
+const vid = document.getElementById("live-video");
+
+function livePos() {
+  const s = live.snap;
+  if (!s || s.t0 == null) return null;
+  return Math.min(((Date.now() + live.offset) / 1000 - s.t0) * s.speed, s.duration_s || 0);
+}
+
+function syncVideo() {
+  const s = live.snap, pos = livePos();
+  const on = s && LIVE_ON.has(s.state) && pos != null && pos < (s.duration_s || 0) - 0.05;
+  const tag = document.getElementById("live-tag");
+  if (on) {
+    tag.textContent = "EN DIRECTO"; tag.className = "tag on";
+    const target = Math.max(0, pos);
+    if (vid.playbackRate !== s.speed) vid.playbackRate = s.speed;
+    if (Math.abs(vid.currentTime - target) > 0.6) vid.currentTime = target;
+    if (vid.paused) vid.play().catch(() => {});
+  } else {
+    if (!vid.paused) vid.pause();
+    tag.className = "tag";
+    tag.textContent = s && s.state === "FINISHED" ? "FIN DE GRABACIÓN" : "SIN SEÑAL";
+  }
+  const dur = (s && s.duration_s) || 120, p = Math.max(0, pos || 0);
+  document.getElementById("tl-played").style.width = `${(p / dur) * 100}%`;
+  document.getElementById("tl-pos").textContent = pos != null ? `${mmss(p)} en directo` : "—";
+  document.getElementById("tl-dur").textContent = mmss(dur);
+}
+setInterval(syncVideo, 250);
+
+function renderLive(s) {
+  const st = document.getElementById("live-state");
+  st.replaceChildren(el("span", { class: `badge s ${s.state === "DETECTED" || s.state === "ERROR" ? "s-FALLIDO" : s.state === "LIVE" ? "" : "s-COMPLETADO"}` },
+    LIVE_LABEL[s.state] || s.state));
+  document.getElementById("live-start").textContent = LIVE_ON.has(s.state) ? "Reiniciar transmisión" : "Iniciar transmisión";
+  document.getElementById("live-model").textContent =
+    `Detector: ${s.detector_model} · muestra cada ${s.sample_every_s} s · confirma con ${s.confirm} positivos seguidos`;
+
+  // Línea temporal: marca de detección y ventana del corte
+  const tl = document.getElementById("tl");
+  tl.querySelectorAll(".win,.mark").forEach((n) => n.remove());
+  const dur = s.duration_s || 120, d = s.detection;
+  if (d) {
+    tl.append(el("div", { class: "win", style: `left:${(d.clip_start_s / dur) * 100}%;width:${((d.clip_end_s - d.clip_start_s) / dur) * 100}%` }),
+      el("div", { class: "mark", style: `left:${(d.detected_at_s / dur) * 100}%` }));
+  }
+
+  const alert = s.alert || { state: "NONE", events: [] };
+  const active = alert.state === "ACTIVE", cleared = alert.state === "CLEARED";
+  const lastAlert = [...alert.events].reverse().find((e) => e.type === "ALERTA");
+  const cam = document.getElementById("cam"), banner = document.getElementById("live-banner");
+  cam.classList.toggle("alert", active && !s.ended);
+  banner.hidden = !d;
+  banner.classList.toggle("ok", cleared);
+  if (active) {
+    banner.textContent = `⚠ Manipulación detectada en ${mmss(lastAlert?.t ?? d.detected_at_s)}` + (s.incident_id
+      ? ` · corte ${mmss(d.clip_start_s)}–${mmss(d.clip_end_s)} enviado`
+      : ` · preparando corte ${mmss(d.clip_start_s)}–${mmss(d.clip_end_s)}…`);
+  } else if (cleared) {
+    banner.textContent = `✓ Comportamiento normal desde ${mmss(alert.normal_since_s)} · el sospechoso se ha ido · seguimos monitorizando`;
+  }
+
+  // Estado visible: la alerta manda sobre el estado interno del corte
+  st.replaceChildren(el("span", { class: `badge s ${active ? "s-FALLIDO" : cleared || s.state === "LIVE" ? "s-COMPLETADO" : ""}` },
+    s.ended ? "Transmisión finalizada" : active ? "¡Manipulación detectada!" : cleared ? "Monitorizando · normal" :
+      LIVE_LABEL[s.state] || s.state));
+
+  const box = document.getElementById("live-detection");
+  box.replaceChildren(...(d ? [el("div", { class: `det ${cleared ? "cleared" : ""}` },
+    el("h3", {}, active ? "Alerta de manipulación activa" : "Alerta de manipulación cerrada"),
+    el("div", {}, d.observation),
+    el("ol", { class: "events", "aria-label": "Historial de la alerta" }, alert.events.map((e) => el("li", { class: e.type === "ALERTA" ? "a" : "n" },
+      el("b", {}, mmss(e.t)), e.type === "ALERTA" ? " · alerta: " : " · normal: ", e.observation))),
+    el("div", { class: "hint" }, `Inicio detectado ${mmss(d.detected_at_s)} · confirmado ${mmss(d.confirmed_at_s)} · confianza ${Math.round(d.confidence * 100)}%`),
+    el("div", { class: "hint" }, `Corte: ${mmss(d.clip_start_s)} – ${mmss(d.clip_end_s)} (${PRE_LABEL(d)})`),
+    s.incident_id ? el("div", {}, el("strong", {}, "Incidencia: "), s.incident_id, " · ", statusBadge(s.incident_status),
+      " ", el("button", { type: "button", class: "secondary", style: "margin:6px 0 0", onclick: () => openIncident(s.incident_id) }, "Ver informe"))
+      : el("div", { class: "hint" }, s.state === "CUTTING" ? "Cortando clip…" : `Esperando a que el directo llegue a ${mmss(d.clip_end_s)} para cortar…`))]
+    : s.error ? [el("p", { class: "msg err" }, "Error: " + s.error)] : []));
+
+  const sig = JSON.stringify(s.samples.map((x) => [x.t, x.status]));
+  if (sig !== live.logSig) {
+    live.logSig = sig;
+    const items = [...s.samples].reverse().map((x) => {
+      const cls = x.status === "pending" ? "" : x.status === "error" ? "err" : x.positive ? "pos" : "neg";
+      const verdict = x.status === "pending" ? "analizando…" : x.status === "error" ? "error" :
+        x.positive ? `MANIPULACIÓN ${Math.round(x.confidence * 100)}%` : x.manipulation ? `dudoso ${Math.round(x.confidence * 100)}%` : "normal";
+      return el("li", { class: cls }, el("b", {}, mmss(x.t)), " · ", verdict,
+        x.observation ? el("div", { class: "hint" }, x.observation) : null,
+        x.latency_s ? el("div", { class: "hint" }, `${x.latency_s} s de latencia`) : null);
+    });
+    document.getElementById("live-log").replaceChildren(...(items.length ? items : [el("li", { class: "hint" }, "Sin muestras todavía.")]));
+  }
+
+  if (s.incident_id && live.shownIncident !== s.incident_id) {
+    live.shownIncident = s.incident_id;
+    loadDetail.sig = null; select(s.incident_id);
+  }
+}
+
+function openIncident(id) {
+  loadDetail.sig = null; select(id);
+  document.getElementById("detail").scrollIntoView({ behavior: "smooth" });
+}
+
+async function pollLive() {
+  try {
+    const t = Date.now();
+    const s = await api("api/live");
+    live.offset = s.server_now * 1000 - (t + Date.now()) / 2;
+    // Precarga una sola vez (o si falló); no se recarga al reiniciar para evitar pantallazos negros
+    if (!vid.src || vid.error) { vid.src = s.video_url; vid.load(); }
+    live.snap = s;
+    renderLive(s);
+  } catch (e) { /* reintenta en el siguiente sondeo */ }
+  setTimeout(pollLive, live.snap && LIVE_ON.has(live.snap.state) ? 1000 : 4000);
+}
+
+document.getElementById("live-start").addEventListener("click", async () => {
+  const speed = new URLSearchParams(location.search).get("speed") || "1";
+  try {
+    live.shownIncident = null; live.logSig = "";
+    const s = await api(`api/live/start?speed=${encodeURIComponent(speed)}`, { method: "POST" });
+    if (!vid.src || vid.error) { vid.src = s.video_url; vid.load(); }
+    vid.currentTime = 0;
+    live.offset = s.server_now * 1000 - Date.now();
+    live.snap = s; renderLive(s); syncVideo();
+  } catch (e) { alert("No se pudo iniciar: " + e.message); }
+});
+document.getElementById("live-stop").addEventListener("click", async () => {
+  try { live.snap = await api("api/live/stop", { method: "POST" }); renderLive(live.snap); } catch (e) { alert(e.message); }
+});
+
+loadList();
+loadDetail();
+pollLive();
+</script>
+</body>
+</html>
