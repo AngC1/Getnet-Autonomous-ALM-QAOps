@@ -1,11 +1,11 @@
 """
 Asistente JMeter con Inteligencia Artificial (QAOps Performance Suite) — Getnet (Grupo Santander).
 Funciones principales:
-  1. Generación/parametrización de planes Apache JMeter (.jmx) a partir de objetivos de negocio.
-  2. Ejecución de pruebas de carga concurrentes contra los servicios de Red ATM, Autorizaciones ISO-8583,
-     Bloqueo de Tarjetas (AWS_Kiro) y Liquidaciones de Getnet.
+  1. Generación/parametrización de planes Apache JMeter (.jmx) a partir de objetivos de negocio de tarjetas bancarias.
+  2. Ejecución de pruebas de carga concurrentes contra los servicios de Parque de Tarjetas EMV, Autorizaciones ISO-8583,
+     Bloqueo Preventivo de Tarjetas en ATM (AWS_Kiro) y Disputas/Chargebacks de Getnet.
   3. Análisis cognitivo de resultados .jtl: cálculo de P50/P90/P95/P99, índice Apdex, certificación del Hotfix
-     de caché Redis (GTN-INC-SYS-002) y publicación automática en el Hub ALM (GTN-TC-011 y GTN-TC-012).
+     de lock Redis (GTN-INC-SYS-002) y publicación automática en el Hub ALM (GTN-TC-011 y GTN-TC-012).
 """
 
 from __future__ import annotations
@@ -42,7 +42,6 @@ def percentile(sorted_values: List[float], pct: float) -> float:
 
 
 def compute_apdex(latencies_ms: List[float], threshold_t_ms: float = 180.0) -> float:
-    """Calcula el índice Apdex estándar: (Satisfied + 0.5 * Tolerating) / Total."""
     if not latencies_ms:
         return 1.0
     satisfied = sum(1 for x in latencies_ms if x <= threshold_t_ms)
@@ -94,13 +93,9 @@ def execute_single_sample(base_url: str, sample_spec: Dict[str, Any], thread_nam
 
 
 def run_concurrent_load_to_jtl(base_url: str, vus: int = 16, iterations_per_vu: int = 6) -> Path:
-    """
-    Ejecuta carga concurrente contra el portal Getnet y genera un fichero .jtl
-    en el formato CSV nativo de Apache JMeter.
-    """
-    jtl_path = RESULTS_DIR / "segurcaixa_load_results.jtl"
+    jtl_path = RESULTS_DIR / "getnet_tarjetas_load_results.jtl"
     jmeter_bin = shutil.which("jmeter")
-    jmx_plan = PLANS_DIR / "segurcaixa_servicios_clientes.jmx"
+    jmx_plan = PLANS_DIR / "getnet_tarjetas_bancarias.jmx"
 
     if jmeter_bin and jmx_plan.exists() and os.environ.get("USE_NATIVE_JMETER") == "1":
         if jtl_path.exists():
@@ -113,12 +108,12 @@ def run_concurrent_load_to_jtl(base_url: str, vus: int = 16, iterations_per_vu: 
 
     workload_templates = [
         {
-            "label": "GET /api/v1/cuadro-medico (Red ATM Getnet)",
+            "label": "GET /api/v1/tarjetas/parque (Parque Tarjetas EMV)",
             "method": "GET",
-            "path": "/api/v1/cuadro-medico?provincia=Madrid&especialidad=Cardiología",
+            "path": "/api/v1/tarjetas/parque?provincia=Madrid&tipoTarjeta=Visa%20D%C3%A9bito%20EMV",
         },
         {
-            "label": "POST /api/v1/tarjetas/bloqueo (ATM Card Blocker)",
+            "label": "POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro)",
             "method": "POST",
             "path": "/api/v1/tarjetas/bloqueo",
             "json": {
@@ -129,35 +124,35 @@ def run_concurrent_load_to_jtl(base_url: str, vus: int = 16, iterations_per_vu: 
             },
         },
         {
-            "label": "POST /api/v1/autorizaciones (ISO-8583)",
+            "label": "POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100)",
             "method": "POST",
-            "path": "/api/v1/autorizaciones",
+            "path": "/api/v1/tarjetas/autorizaciones",
             "json": {
-                "numTarjeta": "8000123456789012",
-                "tipoActo": "Resonancia Magnética Nuclear (RMN)",
-                "codigoPrescripcion": "RX-99281",
-                "centroMedico": "Hospital Ruber Internacional",
+                "numTarjeta": "4548123456789012",
+                "tipoOperacion": "Autorización Compra TPV Chip EMV (MTI 0100)",
+                "codigoReferencia": "ISO-99281",
+                "nodoAtmComercio": "Cajero ATM-GTN-MAD-0042 Gran Vía",
             },
         },
         {
-            "label": "POST /api/v1/autorizaciones (Inspección Antifraude)",
+            "label": "POST /api/v1/tarjetas/autorizaciones (Control Antifraude)",
             "method": "POST",
-            "path": "/api/v1/autorizaciones",
+            "path": "/api/v1/tarjetas/autorizaciones",
             "json": {
-                "numTarjeta": "8000123456789012",
-                "tipoActo": "Estudio Genético Oncológico",
-                "codigoPrescripcion": "GEN-77412",
-                "centroMedico": "Centro Médico Teknon",
+                "numTarjeta": "4548123456789012",
+                "tipoOperacion": "Operación Internacional de Alto Riesgo (Auditoría Antifraude)",
+                "codigoReferencia": "RISK-77412",
+                "nodoAtmComercio": "Hub Internacional Tarjetas Getnet",
             },
         },
         {
-            "label": "POST /api/v1/reembolsos (Liquidación TPV)",
+            "label": "POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard)",
             "method": "POST",
-            "path": "/api/v1/reembolsos",
+            "path": "/api/v1/tarjetas/disputas",
             "json": {
                 "nif": "12345678Z",
-                "modalidadPoliza": "Adeslas Premier (90%)",
-                "importeFactura": 250.00,
+                "programaTarjeta": "Getnet Corporate Premier (90%)",
+                "importeCargo": 250.00,
                 "iban": "ES9121000418450200051332",
             },
         },
@@ -169,7 +164,7 @@ def run_concurrent_load_to_jtl(base_url: str, vus: int = 16, iterations_per_vu: 
         for vu in range(1, vus + 1):
             for it in range(iterations_per_vu):
                 spec = workload_templates[(vu + it) % len(workload_templates)]
-                t_name = f"TG_Getnet_VU-{vu:02d}"
+                t_name = f"TG_Getnet_Tarjetas_VU-{vu:02d}"
                 futures.append(pool.submit(execute_single_sample, base_url, spec, t_name))
         for fut in as_completed(futures):
             samples.append(fut.result())
@@ -196,7 +191,6 @@ def run_concurrent_load_to_jtl(base_url: str, vus: int = 16, iterations_per_vu: 
 
 
 def analyze_jtl_with_ai(jtl_path: Path, sla_p95_ms: float = 450.0) -> Dict[str, Any]:
-    """Analiza un fichero .jtl y genera conclusiones de ingeniería de rendimiento asistidas por IA."""
     rows: List[Dict[str, Any]] = []
     with open(jtl_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -240,14 +234,14 @@ def analyze_jtl_with_ai(jtl_path: Path, sla_p95_ms: float = 450.0) -> Dict[str, 
 
     sla_passed = (p95_ms <= sla_p95_ms) and (error_pct <= 1.0)
     ai_insights = [
-        f"Cumplimiento SLA Global Getnet: {'APROBADO' if sla_passed else 'INCUMPLIDO'} (P95 = {p95_ms} ms frente al objetivo < {sla_p95_ms} ms; Error Rate = {error_pct}%).",
-        f"Índice de satisfacción transaccional Apdex = {apdex} con caudal sostenido de {throughput_rps} req/s ({total} transacciones).",
-        "Verificación Post-Hotfix (GTN-INC-SYS-002 & GTN-INC-ATM-001): El servicio getnet-card-blocker-svc procesa bloqueos ATM con reverso EMV 0420 y lock Redis TTL=1500ms con 0% errores.",
+        f"Cumplimiento SLA Global Tarjetas Getnet: {'APROBADO' if sla_passed else 'INCUMPLIDO'} (P95 = {p95_ms} ms frente al objetivo < {sla_p95_ms} ms; Error Rate = {error_pct}%).",
+        f"Índice de satisfacción transaccional Apdex = {apdex} con caudal sostenido de {throughput_rps} req/s ({total} operaciones de tarjetas).",
+        "Verificación Post-Hotfix (GTN-INC-SYS-002 & GTN-INC-ATM-001): El servicio getnet-card-blocker-svc procesa bloqueos ATM con reverso EMV 0420 y lock Redis TTL=3000ms con 0% errores.",
     ]
 
     report = {
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
-        "scenario": "Pico Transaccional Getnet Core & Card Blocker - Ejecución JMeter AI",
+        "scenario": "Pico Transaccional de Tarjetas Bancarias Getnet & Card Blocker - Ejecución JMeter AI",
         "totalSamples": total,
         "throughputRps": throughput_rps,
         "avgResponseMs": avg_ms,
@@ -267,7 +261,7 @@ def analyze_jtl_with_ai(jtl_path: Path, sla_p95_ms: float = 450.0) -> Dict[str, 
 def write_markdown_report(report: Dict[str, Any]) -> Path:
     md_path = RESULTS_DIR / "AI_PERFORMANCE_REPORT.md"
     lines = [
-        "# Informe de Rendimiento JMeter Asistido por IA — Getnet (Grupo Santander)",
+        "# Informe de Rendimiento JMeter Asistido por IA — Operativa de Tarjetas Bancarias Getnet",
         "",
         f"- **Fecha de Ejecución**: `{report['timestamp']}`",
         f"- **Escenario**: {report['scenario']}",
@@ -286,7 +280,7 @@ def write_markdown_report(report: Dict[str, Any]) -> Path:
         f"| Tasa de Error | `{report['errorRatePct']}%` | <= 1.0% |",
         f"| Índice Apdex | `{report['apdex']}` | >= 0.90 |",
         "",
-        "## 2. Desglose por Transacción / Endpoint",
+        "## 2. Desglose por Transacción de Tarjetas Bancarias",
         "",
         "| Endpoint / Transacción | Muestras | Media (ms) | P95 (ms) | Error % |",
         "| :--- | :--- | :--- | :--- | :--- |",
@@ -330,13 +324,13 @@ def publish_to_alm_hub(base_url: str, report: Dict[str, Any]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Asistente JMeter IA - Getnet QAOps")
+    parser = argparse.ArgumentParser(description="Asistente JMeter IA - Getnet Tarjetas QAOps")
     parser.add_argument("--base-url", default=os.environ.get("GETNET_BASE_URL", "http://127.0.0.1:8080"))
     parser.add_argument("--vus", type=int, default=12, help="Usuarios virtuales concurrentes")
     parser.add_argument("--iterations", type=int, default=5, help="Iteraciones por usuario virtual")
     args = parser.parse_args()
 
-    print(f"=== [Getnet JMeter AI] Ejecutando prueba de carga contra {args.base_url} ===")
+    print(f"=== [Getnet JMeter AI] Ejecutando prueba de carga de Tarjetas Bancarias contra {args.base_url} ===")
     jtl_file = run_concurrent_load_to_jtl(args.base_url, vus=args.vus, iterations_per_vu=args.iterations)
     print(f"1. Fichero JTL generado: {jtl_file}")
 

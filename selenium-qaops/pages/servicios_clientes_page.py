@@ -1,6 +1,6 @@
 """
 Page Object Model (POM) con Motor de Auto-Curación (Self-Healing Locators)
-para el portal Getnet (Grupo Santander) (/servicios-para-clientes) — Ayesa Digital QAOps & Autonomous ALM.
+para el Portal Operativo de Tarjetas Bancarias Getnet (Grupo Santander) (/servicios-para-clientes).
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 
 class ServiciosClientesPage:
-    """Page Object del portal Getnet (/servicios-para-clientes) con soporte Self-Healing."""
+    """Page Object del portal de Tarjetas Bancarias Getnet (/servicios-para-clientes) con soporte Self-Healing."""
 
     def __init__(self, driver: WebDriver, base_url: str = "http://127.0.0.1:8080") -> None:
         self.driver = driver
@@ -23,10 +23,6 @@ class ServiciosClientesPage:
         self.healing_events: List[str] = []
 
     def find_healed(self, candidates: List[Tuple[str, str]]) -> WebElement:
-        """
-        Intenta localizar un elemento probando selectores en orden de prioridad.
-        Si el selector primario falla y funciona un fallback, registra un evento Self-Healing.
-        """
         last_exc = None
         for idx, (by, value) in enumerate(candidates):
             try:
@@ -67,23 +63,23 @@ class ServiciosClientesPage:
         )
         btn.click()
 
-    # --- 1. Flujo Red ATM & Centros Getnet ---
-    def buscar_cuadro_medico(
+    # --- 1. Flujo Parque de Tarjetas Bancarias EMV & Red ATM ---
+    def buscar_parque_tarjetas(
         self,
         provincia: str = "Todas",
-        especialidad: str = "Todas",
-        poliza: str = "Todas",
+        tipo_tarjeta: str = "Todas",
+        programa: str = "Todas",
         texto: str = "",
     ) -> int:
         self.switch_tab("btn-tab-cuadro")
         Select(self.find_healed([(By.ID, "cm-provincia")])).select_by_visible_text(
             "Todas las provincias" if provincia == "Todas" else provincia
         )
-        Select(self.find_healed([(By.ID, "cm-especialidad")])).select_by_visible_text(
-            "Todas las especialidades" if especialidad == "Todas" else especialidad
+        Select(self.find_healed([(By.ID, "trj-tipo")])).select_by_visible_text(
+            "Todos los tipos de tarjeta" if tipo_tarjeta == "Todas" else tipo_tarjeta
         )
-        Select(self.find_healed([(By.ID, "cm-poliza")])).select_by_visible_text(
-            "Todas las modalidades" if poliza == "Todas" else poliza
+        Select(self.find_healed([(By.ID, "trj-programa")])).select_by_visible_text(
+            "Todos los programas de tarjeta" if programa == "Todas" else programa
         )
         q_input = self.find_healed([(By.ID, "cm-query")])
         q_input.clear()
@@ -95,28 +91,28 @@ class ServiciosClientesPage:
         cards = self.driver.find_elements(By.CSS_SELECTOR, "[data-testid='center-card-item']")
         return len(cards)
 
-    # --- 2. Flujo Autorizaciones ISO-8583 ---
-    def solicitar_autorizacion(
+    # --- 2. Flujo Autorización Online de Tarjetas Bancarias ISO-8583 ---
+    def solicitar_autorizacion_tarjeta(
         self,
         num_tarjeta: str,
-        tipo_acto_visible: str,
-        prescripcion: str,
-        centro: str,
+        tipo_operacion_visible: str,
+        codigo_referencia: str,
+        nodo_atm_comercio: str,
     ) -> str:
         self.switch_tab("btn-tab-autorizaciones")
         tarjeta_el = self.find_healed([(By.ID, "aut-tarjeta")])
         tarjeta_el.clear()
         tarjeta_el.send_keys(num_tarjeta)
 
-        Select(self.find_healed([(By.ID, "aut-tipo-acto")])).select_by_visible_text(tipo_acto_visible)
+        Select(self.find_healed([(By.ID, "aut-tipo-acto")])).select_by_visible_text(tipo_operacion_visible)
 
         pres_el = self.find_healed([(By.ID, "aut-prescripcion")])
         pres_el.clear()
-        pres_el.send_keys(prescripcion)
+        pres_el.send_keys(codigo_referencia)
 
         centro_el = self.find_healed([(By.ID, "aut-centro")])
         centro_el.clear()
-        centro_el.send_keys(centro)
+        centro_el.send_keys(nodo_atm_comercio)
 
         self.find_healed([(By.ID, "btn-solicitar-autorizacion")]).click()
         alert = self.wait.until(
@@ -126,20 +122,20 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 3. Flujo Liquidaciones y Reembolsos ---
-    def solicitar_reembolso(
+    # --- 3. Flujo Disputas, Contracargos (Chargebacks) y Fraude en Tarjetas ---
+    def registrar_disputa_tarjeta(
         self,
         nif: str,
-        modalidad_visible: str,
+        programa_visible: str,
         importe: str,
         iban: str,
     ) -> str:
-        self.switch_tab("btn-tab-reembolsos")
+        self.switch_tab("btn-tab-disputas")
         nif_el = self.find_healed([(By.ID, "rmb-nif")])
         nif_el.clear()
         nif_el.send_keys(nif)
 
-        Select(self.find_healed([(By.ID, "rmb-modalidad")])).select_by_visible_text(modalidad_visible)
+        Select(self.find_healed([(By.ID, "rmb-modalidad")])).select_by_visible_text(programa_visible)
 
         imp_el = self.find_healed([(By.ID, "rmb-importe")])
         imp_el.clear()
@@ -149,7 +145,7 @@ class ServiciosClientesPage:
         iban_el.clear()
         iban_el.send_keys(iban)
 
-        self.find_healed([(By.ID, "btn-enviar-reembolso")]).click()
+        self.find_healed([(By.ID, "btn-enviar-disputa")]).click()
         alert = self.wait.until(
             lambda d: d.find_element(By.ID, "rmb-resultado-alert")
             if "show" in d.find_element(By.ID, "rmb-resultado-alert").get_attribute("class")
@@ -157,8 +153,8 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 4. Flujo Área Cliente & Tarjeta Digital Getnet ---
-    def login_area_cliente(self, nif: str, password: str) -> str:
+    # --- 4. Flujo Área Titular & Tarjeta Bancaria Digital Tokenizada ---
+    def login_area_titular(self, nif: str, password: str) -> str:
         self.switch_tab("btn-tab-area-cliente")
         nif_el = self.find_healed([(By.ID, "login-nif")])
         nif_el.clear()
@@ -176,10 +172,10 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 5. Flujo Soporte Técnico Remoto / Videoconsulta ---
-    def reservar_videoconsulta(self, especialidad_visible: str, motivo: str) -> str:
+    # --- 5. Flujo Soporte Criptográfico EMV, PIN Block HSM y 3DS2 24h ---
+    def solicitar_soporte_tarjetas(self, unidad_visible: str, motivo: str) -> str:
         self.switch_tab("btn-tab-videoconsulta")
-        Select(self.find_healed([(By.ID, "vc-especialidad")])).select_by_visible_text(especialidad_visible)
+        Select(self.find_healed([(By.ID, "sop-unidad")])).select_by_visible_text(unidad_visible)
 
         motivo_el = self.find_healed([(By.ID, "vc-motivo")])
         motivo_el.clear()
@@ -193,7 +189,7 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 6. Flujo Bloqueo de Tarjeta en Cajero ATM (AWS_Kiro) ---
+    # --- 6. Flujo Bloqueo Preventivo de Tarjeta en Cajero ATM (AWS_Kiro) ---
     def procesar_bloqueo_tarjeta_atm(
         self,
         num_tarjeta: str = "4548 1234 5678 9012",

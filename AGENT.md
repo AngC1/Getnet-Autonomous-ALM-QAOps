@@ -1,7 +1,3 @@
-# AGENT.md — Guía Rápida del Agente Autónomo ALM (Getnet · Grupo Santander)
+# AGENT.md — Guía Operativa de los 5 Agentes Autónomos de Tarjetas Bancarias Getnet
 
-- **Proyecto**: `Getnet Autonomous Production ALM & QAOps (Zero Human-in-the-Loop)`
-- **SUT / Portal Operativo Getnet**: `http://127.0.0.1:8080/servicios-para-clientes`
-- **Cuadro de Mando CIO en Jira Xray**: `http://127.0.0.1:8080/alm-dashboard`
-- **Presentación Ejecutiva CIO Getnet**: `http://127.0.0.1:8080/presentacion`
-- **Comando Único de Certificación E2E**: `python run_qaops_suite.py`
+Consulta [AGENTS.md](file:///c:/Users/MACADIAD/_Getnet/AGENTS.md) y [README_RAG_ARCHITECTURE.md](file:///c:/Users/MACADIAD/_Getnet/rag-knowledge-base/README_RAG_ARCHITECTURE.md) para el detalle de la máquina de 8 estados (`S1`..`S8`), los 5 agentes autónomos (`Kiro-ATM-Vision-Agent`, `Observability-MCP-Agent`, `RAG-Knowledge-Architect-Agent`, `Self-Healing-Patch-Agent`, `QAOps-Xray-Certifier-Agent`), las ventanas de conexión MCP Server (`Dynatrace` y `AWS CloudWatch`) y la suite de 14 casos de prueba de tarjetas bancarias (`python run_qaops_suite.py`).

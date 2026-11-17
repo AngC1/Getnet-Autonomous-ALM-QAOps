@@ -1,17 +1,7 @@
-id,tracker,qa_key,subject,priority,status,detected_by
-5011,QA Test,GTN-TC-001,Renderizado del catálogo de Servicios Getnet para Clientes/Comercios y KPIs,High,Closed (PASSED),Selenium MCP
-5012,QA Test,GTN-TC-002,Búsqueda de Red de Cajeros ATM y Centros Getnet en Madrid,Highest,Closed (PASSED),Selenium MCP
-5013,QA Test,GTN-TC-003,Búsqueda de Nodos ATM de Guardia 24h y filtro por colectivo,High,Closed (PASSED),Selenium MCP
-5014,QA Test,GTN-TC-004,Solicitud exitosa de Autorización Operativa de Tarjeta Getnet,Highest,Closed (PASSED),Selenium MCP
-5015,QA Test,GTN-TC-005,Validación negativa de Autorización con PAN inválido,High,Closed (PASSED),Selenium MCP
-5016,QA Test,GTN-TC-006,Operación de alta complejidad derivada a Inspección Antifraude,Medium,Closed (PASSED),Pytest API
-5017,QA Test,GTN-TC-007,Registro de Liquidación / Reembolso de Transacción TPV (Premier 90%),Highest,Closed (PASSED),Selenium MCP
-5018,QA Test,GTN-TC-008,Validación de IBAN incorrecto en solicitud de Reembolso,Medium,Closed (PASSED),Selenium MCP
-5019,QA Test,GTN-TC-009,Acceso al Área Cliente Getnet y visualización de Tarjeta Digital,High,Closed (PASSED),Selenium MCP
-5020,QA Test,GTN-TC-010,Reserva de Sesión de Soporte Técnico Remoto 24h,Medium,Closed (PASSED),Selenium MCP
-5021,QA Test,GTN-TC-011,Prueba de Carga JMeter AI - Red ATM y Servicios Getnet (P95 < 450ms),Highest,Closed (PASSED),JMeter AI
-5022,QA Test,GTN-TC-012,Prueba de Estrés JMeter AI - Pico de Autorizaciones y Bloqueo de Tarjetas,High,Closed (PASSED),JMeter AI
-5023,QA Test,GTN-TC-013,Resolución Autónoma de Incidencia Funcional ATM (AWS_Kiro Sentinel -> Re-Fix EMV 0420),Highest,Closed (PASSED),Autonomous ALM Agent
-5024,QA Test,GTN-TC-014,Resolución Autónoma de Incidencia de Sistemas en PRO (AWS CloudWatch + Prometheus MCP),Highest,Closed (PASSED),Autonomous ALM Agent
-5091,Production Incident,GTN-INC-SYS-002,[Sistemas / CloudWatch + Prometheus MCP] Deadlock Redis y saturación HikariCP en getnet-card-blocker-svc,Highest,Resolved (Auto-Fixed & Redeployed),AWS CloudWatch + Prometheus MCP
-5092,Production Incident,GTN-INC-ATM-001,[Funcional / ATM Kiro] Bloqueo y retención de tarjeta en ATM-GTN-MAD-0042 sin reverso EMV 0420,Highest,Resolved (Auto-Fixed & Redeployed),AWS_Kiro ATM Sentinel
+ID,Tracker,Project,Subject,Priority,Status,XrayKey,RAGPlaybook
+5001,Incident,Getnet-Tarjetas-ALM,GTN-INC-ATM-001: Retencion de tarjeta bancaria en cajero ATM-GTN-MAD-0042 sin reverso ISO-8583 MTI 0420 (AWS_Kiro),Immediate,Resolved (Auto-Redeployed),GTN-TC-013,RAG-PB-ATM-001
+5002,Incident,Getnet-Tarjetas-ALM,GTN-INC-SYS-002: Deadlock Redis TTL=0 y saturacion HikariCP detectado via MCP en Dynatrace Davis AI y AWS CloudWatch,Immediate,Resolved (Auto-Redeployed),GTN-TC-014,RAG-PB-SYS-002
+5003,Feature,Getnet-Tarjetas-ALM,GTN-US-101: Buscador de Parque de Tarjetas Bancarias EMV y Red de Cajeros ATM,High,Closed,GTN-TC-002,N/A
+5004,Feature,Getnet-Tarjetas-ALM,GTN-US-102: Pasarela de Autorizacion Online de Tarjetas Bancarias ISO-8583 y 3D-Secure 2.2,Urgent,Closed,GTN-TC-004,RAG-PB-ISO-003
+5005,Feature,Getnet-Tarjetas-ALM,GTN-US-103: Gestion de Disputas y Contracargos (Chargebacks Visa/Mastercard) con abono provisional 90%,High,Closed,GTN-TC-007,RAG-PB-CHB-006
+5006,Feature,Getnet-Tarjetas-ALM,GTN-US-104: Area Titular con Tarjeta Bancaria Digital Tokenizada y Soporte Criptografico HSM 24h,High,Closed,GTN-TC-009,RAG-PB-HSM-005

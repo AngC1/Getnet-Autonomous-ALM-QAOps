@@ -1,27 +1,18 @@
 pipeline {
     agent any
-    options {
-        timestamps()
-    }
     environment {
-        ADESLAS_BASE_URL = "http://127.0.0.1:8080"
-        QAOPS_BROWSER = "auto"
+        GETNET_BASE_URL = "http://127.0.0.1:8080"
     }
     stages {
-        stage('1. Prepare Environment') {
+        stage('1. RAG Knowledge Base Self-Test') {
             steps {
-                bat 'python -m pip install -r requirements.txt'
+                sh 'python rag-knowledge-base/rag_engine.py --selftest'
             }
         }
-        stage('2. Execute QAOps End-to-End & Performance Gate') {
+        stage('2. Full Autonomous ALM & Bank Card QAOps Suite') {
             steps {
-                bat 'python run_qaops_suite.py'
+                sh 'python run_qaops_suite.py'
             }
-        }
-    }
-    post {
-        always {
-            archiveArtifacts artifacts: 'jmeter-ai/results/*.*, selenium-qaops/reports/*.*, alm-backlog/**/*.*', allowEmptyArchive: true
         }
     }
 }

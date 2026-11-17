@@ -1,13 +1,13 @@
 """
 Servidor MCP (Model Context Protocol) de Selenium para QAOps & Autonomous ALM — Getnet (Grupo Santander).
-Permite a Agentes de IA controlar Selenium WebDriver, inspeccionar el DOM con auto-curación (Self-Healing Locators),
-ejecutar flujos funcionales y de bloqueo de tarjetas ATM de Getnet (/servicios-para-clientes) y reportar
+Permite a los Agentes de IA controlar Selenium WebDriver, inspeccionar el DOM con auto-curación (Self-Healing Locators),
+ejecutar flujos funcionales exclusivos de Tarjetas Bancarias (/servicios-para-clientes) y reportar
 ejecuciones al Hub ALM en Jira Xray, TestLink y Redmine.
 
 Modos de uso:
   1. Modo Estándar MCP (JSON-RPC 2.0 sobre stdio):
      python mcp-selenium-server/server.py
-  2. Modo Diagnóstico / Self-Test E2E contra el portal local:
+  2. Modo Diagnóstico / Self-Test E2E contra el portal de tarjetas:
      python mcp-selenium-server/server.py --selftest
 """
 
@@ -35,7 +35,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class SeleniumMcpController:
-    """Controlador de sesión Selenium WebDriver gestionado por el Servidor MCP de Getnet."""
+    """Controlador de sesión Selenium WebDriver gestionado por el Servidor MCP de Tarjetas Getnet."""
 
     def __init__(self, base_url: str = "http://127.0.0.1:8080") -> None:
         self.base_url = base_url.rstrip("/")
@@ -113,20 +113,20 @@ class SeleniumMcpController:
             "locators": catalog,
         }
 
-    def execute_adeslas_flow(self, flow_name: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Ejecuta un flujo E2E del Portal Getnet y devuelve evidencias."""
+    def execute_tarjetas_flow(self, flow_name: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Ejecuta un flujo E2E de Tarjetas Bancarias del Portal Getnet y devuelve evidencias."""
         params = params or {}
         drv = self.ensure_driver()
         drv.get(f"{self.base_url}/servicios-para-clientes")
         start_t = time.perf_counter()
 
-        if flow_name == "cuadro_medico":
+        if flow_name == "parque_tarjetas":
             drv.find_element(By.ID, "btn-tab-cuadro").click()
             Select(drv.find_element(By.ID, "cm-provincia")).select_by_visible_text(
                 params.get("provincia", "Madrid")
             )
-            Select(drv.find_element(By.ID, "cm-especialidad")).select_by_visible_text(
-                params.get("especialidad", "Cardiología")
+            Select(drv.find_element(By.ID, "trj-tipo")).select_by_visible_text(
+                params.get("tipoTarjeta", "Visa Débito EMV")
             )
             drv.find_element(By.ID, "btn-buscar-cuadro").click()
             time.sleep(0.25)
@@ -135,16 +135,16 @@ class SeleniumMcpController:
             return {
                 "flow": flow_name,
                 "status": "PASSED" if len(cards) > 0 else "FAILED",
-                "centrosEncontrados": len(cards),
+                "nodosTarjetasEncontrados": len(cards),
                 "durationMs": elapsed,
             }
 
         if flow_name == "autorizacion":
             drv.find_element(By.ID, "btn-tab-autorizaciones").click()
-            drv.find_element(By.ID, "aut-tarjeta").send_keys(params.get("numTarjeta", "8000123456789012"))
-            drv.find_element(By.ID, "aut-prescripcion").send_keys(params.get("codigoPrescripcion", "RX-99281"))
+            drv.find_element(By.ID, "aut-tarjeta").send_keys(params.get("numTarjeta", "4548123456789012"))
+            drv.find_element(By.ID, "aut-prescripcion").send_keys(params.get("codigoReferencia", "ISO-99281"))
             drv.find_element(By.ID, "aut-centro").send_keys(
-                params.get("centroMedico", "Hospital Ruber Internacional")
+                params.get("nodoAtmComercio", "Cajero ATM-GTN-MAD-0042 Gran Vía")
             )
             drv.find_element(By.ID, "btn-solicitar-autorizacion").click()
             time.sleep(0.25)
@@ -170,20 +170,20 @@ class SeleniumMcpController:
                 "durationMs": elapsed,
             }
 
-        if flow_name == "reembolso":
-            drv.find_element(By.ID, "btn-tab-reembolsos").click()
+        if flow_name == "disputa":
+            drv.find_element(By.ID, "btn-tab-disputas").click()
             drv.find_element(By.ID, "rmb-nif").send_keys(params.get("nif", "12345678Z"))
             drv.find_element(By.ID, "rmb-importe").send_keys(str(params.get("importe", "250.00")))
             drv.find_element(By.ID, "rmb-iban").send_keys(
                 params.get("iban", "ES9121000418450200051332")
             )
-            drv.find_element(By.ID, "btn-enviar-reembolso").click()
+            drv.find_element(By.ID, "btn-enviar-disputa").click()
             time.sleep(0.25)
             alert_text = drv.find_element(By.ID, "rmb-resultado-alert").text
             elapsed = int((time.perf_counter() - start_t) * 1000)
             return {
                 "flow": flow_name,
-                "status": "PASSED" if "RMB-2026-" in alert_text else "FAILED",
+                "status": "PASSED" if "DSP-2026-" in alert_text else "FAILED",
                 "alertText": alert_text,
                 "durationMs": elapsed,
             }
@@ -214,7 +214,7 @@ class SeleniumMcpController:
 MCP_TOOLS_SCHEMA = [
     {
         "name": "selenium_start_session",
-        "description": "Inicia una sesión de Selenium WebDriver apuntando al portal Getnet (/servicios-para-clientes).",
+        "description": "Inicia una sesión de Selenium WebDriver apuntando al portal de Tarjetas Getnet (/servicios-para-clientes).",
         "inputSchema": {
             "type": "object",
             "properties": {"headless": {"type": "boolean", "default": True}},
@@ -222,7 +222,7 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "selenium_navigate",
-        "description": "Navega a una URL o ruta del portal Getnet o del Cuadro de Mando Jira Xray.",
+        "description": "Navega a una URL o ruta del portal de tarjetas Getnet o del Cuadro de Mando Jira Xray.",
         "inputSchema": {
             "type": "object",
             "properties": {"path_or_url": {"type": "string"}},
@@ -235,12 +235,12 @@ MCP_TOOLS_SCHEMA = [
         "inputSchema": {"type": "object", "properties": {}},
     },
     {
-        "name": "selenium_execute_adeslas_flow",
-        "description": "Ejecuta un flujo funcional E2E de Getnet (cuadro_medico, autorizacion, reembolso, bloqueo_atm).",
+        "name": "selenium_execute_tarjetas_flow",
+        "description": "Ejecuta un flujo funcional E2E de tarjetas bancarias Getnet (parque_tarjetas, autorizacion, disputa, bloqueo_atm).",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "flow_name": {"type": "string", "enum": ["cuadro_medico", "autorizacion", "reembolso", "bloqueo_atm"]},
+                "flow_name": {"type": "string", "enum": ["parque_tarjetas", "autorizacion", "disputa", "bloqueo_atm"]},
                 "params": {"type": "object"},
             },
             "required": ["flow_name"],
@@ -256,7 +256,7 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "alm_sync_test_result",
-        "description": "Actualiza el resultado de un Test Case (ej. GTN-TC-002) en el Hub ALM (Jira Xray / TestLink / Redmine).",
+        "description": "Actualiza el resultado de un Test Case de tarjetas (ej. GTN-TC-002) en el Hub ALM (Jira Xray / TestLink / Redmine).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -286,7 +286,7 @@ def handle_mcp_request(controller: SeleniumMcpController, req: Dict[str, Any]) -
             "id": req_id,
             "result": {
                 "protocolVersion": "2024-11-05",
-                "serverInfo": {"name": "getnet-selenium-qaops-mcp", "version": "1.0.0"},
+                "serverInfo": {"name": "getnet-selenium-qaops-mcp", "version": "2.0.0"},
                 "capabilities": {"tools": {}, "resources": {}, "prompts": {}},
             },
         }
@@ -304,8 +304,8 @@ def handle_mcp_request(controller: SeleniumMcpController, req: Dict[str, Any]) -
                 out = controller.navigate(args["path_or_url"])
             elif name == "selenium_inspect_dom_locators":
                 out = controller.inspect_dom_locators()
-            elif name == "selenium_execute_adeslas_flow":
-                out = controller.execute_adeslas_flow(args["flow_name"], args.get("params"))
+            elif name == "selenium_execute_tarjetas_flow":
+                out = controller.execute_tarjetas_flow(args["flow_name"], args.get("params"))
             elif name == "selenium_take_screenshot":
                 out = controller.take_screenshot(args.get("filename", "mcp_evidence.png"))
             elif name == "alm_sync_test_result":
@@ -354,7 +354,7 @@ def run_stdio_server(base_url: str) -> None:
 
 
 def run_selftest(base_url: str) -> int:
-    print("=== [Getnet QAOps] Self-Test del Servidor MCP de Selenium ===")
+    print("=== [Getnet QAOps] Self-Test del Servidor MCP de Selenium (Operativa de Tarjetas Bancarias) ===")
     controller = SeleniumMcpController(base_url=base_url)
     try:
         info = controller.start_session(headless=True)
@@ -363,19 +363,24 @@ def run_selftest(base_url: str) -> int:
         dom_info = controller.inspect_dom_locators()
         print(f"2. Inspección DOM Self-Healing: {dom_info['interactiveElementsCount']} selectores extraídos.")
 
-        flow_cm = controller.execute_adeslas_flow("cuadro_medico", {"provincia": "Madrid", "especialidad": "Cardiología"})
-        print(f"3. Flujo MCP Red ATM Getnet: {flow_cm['status']} ({flow_cm['centrosEncontrados']} nodos, {flow_cm['durationMs']} ms)")
+        flow_pt = controller.execute_tarjetas_flow(
+            "parque_tarjetas", {"provincia": "Madrid", "tipoTarjeta": "Visa Débito EMV"}
+        )
+        print(
+            f"3. Flujo MCP Parque de Tarjetas Getnet: {flow_pt['status']} "
+            f"({flow_pt['nodosTarjetasEncontrados']} nodos, {flow_pt['durationMs']} ms)"
+        )
 
-        flow_aut = controller.execute_adeslas_flow("autorizacion")
-        print(f"4. Flujo MCP Autorizaciones ISO-8583: {flow_aut['status']} ({flow_aut['durationMs']} ms)")
+        flow_aut = controller.execute_tarjetas_flow("autorizacion")
+        print(f"4. Flujo MCP Autorizaciones Tarjeta ISO-8583: {flow_aut['status']} ({flow_aut['durationMs']} ms)")
 
-        flow_blk = controller.execute_adeslas_flow("bloqueo_atm")
+        flow_blk = controller.execute_tarjetas_flow("bloqueo_atm")
         print(f"5. Flujo MCP Bloqueo Tarjeta ATM (AWS_Kiro): {flow_blk['status']} ({flow_blk['durationMs']} ms)")
 
         shot = controller.take_screenshot("mcp_selftest_servicios_clientes.png")
         print(f"6. Evidencia PNG generada: {shot['path']}")
 
-        sync = controller.sync_alm_result("GTN-TC-002", "PASSED", flow_cm["durationMs"])
+        sync = controller.sync_alm_result("GTN-TC-002", "PASSED", flow_pt["durationMs"])
         print(f"7. Sincronización ALM Jira Xray / TestLink: {sync}")
         return 0
     finally:
@@ -383,7 +388,7 @@ def run_selftest(base_url: str) -> int:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Servidor MCP de Selenium - Getnet QAOps")
+    parser = argparse.ArgumentParser(description="Servidor MCP de Selenium - Getnet Tarjetas QAOps")
     parser.add_argument("--base-url", default=os.environ.get("GETNET_BASE_URL", "http://127.0.0.1:8080"))
     parser.add_argument("--selftest", action="store_true", help="Ejecuta prueba de autodiagnóstico MCP contra el portal")
     args = parser.parse_args()

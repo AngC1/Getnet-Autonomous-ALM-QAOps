@@ -1,73 +1,30 @@
-# Getnet (Grupo Santander) — Autonomous Production ALM (Zero Human-in-the-Loop) & QAOps Suite
+# Getnet (Grupo Santander) — Autonomous Production ALM & QAOps de Tarjetas Bancarias (Zero Human-in-the-Loop)
 
-> **DEMO EJECUTIVA CIO GETNET · AYESA DIGITAL QAOPS**
-> Ecosistema completo de **ALM en Producción Sin Human-in-the-Loop** que integra detección, triaje, análisis de causa raíz (RCA), auto-reparación (*re-fixing*), pruebas regresivas E2E/Performance y *re-deploy* autónomo ante:
-> 1. **Incidencia Funcional desde Cajero ATM (`GTN-INC-ATM-001`)**: Construida sobre el motor **`AWS_Kiro-main`** (`atm_sentinel.py` + `brand_verifier/incident.py`) simulando una incidencia de **bloqueo y retención de tarjeta en el sistema** (`ATM-GTN-MAD-0042`) sin emisión de reverso EMV `ISO-8583 MTI 0420`.
-> 2. **Incidencia de Sistemas en Producción (`GTN-INC-SYS-002`)**: Detectada desde **AWS CloudWatch Alarms / Logs Insights** y el **Servidor MCP de Monitor OpenSource (Prometheus / OpenTelemetry)** (`mcp-observability-server/server.py`) por deadlock de mutex en Redis (`lock_ttl_ms=0`) y saturación del pool de conexiones HikariCP en `getnet-card-blocker-svc`.
+Plataforma de demostración ejecutiva para el **CIO de Getnet (Grupo Santander)** que simula el ciclo completo **ALM en Producción sin Human-in-the-Loop (Zero-Touch)** aplicado exclusivamente al dominio de **Tarjetas Bancarias EMV y Cajeros ATM**:
 
----
-
-## 🏗️ Arquitectura del Ciclo Completo ALM Sin Human-in-the-Loop
-
-```mermaid
-flowchart TB
-    subgraph SENSORS["1. Detección en Producción (Sensores Activos)"]
-        ATM["🏧 Cajero ATM-GTN-MAD-0042\nMotor AWS_Kiro-main\n(atm_sentinel.py + incident.py)"]
-        CW["☁️ AWS CloudWatch + Prometheus MCP\nmcp-observability-server\n(CW-ALARM-GTN-CARDLOCK-P99)"]
-    end
-
-    subgraph BRAIN["2. Triaje, Análisis RCA & Re-Fixing Autónomo (Zero Human-in-the-Loop)"]
-        TRIAGE["🧠 Agente de Triaje Cognitivo\n• Enmascarado PCI-DSS (redact_pan)\n• Apertura Issues GTN-INC-ATM-001 & GTN-INC-SYS-002"]
-        RCA["🔍 Análisis Causa Raíz (RCA)\n• AST Code Analysis (card_lock_engine)\n• CloudWatch Logs Insights + PromQL"]
-        FIX["🛠️ Re-Fixing Autónomo (Hotfix)\n• PATCH-GTN-ATM-0420 (Reverso EMV + Token Wallet)\n• PATCH-GTN-SYS-REDIS (TTL=1500ms + Circuit Breaker)"]
-    end
-
-    subgraph GATES["3. Quality Gates, Canary Re-Deploy & Cuadro de Mando Jira Xray"]
-        MCP_SEL["🤖 Servidor MCP Selenium\n(DOM Pruning -92.8% tokens + Self-Healing)"]
-        PYTEST["🧪 Suite Pytest + Selenium POM\n(12 Tests E2E: GTN-TC-001..010, 013, 014)"]
-        JMETER["⚡ Motor JMeter AI Performance\n(GTN-TC-011..012: P95 < 80ms, Apdex = 1.0)"]
-        JIRA["📊 Cuadro de Mando CIO en Jira Xray\n(14/14 Tests PASSED · 2/2 Incidencias RESOLVED)"]
-    end
-
-    ATM --> TRIAGE
-    CW --> TRIAGE
-    TRIAGE --> RCA --> FIX --> MCP_SEL --> PYTEST --> JMETER --> JIRA
-```
+1. **Flujo Visual de Máquina de 8 Estados (`S1` a `S8`) y Orquestación de 5 Agentes Autónomos**:
+   - `AGT-01 · Kiro-ATM-Vision-Agent`: Detección visual de retención de tarjeta en ranura ATM (`AWS_Kiro-main`) y enmascarado PCI-DSS (`redact_pan`).
+   - `AGT-02 · Observability-MCP-Agent`: Correlación en tiempo real vía **MCP Server** con **Dynatrace Davis AI (`DT-PROB-2026-8841`)**, **AWS CloudWatch (`CW-ALARM-GTN-CARDLOCK-P99`)** y **Prometheus OpenSource**.
+   - `AGT-03 · RAG-Knowledge-Architect-Agent`: Consulta sobre el **Motor RAG de Comportamiento de Incidencias Bancarias (`rag-knowledge-base/`)** mediante similitud coseno TF-IDF + Boost BM25.
+   - `AGT-04 · Self-Healing-Patch-Agent`: Inyección en caliente de parches (`enable_emv_reversal_0420=True` + emisión `ISO-8583 MTI 0420` y `redis_lock_ttl_ms=3000` + Circuit Breaker) y despliegue Canary (`v2026.11.2-AUTONOMOUS-PRO`).
+   - `AGT-05 · QAOps-Xray-Certifier-Agent`: Ejecución autónoma de los **12 Tests E2E Selenium de Tarjetas Bancarias** y **2 Tests de Estrés JMeter IA**, cerrando las incidencias en el **Cuadro de Mando de Jira Xray**.
+2. **Ventanas Interactivas de Conexión MCP Server (`Dynatrace` y `AWS CloudWatch`)**:
+   - Configura endpoints, tokens API / IAM Roles, ejecuta consultas **DQL (Dynatrace)** y **CloudWatch Logs Insights** en vivo e inspecciona las tramas JSON-RPC 2.0 desde `/alm-dashboard`.
+3. **Base de Conocimiento & Modelo RAG de Incidencias en Producción (`rag-knowledge-base/`)**:
+   - 6 Playbooks detallados de tarjetas bancarias (`RAG-PB-ATM-001` a `RAG-PB-CHB-006`) con modelo de comportamiento, propagación del fallo, causa raíz (RCA) y remediación sin intervención humana.
 
 ---
 
-## 🚀 Ejecución Rápida para la Demo del CIO de Getnet
-
-### Opción 1: Ejecución Completa del Arnés Zero-Touch (CLI)
-Levanta automáticamente el aplicativo de sistema de Getnet, inyecta y resuelve ambas incidencias (ATM Funcional + Sistemas CloudWatch/Prometheus), ejecuta los 2 servidores MCP, los 12 tests E2E de Pytest/Selenium y la prueba de carga JMeter IA:
+## Ejecución Rápida de la Demo Completa
 
 ```bash
+# 1. Ejecutar el arnés completo Zero-Touch (RAG + MCP Dynatrace/CloudWatch/Kiro + Selenium E2E + JMeter IA)
 python run_qaops_suite.py
+
+# 2. Iniciar el servidor web en http://127.0.0.1:8080
+python portal-getnet/app.py
 ```
 
-### Opción 2: Demo Interactiva en Vivo en Navegador (Portal Getnet + Cuadro de Mando Jira Xray)
-```bash
-python portal-adeslas/app.py
-```
-Abre en tu navegador:
-- **📊 Cuadro de Mando Ejecutivo CIO en Jira Xray**: `http://127.0.0.1:8080/alm-dashboard`
-  - Pulsa **`🔥 1. Simular Fallo PRO (ATM + CloudWatch)`** para inyectar en vivo la incidencia funcional de bloqueo de tarjeta en el cajero `ATM-GTN-MAD-0042` y la alarma crítica de AWS CloudWatch / Prometheus.
-  - Pulsa **`🤖 2. Ciclo ALM Sin Human-in-the-Loop (Auto-Fix & Re-Deploy)`** para observar cómo el sistema detecta, tria, analiza la causa raíz, aplica el hotfix en caliente, redespliega la release `v2026.11.2-AUTONOMOUS-PRO` y certifica los **14/14 Test Cases en Jira Xray**.
-- **🏧 Portal Operativo Getnet & Simulador de Bloqueo de Tarjetas ATM**: `http://127.0.0.1:8080/servicios-para-clientes` (Pestaña 6: *Simulador Bloqueo Tarjeta ATM (AWS Kiro + CloudWatch)*).
-- **📽️ Presentación Ejecutiva CIO Getnet**: `http://127.0.0.1:8080/presentacion`
-
----
-
-## 🧩 Estructura del Repositorio
-
-| Directorio / Archivo | Descripción |
-| :--- | :--- |
-| `portal-adeslas/app.py` | Aplicativo de sistema Getnet (Pasarela ISO-8583, Bloqueo de Tarjetas ATM, Observabilidad CloudWatch/Prometheus y Hub ALM Jira Xray). |
-| `AWS_Kiro-main/AWS_Kiro-main/` | Motor de análisis de incidencias funcionales de cajeros ATM (`atm_sentinel.py`, `brand_verifier/incident.py`, enmascarado PCI-DSS `redact_pan` y triaje). |
-| `mcp-observability-server/server.py` | **Servidor MCP de Monitor OpenSource (Prometheus/OpenTelemetry) + AWS CloudWatch + AWS_Kiro** (`--selftest` y JSON-RPC 2.0 stdio). |
-| `mcp-selenium-server/server.py` | **Servidor MCP de Selenium WebDriver** con poda semántica del DOM (*DOM Pruning*) y *Self-Healing Locators*. |
-| `selenium-qaops/` | Suite E2E Pytest + Page Object Model con auto-curación (`GTN-TC-001` a `GTN-TC-010`, `GTN-TC-013`, `GTN-TC-014`). |
-| `jmeter-ai/` | Motor de pruebas de rendimiento concurrentes y diagnóstico cognitivo JMeter IA (`GTN-TC-011` y `GTN-TC-012`). |
-| `alm-backlog/` | Exportaciones sincronizadas de **Jira Xray** (`backlog_xray_export.json`), **TestLink** (`segurcaixa_testplan_testlink.xml`) y **Redmine** (`redmine_issues_backlog.csv`). |
-| `specs/` | Especificaciones SDD (`sdd-segurcaixa-servicios-clientes.md` y `sdd-getnet-autonomous-alm.md`). |
-| `presentacion/` | Presentación ejecutiva interactiva para el CIO de Getnet. |
+- **Cuadro de Mando CIO en Jira Xray**: `http://127.0.0.1:8080/alm-dashboard`
+- **Portal Operativo de Tarjetas Bancarias y Red ATM**: `http://127.0.0.1:8080/servicios-para-clientes`
+- **Presentación Ejecutiva CIO Getnet**: `http://127.0.0.1:8080/presentacion`

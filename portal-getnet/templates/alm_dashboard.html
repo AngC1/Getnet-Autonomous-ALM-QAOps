@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuadro de Mando CIO Getnet · Jira Xray | Flujo de Estados, Agentes, Ventanas MCP (Dynatrace/CloudWatch) y Motor RAG</title>
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --bg-card: #0f172a;
+      --bg-card-alt: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --getnet-red: #ef4444;
+      --getnet-red-dark: #991b1b;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --cyan: #06b6d4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header.topbar {
+      background: linear-gradient(90deg, #090d16 0%, #450a0a 55%, #0f172a 100%);
+      border-bottom: 2px solid var(--getnet-red);
+      padding: 14px 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .jira-badge {
+      background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+      color: #fff;
+      font-weight: 900;
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      letter-spacing: 0.4px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+    }
+    .topbar-title h1 { font-size: 1.15rem; font-weight: 800; }
+    .topbar-title span { font-size: 0.78rem; color: #fca5a5; }
+    .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .btn {
+      padding: 8px 13px;
+      border-radius: 6px;
+      font-size: 0.81rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-card-alt);
+      color: var(--text);
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { border-color: var(--cyan); background: #26354d; }
+    .btn-red { background: var(--getnet-red); border-color: #dc2626; color: #fff; }
+    .btn-red:hover { background: #dc2626; }
+    .btn-green { background: #059669; border-color: #10b981; color: #fff; }
+    .btn-green:hover { background: #047857; }
+    .btn-purple { background: #6d28d9; border-color: #8b5cf6; color: #fff; }
+    .btn-purple:hover { background: #5b21b6; }
+    .btn-blue { background: #1d4ed8; border-color: #3b82f6; color: #fff; }
+    .btn-blue:hover { background: #1e40af; }
+
+    .container { max-width: 1460px; margin: 22px auto 60px; padding: 0 22px; }
+
+    .zero-touch-banner {
+      background: linear-gradient(135deg, rgba(153, 27, 27, 0.35) 0%, rgba(15, 23, 42, 0.96) 55%, rgba(6, 95, 70, 0.35) 100%);
+      border: 1px solid #ef4444;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+    .zero-touch-banner h2 { font-size: 1.22rem; color: #fff; margin-bottom: 5px; }
+    .zero-touch-banner p { font-size: 0.87rem; color: #cbd5e1; max-width: 850px; }
+    .zero-touch-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 15px 17px;
+      border-top: 3px solid var(--getnet-red);
+    }
+    .kpi-card .label { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+    .kpi-card .value { font-size: 1.55rem; font-weight: 900; margin: 5px 0 3px; }
+    .kpi-card .sub { font-size: 0.77rem; color: var(--green); }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 22px;
+    }
+    .card h2 {
+      font-size: 1.06rem;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
+    @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Flujo Visual de Máquina de Estados (8 Estados) */
+    .state-flow-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 1150px) { .state-flow-grid { grid-template-columns: repeat(2, 1fr); } }
+    .state-node {
+      background: var(--bg-card-alt);
+      border: 1.5px solid var(--border);
+      border-top: 4px solid var(--green);
+      border-radius: 10px;
+      padding: 14px;
+      position: relative;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .state-node:hover {
+      transform: translateY(-3px);
+      border-color: var(--cyan);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.2);
+    }
+    .state-node.active-step {
+      border-color: #f59e0b;
+      border-top-color: #f59e0b;
+      box-shadow: 0 0 22px rgba(245, 158, 11, 0.45);
+      background: rgba(245, 158, 11, 0.12);
+    }
+    .state-node .st-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .state-node .st-num {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      font-weight: 900;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .state-node h4 { font-size: 0.9rem; color: #fff; margin-bottom: 4px; }
+    .state-node .st-agent { font-size: 0.75rem; color: #38bdf8; font-weight: 700; margin-bottom: 6px; }
+    .state-node .st-desc { font-size: 0.76rem; color: #cbd5e1; line-height: 1.38; }
+    .state-node .st-tools {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.25);
+      font-size: 0.71rem;
+      color: #a78bfa;
+      font-family: 'Consolas', monospace;
+    }
+
+    /* Orquestación de los 5 Agentes Autónomos */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .agent-card {
+      background: linear-gradient(180deg, #162036 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-left: 4px solid var(--purple);
+      border-radius: 10px;
+      padding: 15px;
+    }
+    .agent-card h4 { font-size: 0.94rem; color: #f8fafc; margin-bottom: 3px; }
+    .agent-card .ag-role { font-size: 0.76rem; color: #fbbf24; font-weight: 700; margin-bottom: 8px; }
+    .agent-card ul { padding-left: 16px; font-size: 0.77rem; color: #cbd5e1; margin-bottom: 10px; }
+    .agent-card li { margin-bottom: 4px; }
+    .agent-card .ag-footer {
+      font-size: 0.73rem;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 7px 9px;
+      border-radius: 6px;
+      border: 1px solid #1e293b;
+      color: #34d399;
+    }
+
+    /* Tarjetas de Conexión MCP Server (Dynatrace, CloudWatch, Prometheus, Kiro) */
+    .mcp-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .mcp-conn-card {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .mcp-conn-card.dynatrace { border-top: 4px solid #a855f7; }
+    .mcp-conn-card.cloudwatch { border-top: 4px solid #f59e0b; }
+    .mcp-conn-card.prometheus { border-top: 4px solid #06b6d4; }
+    .mcp-conn-card.kiro { border-top: 4px solid #ef4444; }
+
+    /* Tablas y Píldoras */
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; background: rgba(255,255,255,0.02); }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.71rem;
+      font-weight: 800;
+    }
+    .status-passed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .status-failed { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border: 1px solid #ef4444; }
+    .status-info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; }
+    .status-purple { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid #8b5cf6; }
+    code { font-family: 'Consolas', monospace; font-size: 0.78rem; color: #38bdf8; }
+
+    /* Ventanas Modales de Conexión MCP Server (Dynatrace & CloudWatch) */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.84);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-window {
+      background: #0f172a;
+      border: 2px solid #3b82f6;
+      border-radius: 14px;
+      max-width: 880px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .modal-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .modal-form-grid label { display: block; font-size: 0.77rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+    .modal-form-grid input, .modal-form-grid select, .modal-form-grid textarea {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      font-family: 'Consolas', monospace;
+    }
+    .jsonrpc-console {
+      background: #050811;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.77rem;
+      color: #34d399;
+      max-height: 310px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Superior Jira Xray & Conectores MCP -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="jira-badge">GETNET · JIRA XRAY ALM</div>
+      <div class="topbar-title">
+        <h1 id="alm-dashboard-title">Cuadro de Mando CIO Getnet · ALM Autónomo de Tarjetas Bancarias Sin Human-in-the-Loop</h1>
+        <span>Flujo Visual de 8 Estados · 5 Agentes IA · Ventanas MCP (<code>Dynatrace Davis AI</code> + <code>AWS CloudWatch</code>) · Base de Conocimiento <code>RAG</code></span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-purple" onclick="openMcpModal('dynatrace')" id="btn-open-mcp-dynatrace">🔌 Ventana MCP Dynatrace</button>
+      <button class="btn btn-blue" onclick="openMcpModal('cloudwatch')" id="btn-open-mcp-cloudwatch">☁️ Ventana MCP AWS CloudWatch</button>
+      <button class="btn" onclick="openMcpModal('kiro_atm')" id="btn-open-mcp-kiro">🏧 Ventana MCP AWS Kiro ATM</button>
+      <a class="btn" href="/servicios-para-clientes">💳 Portal Operativo de Tarjetas</a>
+      <a class="btn" href="/presentacion">📽️ Presentación CIO</a>
+      <a class="btn btn-red" href="/api/v1/alm/export/jira-xray">⬇ Exportar Xray JSON</a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- BANNER DE SIMULACIÓN EN VIVO PARA EL CIO DE GETNET -->
+    <div class="zero-touch-banner" data-testid="zero-touch-banner">
+      <div>
+        <h2>🤖 Centro de Mando Autónomo (Zero Human-in-the-Loop) · Dominio Exclusivo: Tarjetas Bancarias Getnet</h2>
+        <p>Simula en tiempo real una <strong>Incidencia Funcional de Tarjeta Retenida en Cajero ATM (<code>AWS_Kiro-main</code>)</strong> y una <strong>Incidencia de Sistemas en Producción (<code>Dynatrace Davis AI + AWS CloudWatch MCP</code>)</strong>. Observa cómo los <strong>5 Agentes Autónomos</strong> consultan el <strong>Motor RAG</strong>, aplican el Hotfix, redespliegan en Canary y certifican los 14 casos de tarjetas en Jira Xray.</p>
+        <div id="live-Banner-status" style="margin-top:8px;font-size:0.84rem;color:#6ee7b7;font-weight:700;">
+          Estado Global: <span id="overall-alm-status">{{ autonomous.overallStatus }}</span> · Release Activa: <code id="active-release-code">{{ autonomous.deployedRelease }}</code>
+        </div>
+      </div>
+      <div class="zero-touch-controls">
+        <button class="btn btn-red" id="btn-inject-incidents" onclick="injectProductionIncidents()">🔥 1. Simular Fallos en PRO (ATM + Dynatrace + CloudWatch)</button>
+        <button class="btn btn-green" id="btn-run-autonomous-alm" onclick="runAutonomousAlmCycle()">⚡ 2. Ejecutar Ciclo ALM Autónomo (RAG + Auto-Fix)</button>
+        <button class="btn btn-purple" id="btn-animate-states" onclick="animateStateMachineFlow()">▶️ 3. Animar Paso a Paso Estados y Agentes</button>
+      </div>
+    </div>
+
+    <!-- KPIs Ejecutivos CIO Getnet -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="label">Incidencia Funcional Tarjeta ATM</div>
+        <div class="value" id="kpi-atm-inc" style="color: {{ '#ef4444' if system_state.atm_functional_bug_active else '#10b981' }};">
+          {{ 'OPEN (P1)' if system_state.atm_functional_bug_active else 'RESOLVED' }}
+        </div>
+        <div class="sub"><code>GTN-INC-ATM-001</code> · Reverso MTI 0420</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Incidencia Sistemas (Dynatrace/CW)</div>
+        <div class="value" id="kpi-sys-inc" style="color: {{ '#ef4444' if system_state.systems_cloudwatch_bug_active else '#10b981' }};">
+          {{ 'ALARM (P0)' if system_state.systems_cloudwatch_bug_active else 'RESOLVED' }}
+        </div>
+        <div class="sub"><code>GTN-INC-SYS-002</code> · Redis Lock TTL={{ system_state.redis_lock_ttl_ms }}ms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Base de Conocimiento RAG</div>
+        <div class="value" style="color:#a78bfa;">{{ rag_playbooks|length }} Playbooks</div>
+        <div class="sub">Precisión TF-IDF + BM25: 99.0%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Conectores MCP Server Activos</div>
+        <div class="value" style="color:#38bdf8;">4 / 4 UP</div>
+        <div class="sub">Dynatrace · CloudWatch · Prometheus · Kiro</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">MTTR Ciclo Autónomo ALM</div>
+        <div class="value" style="color:#f59e0b;">{{ autonomous.mttrSeconds }} s</div>
+        <div class="sub">vs 3h 45m con intervención humana</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Certificación Tarjetas Jira Xray</div>
+        <div class="value" id="kpi-xray-pass" style="color: var(--green);">{{ selenium.passed + 2 }} / 14</div>
+        <div class="sub">100% Casos de Tarjetas Bancarias PASSED</div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 1: FLUJO VISUAL DE ESTADOS (MÁQUINA DE 8 ESTADOS) Y CÓMO TRABAJAN LOS 5 AGENTES -->
+    <div class="card" id="section-visual-agent-flow">
+      <h2>
+        <span>🔄 Flujo Visual de Estados del Ciclo ALM y Orquestación de los 5 Agentes Autónomos (Zero Human-in-the-Loop)</span>
+        <span class="status-pill status-passed" id="state-machine-badge">MÁQUINA DE ESTADOS: 8 / 8 ESTADOS COMPLETADOS</span>
+      </h2>
+      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:10px;">
+        Haz clic en cualquier estado (<code>S1</code> a <code>S8</code>) o pulsa <strong>"▶️ 3. Animar Paso a Paso Estados y Agentes"</strong> para inspeccionar cómo viaja el evento desde la ranura del cajero ATM y los agentes de Dynatrace/CloudWatch hasta el cierre certificado en Jira Xray.
+      </p>
+
+      <!-- Máquina Visual de 8 Estados -->
+      <div class="state-flow-grid" id="state-machine-grid">
+        {% for st in state_machine %}
+        <div class="state-node" id="node-{{ st.stateId }}" onclick="inspectStateNode('{{ st.stateId }}', '{{ st.name }}', '{{ st.agent }}', '{{ st.inputSignal }}', '{{ st.outputTransition }}')">
+          <div class="st-header">
+            <span class="st-num">ESTADO {{ st.order }} · {{ st.badge }}</span>
+            <span style="font-size:0.72rem;color:#94a3b8;">{{ st.durationMs }} ms</span>
+          </div>
+          <h4>{{ st.name }}</h4>
+          <div class="st-agent">🤖 {{ st.agent }}</div>
+          <div class="st-desc"><strong>Entrada:</strong> {{ st.inputSignal }}</div>
+          <div class="st-desc" style="margin-top:4px;color:#6ee7b7;"><strong>Transición:</strong> {{ st.outputTransition }}</div>
+          <div class="st-tools">MCP Tools: {{ st.mcpTools|join(', ') }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="state-inspector-banner" style="margin-top:14px;padding:12px 16px;background:#090d16;border:1px solid #38bdf8;border-radius:8px;font-size:0.82rem;color:#e2e8f0;">
+        <strong>🔍 Inspector de Transición de Estado en Vivo:</strong> Selecciona cualquier nodo superior o ejecuta la animación paso a paso para visualizar el intercambio de mensajes en el bus Multi-Agente (Protocolo A2A).
+      </div>
+
+      <!-- Cómo Trabajan los 5 Agentes Especializados -->
+      <h3 style="font-size:0.96rem;margin-top:20px;margin-bottom:8px;color:#f8fafc;">🤖 Cómo Trabajan y Colaboran los 5 Agentes Autónomos de Ingeniería &amp; QAOps</h3>
+      <div class="agents-grid">
+        {% for ag in agents_roster %}
+        <div class="agent-card" id="card-{{ ag.agentId }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span class="status-pill status-purple">{{ ag.agentId }}</span>
+            <span class="status-pill status-passed">{{ ag.status }}</span>
+          </div>
+          <h4>{{ ag.name }}</h4>
+          <div class="ag-role">{{ ag.role }}</div>
+          <div style="font-size:0.73rem;color:#94a3b8;margin-bottom:8px;">
+            <strong>Estados:</strong> <code>{{ ag.currentState }}</code><br/>
+            <strong>Servidor MCP:</strong> <code>{{ ag.mcpServer }}</code>
+          </div>
+          <ul>
+            {% for resp in ag.responsibilities %}
+            <li>{{ resp }}</li>
+            {% endfor %}
+          </ul>
+          <div class="ag-footer">
+            <strong>Última Acción Certificada:</strong> {{ ag.lastAction }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: VENTANAS Y PANEL DE CONEXIÓN MCP SERVER CON DYNATRACE, AWS CLOUDWATCH, PROMETHEUS Y AWS KIRO -->
+    <div class="card" id="section-mcp-connectors">
+      <h2>
+        <span>🔌 Conectores MCP Server en Producción (Dynatrace Davis AI · AWS CloudWatch · Prometheus · AWS Kiro ATM)</span>
+        <span class="status-pill status-info">PROTOCOLO JSON-RPC 2.0 ACTIVO</span>
+      </h2>
+      <p style="font-size:0.84rem;color:var(--muted);">
+        Configura, prueba y lanza consultas en vivo hacia las herramientas de observabilidad empresarial mediante el protocolo <strong>Model Context Protocol (MCP)</strong>.
+      </p>
+
+      <div class="mcp-cards-grid">
+        <!-- Conector 1: Dynatrace MCP -->
+        <div class="mcp-conn-card dynatrace">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong style="color:#e9d5ff;font-size:0.95rem;">🟣 Dynatrace Davis AI &amp; PurePath MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.dynatrace.status }} ({{ mcp_connections.dynatrace.latencyMs }}ms)</span>
+            </div>
+            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+              <div><strong>Endpoint:</strong> <code>{{ mcp_connections.dynatrace.endpointUrl }}</code></div>
+              <div><strong>Servidor MCP:</strong> <code>{{ mcp_connections.dynatrace.serverName }}</code></div>
+              <div><strong>Problema Detectado:</strong> <code>DT-PROB-2026-8841</code> (Deadlock Redis en Bloqueo de Tarjetas)</div>
+            </div>
+          </div>
+          <button class="btn btn-purple" onclick="openMcpModal('dynatrace')">🔌 Abrir Ventana de Conexión MCP Dynatrace</button>
+        </div>
+
+        <!-- Conector 2: AWS CloudWatch MCP -->
+        <div class="mcp-conn-card cloudwatch">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong style="color:#fde68a;font-size:0.95rem;">🟠 AWS CloudWatch Alarms &amp; Logs Insights MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.cloudwatch.status }} ({{ mcp_connections.cloudwatch.latencyMs }}ms)</span>
+            </div>
+            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+              <div><strong>Región:</strong> <code>{{ mcp_connections.cloudwatch.region }}</code></div>
+              <div><strong>Log Group:</strong> <code>{{ mcp_connections.cloudwatch.logGroup }}</code></div>
+              <div><strong>Alarma P99:</strong> <code>CW-ALARM-GTN-CARDLOCK-P99</code></div>
+            </div>
+          </div>
+          <button class="btn btn-blue" onclick="openMcpModal('cloudwatch')">☁️ Abrir Ventana de Conexión MCP CloudWatch</button>
+        </div>
+
+        <!-- Conector 3: AWS Kiro ATM Sentinel MCP -->
+        <div class="mcp-conn-card kiro">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong style="color:#fecaca;font-size:0.95rem;">🔴 AWS Kiro ATM Sentinel Vision MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.kiro_atm.status }} ({{ mcp_connections.kiro_atm.latencyMs }}ms)</span>
+            </div>
+            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+              <div><strong>Nodo Cajero:</strong> <code>{{ mcp_connections.kiro_atm.atmNode }}</code></div>
+              <div><strong>Bucket S3:</strong> <code>{{ mcp_connections.kiro_atm.s3Bucket }}</code></div>
+              <div><strong>Privacidad PAN:</strong> <code>brand_verifier.incident.redact_pan</code></div>
+            </div>
+          </div>
+          <button class="btn btn-red" onclick="openMcpModal('kiro_atm')">🏧 Abrir Ventana de Conexión MCP AWS Kiro</button>
+        </div>
+
+        <!-- Conector 4: Prometheus OpenSource MCP -->
+        <div class="mcp-conn-card prometheus">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong style="color:#a5f3fc;font-size:0.95rem;">🔵 Prometheus &amp; OpenTelemetry MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.prometheus.status }} ({{ mcp_connections.prometheus.latencyMs }}ms)</span>
+            </div>
+            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+              <div><strong>Scrape URL:</strong> <code>{{ mcp_connections.prometheus.endpointUrl }}</code></div>
+              <div><strong>Servidor MCP:</strong> <code>{{ mcp_connections.prometheus.serverName }}</code></div>
+              <div><strong>Métricas Clave:</strong> <code>getnet_card_block_latency_p95_ms</code></div>
+            </div>
+          </div>
+          <button class="btn" onclick="openMcpModal('prometheus')">📊 Abrir Ventana de Conexión MCP Prometheus</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: BASE DE CONOCIMIENTO & MODELO RAG DE COMPORTAMIENTO DE INCIDENCIAS EN PRODUCCIÓN -->
+    <div class="card" id="section-rag-knowledge-base">
+      <h2>
+        <span>🧠 Base de Conocimiento &amp; Modelo RAG de Comportamiento de Incidencias Bancarias (<code>rag-knowledge-base/</code>)</span>
+        <span class="status-pill status-purple">{{ rag_meta.embeddingModel }}</span>
+      </h2>
+      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
+        El agente <code>RAG-Knowledge-Architect-Agent</code> indexa los patrones de comportamiento de las incidencias de tarjetas bancarias, sus huellas de telemetría (<code>AWS_Kiro</code>, <code>Dynatrace Davis AI</code>, <code>AWS CloudWatch</code>, <code>ISO-8583</code>) y prescribe la solución determinista que aplica <code>Self-Healing-Patch-Agent</code> sin Human-in-the-Loop.
+      </p>
+
+      <!-- Buscador Interactivo RAG -->
+      <div style="background:#090d16;border:1px solid #4c1d95;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:0.82rem;font-weight:700;color:#c4b5fd;margin-bottom:8px;">
+          🔎 Consulta en Vivo al Motor RAG (Similitud Coseno TF-IDF + Boost BM25 de Telemetría):
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+          <input type="text" id="rag-search-input" value="Tarjeta bancaria retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 y deadlock Redis" style="flex:1;min-width:300px;padding:10px 12px;border-radius:6px;border:1px solid #6d28d9;background:#1e293b;color:#fff;font-size:0.86rem;" />
+          <button class="btn btn-purple" onclick="runRagQuery()">🧠 Recuperar Playbook RAG &amp; Sintetizar Solución</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Tarjeta retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 Kiro')">🏧 Preset 1: Retención Tarjeta ATM (MTI 0420)</button>
+          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Dynatrace Davis AI DT-PROB-2026-8841 y CloudWatch deadlock Redis TTL 0 HikariCP')">🟣 Preset 2: Deadlock Redis &amp; HikariCP (Dynatrace/CW)</button>
+          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Fallo autorización 3D-Secure 2.2 ISO-8583 RC 91 Issuer Switch Inoperative')">🔐 Preset 3: Error ISO-8583 RC 91 (Stand-In STIP)</button>
+          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Fuga de PAN de 16 dígitos en logs PCI-DSS 4.0 redact_pan')">🛡️ Preset 4: Privacidad PCI-DSS (redact_pan)</button>
+          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Desincronización clave ZPK CVK en HSM Thales payShield criptograma ARQC')">🔑 Preset 5: Rotación Claves HSM Thales</button>
+        </div>
+
+        <div id="rag-live-result" style="margin-top:14px;padding:14px;background:#0f172a;border:1px solid #334155;border-radius:8px;font-size:0.81rem;">
+          <strong>Playbook Activo por Defecto:</strong> <code>RAG-PB-ATM-001</code> (Confianza: <strong>99.0%</strong>) + <code>RAG-PB-SYS-002</code> (Confianza: <strong>99.0%</strong>) · Pulsa <em>"Recuperar Playbook RAG"</em> o cualquiera de los presets para ejecutar el motor vectorial en tiempo real.
+        </div>
+      </div>
+
+      <!-- Tabla del Corpus RAG de Comportamiento de Incidencias y Solución Zero-Touch -->
+      <table>
+        <thead>
+          <tr>
+            <th>Playbook RAG</th>
+            <th>Incidencia de Tarjeta / Categoría</th>
+            <th>Modelo de Comportamiento y Propagación del Fallo</th>
+            <th>Causa Raíz (RCA) &amp; Fuentes MCP</th>
+            <th>Cómo se Soluciona en Producción sin Human-in-the-Loop</th>
+            <th>Gate Jira Xray &amp; MTTR</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pb in rag_playbooks %}
+          <tr>
+            <td>
+              <code>{{ pb.playbookId }}</code><br/>
+              <span class="status-pill {{ 'status-failed' if pb.severity == 'CRITICAL' else 'status-info' }}" style="margin-top:4px;">{{ pb.severity }}</span>
+            </td>
+            <td>
+              <strong>{{ pb.title }}</strong><br/>
+              <small style="color:var(--muted);">Incidente: <code>{{ pb.linkedIncidentId }}</code> · Bug: <code>{{ pb.linkedDefectId }}</code></small>
+            </td>
+            <td style="font-size:0.77rem;color:#cbd5e1;">
+              <strong>Disparador:</strong> {{ pb.behaviorModel.triggerCondition }}<br/>
+              <span style="color:#fcd34d;"><strong>Propagación:</strong> {{ pb.behaviorModel.propagationPath }}</span>
+            </td>
+            <td style="font-size:0.77rem;">
+              <code>{{ pb.rootCauseAnalysis.defectType }}</code><br/>
+              <small style="color:#94a3b8;">{{ pb.rootCauseAnalysis.explanation }}</small><br/>
+              <span style="color:#38bdf8;font-size:0.72rem;">Fuentes: {{ pb.telemetrySources|join(' · ') }}</span>
+            </td>
+            <td style="font-size:0.76rem;color:#a7f3d0;">
+              <strong>Agente:</strong> <code>{{ pb.autonomousRemediation.agentOwner }}</code><br/>
+              {% for step in pb.autonomousRemediation.steps[:3] %}
+              <div>{{ step }}</div>
+              {% endfor %}
+              <div style="margin-top:4px;color:#38bdf8;"><strong>Patch JSON:</strong> <code>{{ pb.autonomousRemediation.configPatch|tojson }}</code></div>
+            </td>
+            <td style="font-size:0.76rem;">
+              <strong>Tests:</strong> <code>{{ pb.verificationGate.xrayTests|join(', ') }}</code><br/>
+              <span style="color:#34d399;font-weight:700;">Auto MTTR: {{ pb.verificationGate.mttrAutonomous }}</span><br/>
+              <small style="color:var(--muted);">Manual: {{ pb.verificationGate.mttrManual }}</small>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 4: TELEMETRÍA EN VIVO DE LAS 2 INCIDENCIAS PRO (ATM KIRO vs DYNATRACE/CLOUDWATCH) -->
+    <div class="grid-2">
+      <div class="card">
+        <h2>
+          <span>🏧 Incidencia Funcional Tarjeta ATM (<code>AWS_Kiro-main</code>)</span>
+          <span class="status-pill status-passed" id="badge-atm-status">{{ autonomous.atmKiroDetail.status }}</span>
+        </h2>
+        <div style="font-size:0.82rem;display:grid;gap:8px;">
+          <div><strong>Ticket Jira Xray:</strong> <code>{{ autonomous.atmKiroDetail.incidentKey }}</code> · <strong>Playbook RAG:</strong> <code>{{ autonomous.atmKiroDetail.ragPlaybookId }}</code></div>
+          <div><strong>Cajero ATM:</strong> <code>{{ autonomous.atmKiroDetail.atmId }}</code> ({{ autonomous.atmKiroDetail.location }})</div>
+          <div><strong>Privacidad PCI-DSS (<code>redact_pan</code>):</strong> <code>{{ autonomous.atmKiroDetail.panRedacted }}</code></div>
+          <div><strong>Triaje Kiro:</strong> Categoría <code>{{ autonomous.atmKiroDetail.triage.categoria }}</code> · Riesgo Sentinel: <span class="status-pill status-failed">{{ autonomous.atmKiroDetail.sentinelRisk }} ({{ (autonomous.atmKiroDetail.confidence * 100)|int }}%)</span></div>
+          <div><strong>Causa Raíz:</strong> {{ autonomous.atmKiroDetail.triage.causa_probable }}</div>
+          <div><strong>Acción Autónoma:</strong> {{ autonomous.atmKiroDetail.triage.accion_recomendada }}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>🟣🟠 Incidencia Sistemas (<code>Dynatrace Davis AI</code> + <code>AWS CloudWatch MCP</code>)</span>
+          <span class="status-pill status-passed" id="badge-sys-status">{{ autonomous.cloudwatchSysDetail.status }}</span>
+        </h2>
+        <div style="font-size:0.82rem;display:grid;gap:8px;">
+          <div><strong>Ticket Jira Xray:</strong> <code>{{ autonomous.cloudwatchSysDetail.incidentKey }}</code> · <strong>Playbook RAG:</strong> <code>{{ autonomous.cloudwatchSysDetail.ragPlaybookId }}</code></div>
+          <div><strong>Problema Dynatrace:</strong> <code>{{ autonomous.cloudwatchSysDetail.dynatraceProblemId }}</code> · <strong>Alarma CloudWatch:</strong> <code>{{ autonomous.cloudwatchSysDetail.alarmName }}</code></div>
+          <div><strong>Excepción Detectada:</strong> <code>{{ autonomous.cloudwatchSysDetail.errorSignature }}</code></div>
+          <div><strong>Antes del Auto-Fix:</strong> Latencia P95 = <code>{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.p95LatencyMs }} ms</code> · HikariCP = <code>{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.hikariPoolUsagePct }}%</code> · Deadlocks = <code>{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.redisMutexDeadlocks }}</code></div>
+          <div><strong>Después del Auto-Fix:</strong> Latencia P95 = <strong style="color:#34d399;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.p95LatencyMs }} ms</strong> · HikariCP = <strong style="color:#34d399;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.hikariPoolUsagePct }}%</strong> · Deadlocks = <strong style="color:#34d399;">0</strong></div>
+          <div><strong>Commit Autónomo:</strong> <code>{{ autonomous.cloudwatchSysDetail.hotfixCommit }}</code></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: MATRIZ DE 14 CASOS DE PRUEBA DE TARJETAS BANCARIAS EN JIRA XRAY -->
+    <div class="card">
+      <h2>
+        <span>🧪 Matriz de Certificación Jira Xray — 14 Casos Exclusivos de Tarjetas Bancarias (<code>GTN-TC-001</code> a <code>GTN-TC-014</code>)</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" onclick="triggerLiveSelenium()">🌐 Ejecutar 12 Tests Selenium E2E Tarjetas</button>
+          <button class="btn" onclick="triggerLiveJmeter()">⚡ Ejecutar Stress Test JMeter IA Tarjetas</button>
+        </div>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Clave Xray</th>
+            <th>TestLink ID</th>
+            <th>Caso de Prueba Funcional / Rendimiento / Auto-Remediación de Tarjetas</th>
+            <th>Prioridad</th>
+            <th>Tipo</th>
+            <th>Estado Xray</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tc in alm.testCases %}
+          <tr>
+            <td><code>{{ tc.key }}</code></td>
+            <td><code>{{ tc.testLinkId }}</code></td>
+            <td><strong>{{ tc.summary }}</strong></td>
+            <td>{{ tc.priority }}</td>
+            <td><span class="status-pill status-info">{{ tc.type }}</span></td>
+            <td>
+              <span class="status-pill {{ 'status-passed' if tc.status == 'PASSED' else 'status-failed' }}">
+                {{ tc.status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 6: HISTORIAL DE EJECUCIONES EN VIVO -->
+    <div class="card">
+      <h2>
+        <span>📜 Historial de Ejecuciones en Vivo (Ciclos ALM Zero-Touch, Selenium MCP &amp; JMeter IA)</span>
+        <span class="status-pill status-passed">{{ executions|length }} EJECUCIONES REGISTRADAS</span>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Exec Key</th>
+            <th>Build / Ciclo</th>
+            <th>Orquestador / Agentes</th>
+            <th>Alcance</th>
+            <th>Resultado</th>
+            <th>Duración</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ex in executions %}
+          <tr>
+            <td><code>{{ ex.execKey }}</code></td>
+            <td><strong>{{ ex.buildName }}</strong></td>
+            <td>{{ ex.runner }}</td>
+            <td>{{ ex.testsScope }}</td>
+            <td><span class="status-pill {{ 'status-passed' if ex.status == 'PASSED' else 'status-failed' }}">{{ ex.passed }} PASS / {{ ex.failed }} FAIL</span></td>
+            <td>{{ ex.durationMs }} ms</td>
+            <td>{{ ex.timestamp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- VENTANA MODAL INTERACTIVA DE CONEXIÓN MCP SERVER (DYNATRACE / AWS CLOUDWATCH / KIRO / PROMETHEUS) -->
+  <div class="modal-backdrop" id="mcp-modal-backdrop" data-testid="mcp-modal-backdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div>
+          <h3 id="mcp-modal-title" style="font-size:1.1rem;color:#fff;">🔌 Ventana de Conexión MCP Server</h3>
+          <span id="mcp-modal-subtitle" style="font-size:0.78rem;color:#93c5fd;">Protocolo Model Context Protocol (JSON-RPC 2.0)</span>
+        </div>
+        <button class="btn btn-red" onclick="closeMcpModal()">✖ Cerrar Ventana</button>
+      </div>
+
+      <input type="hidden" id="mcp-provider-input" value="dynatrace" />
+
+      <div class="modal-form-grid">
+        <div>
+          <label for="mcp-endpoint-input">Endpoint / Región MCP Server</label>
+          <input type="text" id="mcp-endpoint-input" value="https://getnet-prod.live.dynatrace.com/api/v2" />
+        </div>
+        <div>
+          <label for="mcp-token-input">Credencial / IAM Role / Token API</label>
+          <input type="text" id="mcp-token-input" value="dt0c01.GETNET_PRO_CARDS.****************8841" />
+        </div>
+        <div>
+          <label for="mcp-entity-input">Entidad / Log Group / Cajero Monitorizado</label>
+          <input type="text" id="mcp-entity-input" value="SERVICE-GETNET-CARD-BLOCKER (/aws/ecs/getnet-card-blocker-svc)" />
+        </div>
+        <div>
+          <label for="mcp-transport-input">Transporte MCP</label>
+          <select id="mcp-transport-input">
+            <option value="stdio">JSON-RPC 2.0 over stdio (Local / Subprocess)</option>
+            <option value="sse">JSON-RPC 2.0 over HTTP SSE (Remote Gateway)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label for="mcp-query-input" style="display:block;font-size:0.77rem;color:var(--muted);margin-bottom:4px;font-weight:700;">
+          Consulta DQL (Dynatrace) / CloudWatch Logs Insights / PromQL a ejecutar vía Tool MCP:
+        </label>
+        <input type="text" id="mcp-query-input" style="width:100%;background:#1e293b;border:1px solid #475569;color:#fff;padding:9px 11px;border-radius:6px;font-family:'Consolas',monospace;font-size:0.82rem;" value="fetch spans | filter dt.entity.service == 'SERVICE-GETNET-CARD-BLOCKER' | summarize p95=percentile(duration, 95), redisDeadlocks=countIf(redis.lock.ttl == 0)" />
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-green" onclick="executeMcpConnectionTest()" id="btn-test-mcp-connection">🔌 Probar Handshake MCP &amp; Ejecutar Tool en Vivo</button>
+        <button class="btn btn-purple" onclick="runRagFromMcpModal()">🧠 Enviar Telemetría Capturada al Motor RAG</button>
+      </div>
+
+      <div class="jsonrpc-console" id="mcp-jsonrpc-output">
+// Pulsa "Probar Handshake MCP & Ejecutar Tool en Vivo" para inspeccionar la trama JSON-RPC 2.0 y los datos de Dynatrace / AWS CloudWatch...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MCP_PRESETS = {
+      dynatrace: {
+        title: "🟣 Ventana de Conexión MCP Server — Dynatrace (Davis AI, Smartscape & Grail DQL)",
+        subtitle: "Servidor MCP: getnet-dynatrace-davis-mcp · Tool: dynatrace_get_davis_problems & dynatrace_execute_dql",
+        endpoint: "https://getnet-prod.live.dynatrace.com/api/v2",
+        token: "dt0c01.GETNET_PRO_CARDS.****************8841",
+        entity: "SERVICE-GETNET-CARD-BLOCKER · DT-PROB-2026-8841",
+        query: "fetch spans | filter dt.entity.service == 'SERVICE-GETNET-CARD-BLOCKER' | summarize p95=percentile(duration, 95), redisDeadlocks=countIf(redis.lock.ttl == 0)"
+      },
+      cloudwatch: {
+        title: "🟠 Ventana de Conexión MCP Server — AWS CloudWatch (Alarms, Logs Insights & X-Ray)",
+        subtitle: "Servidor MCP: getnet-aws-cloudwatch-mcp · Tool: cloudwatch_get_alarms & cloudwatch_query_logs_insights",
+        endpoint: "eu-west-1 (AWS CloudWatch Endpoint · Core Tarjetas Getnet)",
+        token: "arn:aws:iam::904211884210:role/Getnet-Autonomous-ALM-MCP-Role",
+        entity: "/aws/ecs/getnet-card-blocker-svc · CW-ALARM-GTN-CARDLOCK-P99",
+        query: "fields @timestamp, @message | filter level in ['ERROR', 'FATAL'] | sort @timestamp desc | limit 20"
+      },
+      kiro_atm: {
+        title: "🔴 Ventana de Conexión MCP Server — AWS Kiro ATM Sentinel Vision & PCI-DSS",
+        subtitle: "Servidor MCP: getnet-kiro-atm-edge-mcp · Tool: atm_kiro_inspect_incident (redact_pan)",
+        endpoint: "s3://getnet-atm-incidents-pro (ATM-GTN-MAD-0042)",
+        token: "AWS_KIRO_BEDROCK_SONNET_4_5_ROLE",
+        entity: "ATM-GTN-MAD-0042 (Sucursal Getnet Gran Vía 28, Madrid)",
+        query: "inspect_atm_slot --atm-id ATM-GTN-MAD-0042 --enforce-pci-redact-pan --verify-mti-0420"
+      },
+      prometheus: {
+        title: "🔵 Ventana de Conexión MCP Server — Prometheus & OpenTelemetry Collector",
+        subtitle: "Servidor MCP: getnet-prometheus-otel-mcp · Tool: prometheus_query_metrics",
+        endpoint: "http://127.0.0.1:8080/api/v1/observability/prometheus",
+        token: "OPENMETRICS_BEARER_TOKEN_LOCAL",
+        entity: "getnet-card-blocker-svc (Scrape Interval: 5s)",
+        query: "getnet_card_block_latency_p95_ms{service='getnet-card-blocker-svc',env='prod'}"
+      }
+    };
+
+    function openMcpModal(provider) {
+      const cfg = MCP_PRESETS[provider] || MCP_PRESETS.dynatrace;
+      document.getElementById('mcp-provider-input').value = provider;
+      document.getElementById('mcp-modal-title').textContent = cfg.title;
+      document.getElementById('mcp-modal-subtitle').textContent = cfg.subtitle;
+      document.getElementById('mcp-endpoint-input').value = cfg.endpoint;
+      document.getElementById('mcp-token-input').value = cfg.token;
+      document.getElementById('mcp-entity-input').value = cfg.entity;
+      document.getElementById('mcp-query-input').value = cfg.query;
+      document.getElementById('mcp-modal-backdrop').classList.add('open');
+      executeMcpConnectionTest();
+    }
+
+    function closeMcpModal() {
+      document.getElementById('mcp-modal-backdrop').classList.remove('open');
+    }
+
+    async function executeMcpConnectionTest() {
+      const provider = document.getElementById('mcp-provider-input').value;
+      const endpointUrl = document.getElementById('mcp-endpoint-input').value;
+      const query = document.getElementById('mcp-query-input').value;
+      const outBox = document.getElementById('mcp-jsonrpc-output');
+      outBox.textContent = "⏳ Estableciendo sesión MCP JSON-RPC 2.0 y ejecutando herramienta en " + provider.toUpperCase() + "...";
+      const res = await fetch('/api/v1/mcp/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider, endpointUrl, query })
+      });
+      const data = await res.json();
+      outBox.textContent = JSON.stringify(data.jsonrpc, null, 2);
+    }
+
+    async function runRagFromMcpModal() {
+      const provider = document.getElementById('mcp-provider-input').value;
+      closeMcpModal();
+      const q = provider === 'dynatrace' || provider === 'cloudwatch'
+        ? 'Dynatrace Davis AI DT-PROB-2026-8841 y CloudWatch deadlock Redis TTL 0 saturación HikariCP'
+        : 'Tarjeta retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 Kiro';
+      setRagPreset(q);
+      document.getElementById('section-rag-knowledge-base').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function inspectStateNode(stateId, name, agent, inputSig, outputTrans) {
+      document.querySelectorAll('.state-node').forEach(n => n.classList.remove('active-step'));
+      const node = document.getElementById('node-' + stateId);
+      if (node) node.classList.add('active-step');
+      const banner = document.getElementById('state-inspector-banner');
+      banner.innerHTML = `
+        <strong>📍 Estado Seleccionado: <code>${stateId}</code> (${name})</strong><br/>
+        • <strong>Agente Responsable:</strong> <code>${agent}</code><br/>
+        • <strong>Señal de Entrada:</strong> ${inputSig}<br/>
+        • <strong>Resultado / Transición de Salida:</strong> <span style="color:#34d399;">${outputTrans}</span>
+      `;
+    }
+
+    async function animateStateMachineFlow() {
+      const nodes = Array.from(document.querySelectorAll('.state-node'));
+      const badge = document.getElementById('state-machine-badge');
+      badge.textContent = "⏳ SIMULANDO TRANSICIÓN DE ESTADOS Y AGENTES EN VIVO...";
+      badge.className = "status-pill status-info";
+      for (let i = 0; i < nodes.length; i++) {
+        nodes.forEach(n => n.classList.remove('active-step'));
+        nodes[i].classList.add('active-step');
+        nodes[i].click();
+        await new Promise(r => setTimeout(r, 550));
+      }
+      badge.textContent = "MÁQUINA DE ESTADOS: 8 / 8 ESTADOS COMPLETADOS (ZERO-TOUCH)";
+      badge.className = "status-pill status-passed";
+    }
+
+    function setRagPreset(queryText) {
+      document.getElementById('rag-search-input').value = queryText;
+      runRagQuery();
+    }
+
+    async function runRagQuery() {
+      const query = document.getElementById('rag-search-input').value;
+      const box = document.getElementById('rag-live-result');
+      box.innerHTML = `⏳ Consultando índice vectorial TF-IDF + BM25 en <code>rag-knowledge-base/incident_knowledge_base.json</code>...`;
+      const res = await fetch('/api/v1/rag/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, topK: 2 })
+      });
+      const data = await res.json();
+      const rag = data.ragResult;
+      const syn = rag.agenticSynthesis;
+      const topChunk = (rag.retrievedChunks || [])[0] || {};
+      box.innerHTML = `
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <div><strong>🎯 Playbook Seleccionado por RAG:</strong> <code>${syn.selectedPlaybookId}</code> (Similitud: <strong style="color:#34d399;">${topChunk.confidencePct}%</strong>) · Incidente: <code>${syn.linkedIncidentId}</code></div>
+          <div><strong>Agente Ejecutor:</strong> <code>${syn.autonomousAgent}</code> · <strong>MTTR Autónomo:</strong> <strong style="color:#f59e0b;">${syn.estimatedAutonomousMTTR}</strong> (vs ${syn.manualBaselineMTTR} manual)</div>
+        </div>
+        <div style="margin-bottom:6px;color:#cbd5e1;"><strong>Propagación del Comportamiento:</strong> ${syn.behaviorSummary}</div>
+        <div style="margin-bottom:6px;color:#a7f3d0;"><strong>Parche Determinista Sintetizado:</strong> <code>${JSON.stringify(syn.recommendedConfigPatch)}</code></div>
+        <div><strong>Quality Gate en Jira Xray:</strong> Casos requeridos <code>${(syn.xrayVerificationTests || []).join(', ')}</code></div>
+      `;
+    }
+
+    async function injectProductionIncidents() {
+      const statusSpan = document.getElementById('overall-alm-status');
+      statusSpan.textContent = "🔥 INYECTANDO INCIDENCIAS EN CAJERO ATM Y DYNATRACE/CLOUDWATCH...";
+      await fetch('/api/v1/alm/inject-incidents', { method: 'POST' });
+      window.location.reload();
+    }
+
+    async function runAutonomousAlmCycle() {
+      const statusSpan = document.getElementById('overall-alm-status');
+      statusSpan.textContent = "⚡ EJECUTANDO 5 AGENTES + MOTOR RAG + HOTFIX + RE-DEPLOY CANARY...";
+      await fetch('/api/v1/alm/autonomous-cycle', { method: 'POST' });
+      window.location.reload();
+    }
+
+    async function triggerLiveSelenium() {
+      alert("Ejecutando los 12 casos funcionales de tarjetas bancarias con Selenium Headless + MCP DOM Pruning...");
+      await fetch('/api/v1/qaops/trigger-selenium', { method: 'POST' });
+      window.location.reload();
+    }
+
+    async function triggerLiveJmeter() {
+      alert("Ejecutando Stress Test JMeter IA sobre endpoints de bloqueo y autorización de tarjetas bancarias...");
+      await fetch('/api/v1/qaops/trigger-jmeter', { method: 'POST' });
+      window.location.reload();
+    }
+  </script>
+</body>
+</html>

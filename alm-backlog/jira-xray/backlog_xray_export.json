@@ -1,430 +1,284 @@
 {
   "project": {
     "key": "GTN",
-    "name": "Getnet (Grupo Santander) - Autonomous Production ALM, ATM Sentinel & Card Core (QAOps Ayesa Digital)",
-    "lead": "Unidad QAOps & Autonomous ALM BFSI - Ayesa Digital",
+    "name": "Getnet (Grupo Santander) — Operativa de Tarjetas Bancarias & Autonomous Production ALM",
     "version": "2026.11.2-AUTONOMOUS-PRO",
-    "targetUrl": "https://www.getnet.eu/servicios-para-clientes",
-    "localSimUrl": "http://127.0.0.1:8080/servicios-para-clientes",
-    "almMode": "ZERO_HUMAN_IN_THE_LOOP"
+    "domain": "Tarjetas Bancarias (Emisión EMV, Bloqueo Preventivo ATM, Autorización ISO-8583, 3DS2, Disputas/Chargebacks)",
+    "almMode": "ZERO_HUMAN_IN_THE_LOOP",
+    "mcpServers": [
+      "getnet-dynatrace-davis-mcp",
+      "getnet-aws-cloudwatch-mcp",
+      "getnet-prometheus-otel-mcp",
+      "getnet-kiro-atm-edge-mcp",
+      "getnet-selenium-qaops"
+    ],
+    "ragEngine": "getnet-banking-incident-hybrid-v3 (rag-knowledge-base/incident_knowledge_base.json)"
   },
   "epics": [
     {
       "key": "GTN-EP-01",
-      "summary": "Buscador de Red de Cajeros ATM, Terminales TPV SmartPOS y Centros de Soporte 24h",
-      "status": "In Progress",
-      "priority": "High",
-      "businessValue": "Permitir a comercios y titulares Getnet localizar cajeros ATM, nodos SmartPOS y centros de soporte 24h por provincia y modalidad en menos de 2 segundos."
+      "summary": "Parque de Tarjetas Bancarias EMV y Red de Cajeros ATM Monitorizados",
+      "status": "DONE"
     },
     {
       "key": "GTN-EP-02",
-      "summary": "Pasarela de Autorizaciones ISO-8583 y Gestión Operativa de Tarjetas en Tiempo Real",
-      "status": "In Progress",
-      "priority": "Highest",
-      "businessValue": "Automatizar la autorización de operaciones de alto importe, desbloqueos EMV y validación antifraude PCI-DSS reduciendo un 70% las incidencias en Contact Center."
+      "summary": "Pasarela de Autorización Online de Tarjetas Bancarias ISO-8583 y 3D-Secure 2.2",
+      "status": "DONE"
     },
     {
       "key": "GTN-EP-03",
-      "summary": "Liquidación de Comercios, Abonos y Reembolsos / Chargebacks Instantáneos",
-      "status": "In Progress",
-      "priority": "High",
-      "businessValue": "Agilizar la liquidación del 80%-90% de disputas, devoluciones TPV y anticipos de facturación para comercios Getnet Extra y Getnet Premier."
+      "summary": "Gestión de Disputas, Contracargos (Chargebacks) y Fraude en Tarjetas Bancarias",
+      "status": "DONE"
     },
     {
       "key": "GTN-EP-04",
-      "summary": "Portal Comercio / Titular, Tarjeta Corporativa Digital y Soporte Técnico Remoto 24h",
-      "status": "Ready for QA",
-      "priority": "Medium",
-      "businessValue": "Centralizar el acceso al portal privado de comercios, emisión de tarjeta digital corporativa y soporte técnico remoto 24/7."
+      "summary": "Área Titular, Tarjeta Bancaria Digital Tokenizada (Wallet) y Soporte Criptográfico HSM 24h",
+      "status": "DONE"
     },
     {
       "key": "GTN-EP-05",
-      "summary": "Observabilidad Híbrida (AWS CloudWatch + Prometheus MCP) y Rendimiento JMeter IA",
-      "status": "In Progress",
-      "priority": "Highest",
-      "businessValue": "Garantizar un Apdex >= 0.92 y P95 < 450ms durante picos de Black Friday / campañas comerciales en la pasarela Getnet."
+      "summary": "Bloqueo Preventivo de Tarjetas en ATM (AWS_Kiro) con Reverso Automático ISO-8583 MTI 0420",
+      "status": "DONE"
     },
     {
       "key": "GTN-EP-06",
-      "summary": "ALM Autónomo en Producción Sin Human-in-the-Loop (Detección ATM Kiro + CloudWatch -> Triage -> RCA -> Re-Fix -> Re-Deploy)",
-      "status": "Resolved / Verified",
-      "priority": "Highest",
-      "businessValue": "Detectar, triar, analizar, reparar (hotfix) y redesplegar automáticamente incidencias funcionales de cajeros ATM (AWS_Kiro) e incidencias de sistemas (CloudWatch/Prometheus) sin intervención humana."
+      "summary": "Ciclo ALM Autónomo Sin Human-in-the-Loop con Conectores MCP (Dynatrace + CloudWatch) y Motor RAG",
+      "status": "DONE"
     }
   ],
   "userStories": [
     {
       "key": "GTN-US-101",
       "epicKey": "GTN-EP-01",
-      "summary": "Como cliente/comercio Getnet quiero filtrar la red de Cajeros ATM, nodos SmartPOS y Centros de Soporte por provincia, servicio y modalidad",
-      "storyPoints": 5,
-      "status": "Testing",
-      "acceptanceCriteria": [
-        "El buscador debe permitir filtrar por Provincia (Madrid, Barcelona, Sevilla, Valencia, Bilbao, Todas).",
-        "El buscador debe filtrar por Servicio/Especialidad (Cajeros ATM / Cardiología, Soporte 24h / Urgencias 24h, etc.).",
-        "El buscador debe filtrar por Modalidad de Contrato Getnet.",
-        "Debe mostrar dirección, teléfono, disponibilidad online y SLA operativo."
-      ]
+      "summary": "Como responsable de tarjetas, quiero consultar el parque de tarjetas bancarias EMV y cajeros ATM por provincia, red y programa",
+      "priority": "High",
+      "status": "DONE"
     },
     {
       "key": "GTN-US-102",
       "epicKey": "GTN-EP-02",
-      "summary": "Como comercio/titular quiero solicitar una autorización operativa indicando mi tarjeta Getnet y código de operación",
-      "storyPoints": 8,
-      "status": "Testing",
-      "acceptanceCriteria": [
-        "El número de tarjeta Getnet debe tener entre 12 y 16 dígitos numéricos.",
-        "Las operaciones estándar se aprueban automáticamente generando código AUT-2026-XXXXX.",
-        "Las operaciones de inspección antifraude profunda pasan a revisión especializada (PENDIENTE_REVISION_MEDICA)."
-      ]
+      "summary": "Como titular o comercio, quiero tramitar autorizaciones ISO-8583 (MTI 0100/0110) para operaciones con tarjeta bancaria",
+      "priority": "Critical",
+      "status": "DONE"
     },
     {
       "key": "GTN-US-103",
       "epicKey": "GTN-EP-03",
-      "summary": "Como comercio con modalidad Premier/Extra quiero registrar una solicitud de reembolso/liquidación y conocer el abono inmediato",
-      "storyPoints": 8,
-      "status": "Testing",
-      "acceptanceCriteria": [
-        "Validar NIF/NIE y formato de cuenta IBAN española (ES + 22 dígitos).",
-        "Calcular automáticamente el abono: 90% para Getnet Premier y 80% para Getnet Extra.",
-        "Generar identificador único de expediente RMB-2026-XXXXX."
-      ]
+      "summary": "Como titular de tarjeta bancaria, quiero registrar disputas y contracargos (chargebacks) recibiendo abono provisional del 90% en IBAN",
+      "priority": "High",
+      "status": "DONE"
     },
     {
       "key": "GTN-US-104",
       "epicKey": "GTN-EP-04",
-      "summary": "Como titular quiero autenticarme en el Área Cliente Getnet y consultar mi contrato activo y Tarjeta Corporativa Digital",
-      "storyPoints": 5,
-      "status": "Ready for QA",
-      "acceptanceCriteria": [
-        "Permitir login con NIF/NIE registrado y contraseña válida.",
-        "Mostrar contrato activo, modalidad contratada y Tarjeta Digital Getnet 8000123456789012."
-      ]
+      "summary": "Como titular de tarjeta Getnet, quiero acceder a mi Tarjeta Bancaria Digital Tokenizada y soporte criptográfico EMV/HSM 24h",
+      "priority": "High",
+      "status": "DONE"
     },
     {
       "key": "GTN-US-105",
-      "epicKey": "GTN-EP-04",
-      "summary": "Como cliente/comercio quiero agendar una sesión de Soporte Técnico Remoto / Videoconsulta 24h",
-      "storyPoints": 3,
-      "status": "Testing",
-      "acceptanceCriteria": [
-        "Permitir elegir canal de atención inmediata y motivo de consulta.",
-        "Confirmar sesión con código CIT-2026-XXXXX y especialista asignado."
-      ]
+      "epicKey": "GTN-EP-05",
+      "summary": "Como agente Kiro-ATM-Vision, quiero detectar tarjetas retenidas en cajeros ATM, enmascarar el PAN (PCI-DSS) y emitir reverso MTI 0420",
+      "priority": "Blocker",
+      "status": "DONE"
     },
     {
       "key": "GTN-US-106",
-      "epicKey": "GTN-EP-05",
-      "summary": "Como ingeniero SRE/QAOps quiero certificar la capacidad transaccional de Getnet bajo carga concurrente con JMeter IA",
-      "storyPoints": 8,
-      "status": "In Progress",
-      "acceptanceCriteria": [
-        "Tiempo de respuesta P95 < 450 ms con usuarios concurrentes.",
-        "Tasa de error < 1% en transacciones de Autorizaciones, Bloqueo de Tarjetas y Reembolsos."
-      ]
-    },
-    {
-      "key": "GTN-US-107",
       "epicKey": "GTN-EP-06",
-      "summary": "Como CIO de Getnet quiero que una incidencia funcional de bloqueo de tarjeta en un ATM (AWS_Kiro) se detecte, trie, repare y redespliegue en PRO sin Human-in-the-Loop",
-      "storyPoints": 13,
-      "status": "Verified in PRO",
-      "acceptanceCriteria": [
-        "Integrar motor AWS_Kiro-main (validate_incident, redact_pan PCI-DSS, scene_prompt y atm_sentinel).",
-        "Detectar bloqueo funcional de tarjeta sin reverso EMV en ATM-GTN-MAD-0042 (GTN-INC-ATM-001).",
-        "Aplicar hotfix autónomo (enable_emv_reversal_0420=True), redesplegar y verificar con test GTN-TC-013 en Jira Xray."
-      ]
-    },
-    {
-      "key": "GTN-US-108",
-      "epicKey": "GTN-EP-06",
-      "summary": "Como CIO de Getnet quiero que una incidencia de sistemas en PRO desde AWS CloudWatch y Prometheus MCP se auto-repare y certifique en Jira Xray sin intervención humana",
-      "storyPoints": 13,
-      "status": "Verified in PRO",
-      "acceptanceCriteria": [
-        "Integrar servidor MCP de observabilidad (mcp-observability-server) con alarmas AWS CloudWatch y métricas Prometheus OpenSource.",
-        "Detectar saturación de pool DB y deadlock Redis en getnet-card-blocker-svc (GTN-INC-SYS-002).",
-        "Aplicar hotfix autónomo (Redis Lock TTL 1500ms + Circuit Breaker + Caché), redesplegar y verificar con test GTN-TC-014."
-      ]
+      "summary": "Como CIO de Getnet, quiero que los 5 agentes autónomos conecten vía MCP con Dynatrace y CloudWatch, consulten la base RAG y reparen producción sin Human-in-the-Loop",
+      "priority": "Blocker",
+      "status": "DONE"
     }
   ],
   "testPlan": {
-    "key": "GTN-TP-2026-PRO",
-    "summary": "Master Test Plan QAOps & Autonomous ALM - Getnet Card Core, ATM Sentinel & CloudWatch/Prometheus",
-    "environment": "PRODUCCIÓN SIMULADA / ZERO HUMAN-IN-THE-LOOP (Puerto 8080)",
-    "methodology": "SDD + Autonomous Closed-Loop ALM (AWS_Kiro ATM + CloudWatch/Prometheus MCP + Selenium MCP + JMeter AI)",
-    "totalTests": 14
+    "key": "GTN-TP-2026",
+    "summary": "Plan Maestro QAOps & Autonomous ALM — Operativa de Tarjetas Bancarias Getnet",
+    "totalTests": 14,
+    "passed": 14,
+    "failed": 0
   },
   "testCases": [
     {
       "key": "GTN-TC-001",
-      "legacyKey": "SCA-TC-001",
       "testLinkId": "TL-GTN-101",
-      "redmineIssueId": 5011,
       "storyKey": "GTN-US-101",
-      "title": "Renderizado del catálogo de Servicios Getnet para Clientes/Comercios y KPIs transaccionales",
-      "type": "Automated (Selenium + MCP)",
+      "summary": "Verificar catálogo de los 6 módulos operativos exclusivos de tarjetas bancarias Getnet y KPIs en /servicios-para-clientes",
       "priority": "High",
-      "component": "UI / Catálogo Servicios Getnet",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 209,
-      "gherkin": "Given el usuario navega a '/servicios-para-clientes'\nWhen la página termina de cargar\nThen se visualizan las 6 tarjetas de servicios principales de Getnet\nAnd el encabezado corporativo de Getnet es visible",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc001_catalogo_servicios_clientes"
+      "lastExecutionTimeMs": 246
     },
     {
       "key": "GTN-TC-002",
-      "legacyKey": "SCA-TC-002",
       "testLinkId": "TL-GTN-102",
-      "redmineIssueId": 5012,
       "storyKey": "GTN-US-101",
-      "title": "Búsqueda de Red de Cajeros ATM y Centros Getnet filtrando por Provincia (Madrid) y Servicio",
-      "type": "Automated (Selenium + MCP)",
-      "priority": "Highest",
-      "component": "Red ATM & Centros Getnet",
+      "summary": "Filtrar Parque de Tarjetas Bancarias en Madrid para tarjetas 'Visa Débito EMV' y verificar nodos emisores activos",
+      "priority": "High",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 257,
-      "gherkin": "Given el cliente se encuentra en la pestaña 'Red ATM & Centros'\nWhen selecciona la provincia 'Madrid' y el servicio 'Cardiología'\nAnd pulsa en 'Buscar'\nThen se muestran al menos 2 nodos/centros operativos en Madrid",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc002_busqueda_cuadro_medico_madrid_cardiologia"
+      "lastExecutionTimeMs": 289
     },
     {
       "key": "GTN-TC-003",
-      "legacyKey": "SCA-TC-003",
       "testLinkId": "TL-GTN-103",
-      "redmineIssueId": 5013,
       "storyKey": "GTN-US-101",
-      "title": "Búsqueda de Nodos ATM de Guardia / Urgencias 24h y filtro por colectivo",
-      "type": "Automated (Selenium + MCP)",
-      "priority": "High",
-      "component": "Red ATM & Centros Getnet",
+      "summary": "Filtrar unidades de 'Guardia ATM 24h' para el programa 'Red Euro6000 ATM' de bloqueo preventivo de tarjetas",
+      "priority": "Medium",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 205,
-      "gherkin": "Given el cliente accede al buscador de Red ATM y Centros\nWhen selecciona servicio 'Urgencias 24h' y modalidad 'Muface / Isfas'\nThen el listado devuelve únicamente centros operativos 24h",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc003_busqueda_urgencias_muface"
+      "lastExecutionTimeMs": 240
     },
     {
       "key": "GTN-TC-004",
-      "legacyKey": "SCA-TC-004",
       "testLinkId": "TL-GTN-104",
-      "redmineIssueId": 5014,
       "storyKey": "GTN-US-102",
-      "title": "Solicitud exitosa de Autorización Operativa de Tarjeta Getnet (Aprobación Instantánea)",
-      "type": "Automated (Selenium + MCP)",
-      "priority": "Highest",
-      "component": "Autorizaciones ISO-8583",
+      "summary": "Autorización online ISO-8583 exitosa (MTI 0110) con PAN de tarjeta bancaria válido (4548123456789012)",
+      "priority": "Critical",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 260,
-      "gherkin": "Given el titular abre la sección 'Autorizaciones'\nWhen introduce la tarjeta Getnet '8000123456789012', tipo 'Resonancia Magnética Nuclear (RMN)', referencia 'RX-99281' y nodo 'Hospital Ruber Internacional'\nAnd envía el formulario\nThen el sistema aprueba la operación y genera código 'AUT-2026-XXXXX' con estado 'AUTORIZADA'",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc004_solicitud_autorizacion_exitosa"
+      "lastExecutionTimeMs": 294
     },
     {
       "key": "GTN-TC-005",
-      "legacyKey": "SCA-TC-005",
       "testLinkId": "TL-GTN-105",
-      "redmineIssueId": 5015,
       "storyKey": "GTN-US-102",
-      "title": "Validación negativa de Autorización con PAN / número de tarjeta inválido",
-      "type": "Automated (Selenium + MCP)",
+      "summary": "Rechazo de autorización ISO-8583 cuando el PAN de la tarjeta bancaria tiene longitud inválida (< 12 dígitos)",
       "priority": "High",
-      "component": "Autorizaciones ISO-8583",
+      "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 248,
-      "gherkin": "Given el titular abre el formulario de 'Autorizaciones'\nWhen introduce una tarjeta inválida '12345' y pulsa solicitar\nThen el sistema rechaza la petición con HTTP 400 y muestra alerta de formato entre 12 y 16 dígitos",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc005_autorizacion_tarjeta_invalida"
+      "lastExecutionTimeMs": 294
     },
     {
       "key": "GTN-TC-006",
-      "legacyKey": "SCA-TC-006",
       "testLinkId": "TL-GTN-106",
-      "redmineIssueId": 5016,
       "storyKey": "GTN-US-102",
-      "title": "Operación de alta complejidad derivada a Inspección Especializada / Antifraude",
-      "type": "Automated (API / Pytest)",
-      "priority": "Medium",
-      "component": "Autorizaciones ISO-8583",
+      "summary": "Derivación de operación de tarjeta bancaria de alto riesgo a estado PENDIENTE_REVISION_RIESGOS (Control Antifraude)",
+      "priority": "High",
+      "type": "API & Business Rule",
       "status": "PASSED",
-      "lastExecutionTimeMs": 45,
-      "gherkin": "Given una solicitud de autorización de alta complejidad ('Estudio Genético Oncológico')\nWhen se envía al endpoint '/api/v1/autorizaciones'\nThen el estado retornado es 'PENDIENTE_REVISION_MEDICA' con SLA de 48h",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc006_autorizacion_revision_medica"
+      "lastExecutionTimeMs": 47
     },
     {
       "key": "GTN-TC-007",
-      "legacyKey": "SCA-TC-007",
       "testLinkId": "TL-GTN-107",
-      "redmineIssueId": 5017,
       "storyKey": "GTN-US-103",
-      "title": "Registro de Liquidación / Reembolso de Transacción TPV (Modalidad Premier - 90% abono)",
-      "type": "Automated (Selenium + MCP)",
-      "priority": "Highest",
-      "component": "Liquidaciones y Reembolsos",
+      "summary": "Registro de Disputa / Chargeback de tarjeta bancaria con cálculo automático de abono provisional del 90% (225,00 EUR sobre 250,00 EUR)",
+      "priority": "Critical",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 282,
-      "gherkin": "Given el comercio selecciona la gestión 'Solicitud de Reembolso'\nWhen introduce NIF '12345678Z', modalidad 'Adeslas Premier (90% Cobertura)', importe '250.00' EUR e IBAN 'ES9121000418450200051332'\nThen el sistema confirma el expediente 'RMB-2026-XXXXX' con un abono estimado de '225.00 EUR'",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc007_reembolso_premier_calculo_90"
+      "lastExecutionTimeMs": 254
     },
     {
       "key": "GTN-TC-008",
-      "legacyKey": "SCA-TC-008",
       "testLinkId": "TL-GTN-108",
-      "redmineIssueId": 5018,
       "storyKey": "GTN-US-103",
-      "title": "Validación de cuenta IBAN incorrecta en solicitud de Liquidación / Reembolso",
-      "type": "Automated (Selenium + MCP)",
-      "priority": "Medium",
-      "component": "Liquidaciones y Reembolsos",
+      "summary": "Rechazo de Disputa / Chargeback de tarjeta bancaria cuando el IBAN de abono tiene formato inválido",
+      "priority": "High",
+      "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 259,
-      "gherkin": "Given el comercio completa el formulario de reembolso con un IBAN sin formato ES24 dígitos\nWhen intenta enviar la solicitud\nThen se muestra un mensaje de error indicando que el IBAN debe comenzar por ES seguido de 22 dígitos",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc008_reembolso_iban_invalido"
+      "lastExecutionTimeMs": 797
     },
     {
       "key": "GTN-TC-009",
-      "legacyKey": "SCA-TC-009",
       "testLinkId": "TL-GTN-109",
-      "redmineIssueId": 5019,
       "storyKey": "GTN-US-104",
-      "title": "Acceso al Área Cliente Getnet y visualización de Tarjeta Corporativa Digital",
-      "type": "Automated (Selenium + MCP)",
-      "priority": "High",
-      "component": "Área Cliente & Tarjeta Digital",
+      "summary": "Login en Área Titular de Tarjetas (12345678Z / Getnet2026!) y visualización de Tarjeta Bancaria Digital Tokenizada",
+      "priority": "Critical",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 178,
-      "gherkin": "Given el usuario abre el panel de 'Área Cliente'\nWhen inicia sesión con el NIF '12345678Z' y clave 'Adeslas2026!'\nThen visualiza los datos del titular 'Carlos Martínez Gómez', contrato 'POL-SCA-908122' y su Tarjeta Digital '8000123456789012'",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc009_login_area_cliente_tarjeta_digital"
+      "lastExecutionTimeMs": 173
     },
     {
       "key": "GTN-TC-010",
-      "legacyKey": "SCA-TC-010",
       "testLinkId": "TL-GTN-110",
-      "redmineIssueId": 5020,
-      "storyKey": "GTN-US-105",
-      "title": "Reserva de Sesión de Soporte Técnico Remoto / Videoconsulta 24h",
-      "type": "Automated (Selenium + MCP)",
+      "storyKey": "GTN-US-104",
+      "summary": "Solicitud de sesión de Soporte Criptográfico EMV, PIN Block HSM y 3DS2 24h (SOP-2026-XXXXX)",
       "priority": "Medium",
-      "component": "Soporte Digital 24h",
+      "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 183,
-      "gherkin": "Given el cliente accede a 'Videoconsulta y Orientación 24h'\nWhen selecciona especialidad 'Medicina General (24h)' y motivo de consulta\nThen recibe confirmación con código 'CIT-2026-XXXXX' y enlace a sala virtual",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc010_reserva_videoconsulta_medica"
+      "lastExecutionTimeMs": 184
     },
     {
       "key": "GTN-TC-011",
-      "legacyKey": "SCA-TC-011",
       "testLinkId": "TL-GTN-111",
-      "redmineIssueId": 5021,
-      "storyKey": "GTN-US-106",
-      "title": "Prueba de Carga JMeter AI - Consulta Concurrente de Red ATM y Servicios (SLA P95 < 450ms)",
+      "storyKey": "GTN-US-101",
+      "summary": "Prueba de carga JMeter IA sobre consulta de Parque de Tarjetas Bancarias y Bloqueo ATM (P95 < 450 ms, Apdex >= 0.95)",
+      "priority": "High",
       "type": "Performance (JMeter AI)",
-      "priority": "Highest",
-      "component": "API Red ATM & Servicios",
       "status": "PASSED",
-      "lastExecutionTimeMs": 49,
-      "gherkin": "Given un escenario de carga con usuarios concurrentes consultando nodos ATM y servicios\nWhen se ejecuta el plan JMeter durante la ventana de prueba\nThen el percentil 95 es inferior a 450ms y el Error Rate es 0.0%",
-      "automationRef": "jmeter-ai/plans/segurcaixa_servicios_clientes.jmx::TG01_Busqueda_Red_Getnet"
+      "lastExecutionTimeMs": 50
     },
     {
       "key": "GTN-TC-012",
-      "legacyKey": "SCA-TC-012",
       "testLinkId": "TL-GTN-112",
-      "redmineIssueId": 5022,
       "storyKey": "GTN-US-106",
-      "title": "Prueba de Estrés JMeter AI - Ráfaga de Autorizaciones ISO-8583 y Bloqueo de Tarjetas",
+      "summary": "Prueba de estrés concurrente JMeter IA sobre Autorización ISO-8583 y Disputas de Tarjetas sin deadlocks Redis (0% errores)",
+      "priority": "Critical",
       "type": "Performance (JMeter AI)",
-      "priority": "High",
-      "component": "API Autorizaciones & Card Lock",
       "status": "PASSED",
-      "lastExecutionTimeMs": 55,
-      "gherkin": "Given una ráfaga concurrente de autorizaciones y bloqueos preventivos\nWhen el motor JMeter AI analiza el fichero JTL resultante\nThen identifica el índice Apdex >= 0.90 y verifica la ausencia de cuellos de botella tras el hotfix de caché Redis",
-      "automationRef": "jmeter-ai/plans/segurcaixa_servicios_clientes.jmx::TG02_Tramite_Autorizaciones"
+      "lastExecutionTimeMs": 58
     },
     {
       "key": "GTN-TC-013",
-      "legacyKey": "SCA-TC-013",
       "testLinkId": "TL-GTN-113",
-      "redmineIssueId": 5023,
-      "storyKey": "GTN-US-107",
-      "title": "Resolución Autónoma de Incidencia Funcional de Bloqueo de Tarjeta en ATM (AWS_Kiro Sentinel -> Re-Fix EMV 0420)",
-      "type": "Autonomous ALM (AWS_Kiro + Pytest)",
-      "priority": "Highest",
-      "component": "ATM Card Blocker & AWS_Kiro",
+      "storyKey": "GTN-US-105",
+      "summary": "Ciclo ALM Zero-Touch: Detección de tarjeta retenida en ATM (AWS_Kiro), consulta Playbook RAG-PB-ATM-001, Hotfix reverso MTI 0420 y Re-Deploy",
+      "priority": "Blocker",
+      "type": "Autonomous ALM (AWS Kiro + RAG)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 260,
-      "gherkin": "Given una incidencia funcional en el cajero 'ATM-GTN-MAD-0042' donde la tarjeta '4548 1234 5678 9012' queda bloqueada sin reverso EMV\nWhen el motor autónomo ALM procesa el evento con AWS_Kiro (validate_incident, redact_pan, triage_incident) y aplica el Re-Fixing sin Human-in-the-Loop\nThen el endpoint '/api/v1/tarjetas/bloqueo' emite el reverso 'REV-EMV-2026-XXXXX', expulsa/tokeniza la tarjeta y cierra el incidente 'GTN-INC-ATM-001' en Jira Xray",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc013_incidencia_funcional_atm_kiro_autofix"
+      "lastExecutionTimeMs": 285
     },
     {
       "key": "GTN-TC-014",
-      "legacyKey": "SCA-TC-014",
       "testLinkId": "TL-GTN-114",
-      "redmineIssueId": 5024,
-      "storyKey": "GTN-US-108",
-      "title": "Resolución Autónoma de Incidencia de Sistemas en PRO (AWS CloudWatch + Prometheus MCP -> Re-Deploy Canary)",
-      "type": "Autonomous ALM (CloudWatch/Prometheus MCP)",
-      "priority": "Highest",
-      "component": "CloudWatch & Prometheus MCP",
+      "storyKey": "GTN-US-106",
+      "summary": "Ciclo ALM Zero-Touch: Detección vía MCP en Dynatrace (DT-PROB-2026-8841) y CloudWatch (CW-ALARM-GTN-CARDLOCK-P99), Playbook RAG-PB-SYS-002 y Hotfix Redis TTL=3000ms",
+      "priority": "Blocker",
+      "type": "Autonomous ALM (Dynatrace + CloudWatch MCP)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 16,
-      "gherkin": "Given una alarma crítica en AWS CloudWatch ('CW-ALARM-GTN-CARDLOCK-P99') y Prometheus ('redis_mutex_deadlocks_total') por saturación en 'getnet-card-blocker-svc'\nWhen el servidor MCP de observabilidad ejecuta diagnóstico RCA, aplica Re-Fixing (Redis Lock TTL 1500ms + Circuit Breaker) y lanza Re-Deploy Canary sin Human-in-the-Loop\nThen las alarmas CloudWatch y Prometheus pasan a estado 'OK', la latencia P95 cae por debajo de 80ms y el incidente 'GTN-INC-SYS-002' queda 'RESOLVED' en Jira Xray",
-      "automationRef": "tests/test_servicios_clientes_e2e.py::test_tc014_incidencia_sistemas_cloudwatch_mcp_autofix"
+      "lastExecutionTimeMs": 23
     }
   ],
   "productionIncidents": [
     {
       "key": "GTN-INC-ATM-001",
-      "type": "INCIDENCIA FUNCIONAL EN PRODUCCIÓN (CAJERO ATM)",
       "source": "AWS_Kiro-main (atm_sentinel.py + brand_verifier/incident.py)",
       "atmId": "ATM-GTN-MAD-0042",
-      "location": "Sucursal Getnet Gran Vía 28, Madrid",
-      "summary": "[ATM-GTN-MAD-0042] Bloqueo y retención funcional de tarjeta EMV (PAN 4548 **** **** 9012) sin emisión de trama de reverso ISO-8583 MTI 0420",
-      "severity": "Critical (P1)",
+      "summary": "Retención física de tarjeta bancaria (4548 **** **** 9012) en ranura de cajero ATM sin emisión de trama de reverso ISO-8583 MTI 0420",
+      "severity": "CRITICAL (P1)",
+      "ragPlaybook": "RAG-PB-ATM-001",
+      "rootCause": "Flag enable_emv_reversal_0420=False en card_lock_engine omite el envío del reverso MTI 0420 al bloquear preventivamente la tarjeta.",
+      "autoFixApplied": "Activado enable_emv_reversal_0420=True, emitido reverso REV-EMV-2026 y aprovisionado token digital TOK-GTN-WALLET-9012.",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "linkedTestCase": "GTN-TC-013",
-      "detectedAt": "2026-11-17T17:20:02Z",
-      "resolvedAt": "2026-11-17T19:21:07+00:00",
-      "mttrSeconds": 7.2,
-      "rootCause": "En el microservicio getnet-card-blocker-svc, la función de bloqueo preventivo por sospecha en ranura/PIN tenía deshabilitado el flag enable_emv_reversal_0420=False, reteniendo la tarjeta en el obturador sin liberar la pre-autorización.",
-      "autoFixApplied": "Hotfix PATCH-GTN-ATM-0420: Activación de enable_emv_reversal_0420=True + expulsión segura de tarjeta + emisión automática de token digital de sustitución en Wallet Getnet.",
-      "redeployVersion": "v2026.11.2-HOTFIX-ATM"
+      "resolvedAt": "2026-11-17T22:12:40+00:00"
     },
     {
       "key": "GTN-INC-SYS-002",
-      "type": "INCIDENCIA DE SISTEMAS EN PRODUCCIÓN (CLOUDWATCH / PROMETHEUS MCP)",
-      "source": "AWS CloudWatch Alarm (CW-ALARM-GTN-CARDLOCK-P99) + Prometheus OpenSource MCP Server",
-      "service": "getnet-card-blocker-svc (ECS Cluster prod-eu-west-1)",
-      "location": "AWS Region eu-west-1 / us-east-1",
-      "summary": "[CloudWatch + Prometheus MCP] Agotamiento del pool HikariCP (98.5%) y Deadlock de Mutex Redis sin TTL en tabla CARD_BLOCK_STATE (P95 = 1840 ms)",
-      "severity": "Blocker (P0)",
+      "source": "Dynatrace Davis AI (DT-PROB-2026-8841) + AWS CloudWatch (CW-ALARM-GTN-CARDLOCK-P99) + Prometheus MCP",
+      "service": "getnet-card-blocker-svc (ECS prod-eu-west-1)",
+      "summary": "Deadlock en mutex distribuido Redis (redis_lock_ttl_ms=0) y saturación del pool HikariCP al 98.5% (Latencia P95 = 1840 ms)",
+      "severity": "BLOCKER (P0)",
+      "ragPlaybook": "RAG-PB-SYS-002",
+      "rootCause": "Ausencia de TTL en lock Redis de bloqueo de tarjetas provoca bloqueo indefinido de conexiones bajo ráfagas concurrentes.",
+      "autoFixApplied": "Inyectado redis_lock_ttl_ms=3000, activado Circuit Breaker Resilience4j y redesplegada versión v2026.11.2-AUTONOMOUS-PRO (P95 = 42.5 ms).",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "linkedTestCase": "GTN-TC-014",
-      "detectedAt": "2026-11-17T17:20:03Z",
-      "resolvedAt": "2026-11-17T19:21:07+00:00",
-      "mttrSeconds": 6.8,
-      "rootCause": "Los bloqueos distribuidos en Redis (redis:card:lock:*) se adquirían con lock_ttl_ms=0 durante ráfagas de consultas desde ATMs, bloqueando hilos del pool HikariCP y disparando HTTP 503.",
-      "autoFixApplied": "Hotfix PATCH-GTN-SYS-REDIS: Configuración de redis_lock_ttl_ms=1500, activación de Circuit Breaker resiliente, caché Redis de reglas antifraude y drenaje automático de conexiones colgadas.",
-      "redeployVersion": "v2026.11.2-HOTFIX-SYS"
+      "resolvedAt": "2026-11-17T22:12:40+00:00"
     }
   ],
   "defects": [
     {
       "key": "GTN-BUG-201",
-      "redmineIssueId": 5091,
-      "linkedTestCase": "GTN-TC-014",
-      "summary": "[Sistemas / CloudWatch] Latencia P95 > 1800ms y deadlock de mutex Redis en getnet-card-blocker-svc sin TTL ni caché de reglas",
+      "linkedIncident": "GTN-INC-ATM-001",
+      "summary": "Omisión de trama ISO-8583 MTI 0420 en bloqueo preventivo de tarjeta bancaria en cajero ATM-GTN-MAD-0042",
       "severity": "Critical",
-      "priority": "Highest",
-      "status": "Resolved (Auto-Fixed)",
-      "detectedBy": "AWS CloudWatch + Prometheus OpenSource MCP Server",
-      "environment": "Production ECS Cluster (Zero Human-in-the-Loop)"
+      "status": "Resolved (Auto-Fixed)"
     },
     {
       "key": "GTN-BUG-202",
-      "redmineIssueId": 5092,
-      "linkedTestCase": "GTN-TC-013",
-      "summary": "[Funcional / ATM Kiro] Retención de tarjeta en ATM-GTN-MAD-0042 al bloquear sin emitir reverso ISO-8583 MTI 0420",
-      "severity": "Critical",
-      "priority": "Highest",
-      "status": "Resolved (Auto-Fixed)",
-      "detectedBy": "AWS_Kiro ATM Sentinel & Selenium MCP Inspector",
-      "environment": "ATM Network Getnet Madrid (Zero Human-in-the-Loop)"
+      "linkedIncident": "GTN-INC-SYS-002",
+      "summary": "Deadlock de mutex Redis sin TTL en microservicio getnet-card-blocker-svc detectado por Dynatrace Davis AI y CloudWatch",
+      "severity": "Blocker",
+      "status": "Resolved (Auto-Fixed)"
     }
   ]
 }

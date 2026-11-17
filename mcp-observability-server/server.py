@@ -1,14 +1,16 @@
 """
-Servidor MCP (Model Context Protocol) de Observabilidad Híbrida (AWS CloudWatch + OpenSource Prometheus/OpenTelemetry)
-y Motor de Triaje Funcional ATM (AWS_Kiro) para Getnet — Ayesa Digital QAOps.
+Servidor MCP (Model Context Protocol) de Observabilidad Híbrida (Dynatrace Davis AI + AWS CloudWatch + OpenSource Prometheus/OTel),
+Base de Conocimiento RAG y Motor de Triaje Funcional ATM (AWS_Kiro) para Getnet — Ayesa Digital QAOps.
 
 Permite a los agentes autónomos (Zero Human-in-the-Loop):
-  1. Consultar alarmas e insights de AWS CloudWatch (/aws/ecs/getnet-card-blocker-svc).
-  2. Consultar métricas en tiempo real del monitor OpenSource (Prometheus / OpenTelemetry / Alertmanager).
-  3. Procesar incidencias funcionales de bloqueo de tarjeta desde cajeros ATM usando AWS_Kiro-main
+  1. Conectar vía MCP con Dynatrace (Davis AI Problem Feed, Smartscape Topology y consultas DQL PurePath).
+  2. Consultar alarmas e insights de AWS CloudWatch (/aws/ecs/getnet-card-blocker-svc).
+  3. Consultar métricas en tiempo real del monitor OpenSource (Prometheus / OpenTelemetry / Alertmanager).
+  4. Procesar incidencias funcionales de bloqueo de tarjetas bancarias desde cajeros ATM usando AWS_Kiro-main
      (enmascarado PCI-DSS de PAN, extracción de telemetría de vídeo y triaje cognitivo).
-  4. Orquestar el ciclo completo ALM en Producción sin Human-in-the-Loop:
-     Detección -> Triage -> Análisis RCA -> Re-Fixing -> Re-Deploy -> Certificación en Jira Xray.
+  5. Consultar la Base de Conocimiento RAG (rag-knowledge-base/) sobre comportamiento de incidencias bancarias.
+  6. Orquestar el ciclo completo ALM en Producción sin Human-in-the-Loop:
+     Detección -> RAG Lookup -> Triage -> Análisis RCA -> Re-Fixing -> Re-Deploy -> Certificación en Jira Xray.
 
 Modos de uso:
   1. Modo Estándar MCP (JSON-RPC 2.0 sobre stdio):
@@ -32,8 +34,10 @@ import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 KIRO_DIR = PROJECT_ROOT / "AWS_Kiro-main" / "AWS_Kiro-main"
-if str(KIRO_DIR) not in sys.path:
-    sys.path.insert(0, str(KIRO_DIR))
+RAG_DIR = PROJECT_ROOT / "rag-knowledge-base"
+for p in (KIRO_DIR, RAG_DIR):
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 
 from brand_verifier.incident import (  # noqa: E402
     process_incident as kiro_process_incident,
@@ -44,6 +48,7 @@ from brand_verifier.incident import (  # noqa: E402
 )
 from brand_verifier.s3io import S3IO  # noqa: E402
 import atm_sentinel  # noqa: E402
+from rag_engine import IncidentRAGEngine  # noqa: E402
 
 
 class LocalMemoryS3Client:
@@ -63,7 +68,7 @@ class LocalMemoryS3Client:
 
 
 class SimulatedBedrockTriageClient:
-    """Cliente Bedrock determinista para triaje de incidencias ATM de Getnet conforme al esquema de AWS_Kiro."""
+    """Cliente Bedrock determinista para triaje de incidencias ATM de tarjetas bancarias Getnet conforme a AWS_Kiro."""
 
     def __init__(self, response_payload: Dict[str, Any]) -> None:
         self.response_payload = response_payload
@@ -82,14 +87,45 @@ class SimulatedBedrockTriageClient:
 
 
 class ObservabilityMcpController:
-    """Controlador MCP de Observabilidad (AWS CloudWatch + Prometheus OpenSource + AWS Kiro ATM Sentinel)."""
+    """Controlador MCP de Observabilidad (Dynatrace + AWS CloudWatch + Prometheus + AWS Kiro ATM + Motor RAG)."""
 
     def __init__(self, base_url: str = "http://127.0.0.1:8080") -> None:
         self.base_url = base_url.rstrip("/")
+        self.rag_engine = IncidentRAGEngine()
 
     def get_observability_status(self) -> Dict[str, Any]:
         res = requests.get(f"{self.base_url}/api/v1/observability/status", timeout=5)
         return res.json()
+
+    def dynatrace_get_davis_problems(self, status_filter: Optional[str] = None) -> Dict[str, Any]:
+        data = self.get_observability_status()
+        dt = data.get("dynatrace", {})
+        problems = dt.get("problems", [])
+        if status_filter:
+            problems = [p for p in problems if p.get("status") == status_filter.upper()]
+        return {
+            "provider": "Dynatrace Davis AI & Smartscape MCP Server",
+            "environmentUrl": dt.get("environmentUrl", "https://getnet-prod.live.dynatrace.com"),
+            "connectionStatus": dt.get("connectionStatus", "CONNECTED"),
+            "monitoredEntities": dt.get("monitoredEntities", []),
+            "totalProblems": len(problems),
+            "problems": problems,
+            "smartscapeTopology": dt.get("smartscapeTopology", []),
+        }
+
+    def dynatrace_execute_dql(
+        self,
+        dql_query: str = "fetch spans | filter dt.entity.service == 'SERVICE-GETNET-CARD-BLOCKER' | summarize p95=percentile(duration, 95), lockErrors=countIf(redis.lock.timeout == true)",
+    ) -> Dict[str, Any]:
+        data = self.get_observability_status()
+        dt = data.get("dynatrace", {})
+        return {
+            "provider": "Dynatrace Grail DQL Engine via MCP",
+            "dqlQuery": dql_query,
+            "executionTimeMs": 18,
+            "records": dt.get("purePathTraces", []),
+            "davisRootCause": dt.get("davisRootCause", "Healthy"),
+        }
 
     def cloudwatch_get_alarms(self, state_filter: Optional[str] = None) -> Dict[str, Any]:
         data = self.get_observability_status()
@@ -97,7 +133,7 @@ class ObservabilityMcpController:
         if state_filter:
             alarms = [a for a in alarms if a.get("state") == state_filter.upper()]
         return {
-            "provider": "AWS CloudWatch (eu-west-1 / us-east-1)",
+            "provider": "AWS CloudWatch (eu-west-1 / Irlanda · Core Tarjetas Getnet)",
             "namespace": "AWS/GetnetCardCore",
             "totalAlarms": len(alarms),
             "alarms": alarms,
@@ -126,13 +162,16 @@ class ObservabilityMcpController:
             "metrics": prom.get("metrics", {}),
         }
 
+    def rag_retrieve_incident_playbook(self, query: str, telemetry_source: Optional[str] = None) -> Dict[str, Any]:
+        return self.rag_engine.retrieve(query=query, telemetry_source=telemetry_source, top_k=3)
+
     def atm_kiro_inspect_incident(
         self,
         atm_id: str = "ATM-GTN-MAD-0042",
         ubicacion: str = "Sucursal Getnet Gran Vía 28, Madrid",
         descripcion: str = (
-            "Fallo funcional en cajero ATM-GTN-MAD-0042: La tarjeta corporativa Getnet 4548 1234 5678 9012 "
-            "del comercio Sr. Carlos Martínez quedó bloqueada en estado LOCKED_NO_REVERSAL tras validación EMV "
+            "Fallo funcional en cajero ATM-GTN-MAD-0042: La tarjeta bancaria corporativa Getnet 4548 1234 5678 9012 "
+            "del titular Sr. Carlos Martínez quedó bloqueada en estado LOCKED_NO_REVERSAL tras validación EMV "
             "sin emitir trama de reverso ISO-8583 MTI 0420 ni expulsar el plástico."
         ),
     ) -> Dict[str, Any]:
@@ -154,7 +193,7 @@ class ObservabilityMcpController:
             "severidad": "ALTA",
             "causa_probable": (
                 "Regresión funcional en card_lock_engine (ejectCardOnBlock=False y omit_iso8583_0420=True) "
-                "al bloquear preventivamente la tarjeta EMV tras evento en ranura."
+                "al bloquear preventivamente la tarjeta bancaria EMV tras evento en ranura."
             ),
             "accion_recomendada": (
                 "Aplicar hotfix automático en módulo de bloqueo de tarjetas para activar reverso EMV MTI 0420, "
@@ -177,16 +216,16 @@ class ObservabilityMcpController:
                 "threat_type": "CARD_TRAPPING",
                 "confidence": 0.96,
                 "summary": (
-                    "Retención funcional de tarjeta en ranura motorizada de ATM-GTN-MAD-0042 combinada con "
+                    "Retención funcional de tarjeta bancaria en ranura motorizada de ATM-GTN-MAD-0042 combinada con "
                     "bloqueo lógico sin trama de reverso ISO-8583 MTI 0420."
                 ),
                 "evidence": [
-                    "Fotograma 1 (t=0.5s): Inserción de tarjeta corporativa Getnet en lector híbrido EMV.",
+                    "Fotograma 1 (t=0.5s): Inserción de tarjeta bancaria Getnet en lector híbrido EMV.",
                     "Fotograma 3 (t=4.2s): Bloqueo preventivo activado; obturador retiene tarjeta (ejectCardOnBlock=False).",
                     "Fotograma 6 (t=9.8s): Timeout en pasarela de autorización sin emisión de reverso automático 0420.",
                 ],
                 "recommended_actions": [
-                    "Activar flag enable_emv_reversal_0420=True en servicio getnet-card-blocker-svc.",
+                    "Activar flag atm_emv_fallback_reversal=True en servicio getnet-card-blocker-svc.",
                     "Desbloquear ciclo de expulsión segura y emitir tarjeta digital de reemplazo inmediato.",
                     "Ejecutar regresión E2E en Jira Xray (GTN-TC-013) y desplegar Canary en Producción.",
                 ],
@@ -223,7 +262,7 @@ class ObservabilityMcpController:
             requests.post(f"{self.base_url}/api/v1/alm/inject-incidents", json={"source": "MCP_OBSERVABILITY"}, timeout=5)
         res = requests.post(
             f"{self.base_url}/api/v1/alm/autonomous-cycle",
-            json={"triggeredBy": "ayesa-observability-mcp-server (Zero Human-in-the-Loop)"},
+            json={"triggeredBy": "getnet-observability-mcp-server (Zero Human-in-the-Loop)"},
             timeout=15,
         )
         return res.json()
@@ -231,8 +270,28 @@ class ObservabilityMcpController:
 
 MCP_TOOLS_SCHEMA = [
     {
+        "name": "dynatrace_get_davis_problems",
+        "description": "Conecta vía MCP con Dynatrace Davis AI para obtener problemas activos, topología Smartscape y causa raíz en microservicios de tarjetas bancarias.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "status_filter": {"type": "string", "enum": ["OPEN", "CLOSED"]},
+            },
+        },
+    },
+    {
+        "name": "dynatrace_execute_dql",
+        "description": "Ejecuta una consulta DQL (Dynatrace Query Language) sobre trazas distribuidas PurePath y métricas de bloqueo de tarjetas.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "dql_query": {"type": "string"},
+            },
+        },
+    },
+    {
         "name": "cloudwatch_get_alarms",
-        "description": "Consulta las alarmas activas de AWS CloudWatch para los microservicios de tarjetas y ATM de Getnet.",
+        "description": "Consulta las alarmas activas de AWS CloudWatch para los microservicios de tarjetas bancarias y ATM de Getnet.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -242,7 +301,7 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "cloudwatch_query_logs_insights",
-        "description": "Ejecuta una consulta en AWS CloudWatch Logs Insights sobre el grupo de logs de producción de Getnet.",
+        "description": "Ejecuta una consulta en AWS CloudWatch Logs Insights sobre el grupo de logs de producción de tarjetas Getnet.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -261,8 +320,20 @@ MCP_TOOLS_SCHEMA = [
         },
     },
     {
+        "name": "rag_retrieve_incident_playbook",
+        "description": "Consulta la Base de Conocimiento RAG de Getnet para obtener el modelo de comportamiento de una incidencia de tarjetas y su playbook de remediación sin Human-in-the-Loop.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string"},
+                "telemetry_source": {"type": "string"},
+            },
+            "required": ["query"],
+        },
+    },
+    {
         "name": "atm_kiro_inspect_incident",
-        "description": "Analiza una incidencia funcional de bloqueo/retención de tarjeta en ATM usando el motor AWS_Kiro-main (PAN masking PCI-DSS, vídeo y triaje).",
+        "description": "Analiza una incidencia funcional de bloqueo/retención de tarjeta bancaria en ATM usando AWS_Kiro-main (PAN masking PCI-DSS, vídeo y triaje).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -274,7 +345,7 @@ MCP_TOOLS_SCHEMA = [
     },
     {
         "name": "alm_autonomous_zero_touch_cycle",
-        "description": "Ejecuta el ciclo completo ALM en Producción sin Human-in-the-Loop (Detección, Triage, RCA, Re-Fixing, Re-Deploy y Certificación Jira Xray).",
+        "description": "Ejecuta el ciclo completo ALM en Producción sin Human-in-the-Loop (Detección, RAG, Triage, RCA, Re-Fixing, Re-Deploy y Certificación Jira Xray).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -296,7 +367,7 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
             "id": req_id,
             "result": {
                 "protocolVersion": "2024-11-05",
-                "serverInfo": {"name": "getnet-observability-kiro-mcp", "version": "1.0.0"},
+                "serverInfo": {"name": "getnet-observability-dynatrace-cloudwatch-kiro-mcp", "version": "2.0.0"},
                 "capabilities": {"tools": {}, "resources": {}, "prompts": {}},
             },
         }
@@ -308,7 +379,11 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
         name = params.get("name")
         args = params.get("arguments") or {}
         try:
-            if name == "cloudwatch_get_alarms":
+            if name == "dynatrace_get_davis_problems":
+                out = controller.dynatrace_get_davis_problems(args.get("status_filter"))
+            elif name == "dynatrace_execute_dql":
+                out = controller.dynatrace_execute_dql(args.get("dql_query", "fetch spans | limit 10"))
+            elif name == "cloudwatch_get_alarms":
                 out = controller.cloudwatch_get_alarms(args.get("state_filter"))
             elif name == "cloudwatch_query_logs_insights":
                 out = controller.cloudwatch_query_logs_insights(
@@ -316,13 +391,18 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
                 )
             elif name == "prometheus_query_metrics":
                 out = controller.prometheus_query_metrics(args.get("query", "getnet_card_blocker_metrics"))
+            elif name == "rag_retrieve_incident_playbook":
+                out = controller.rag_retrieve_incident_playbook(
+                    query=args.get("query", "bloqueo tarjeta atm mti 0420 redis deadlock"),
+                    telemetry_source=args.get("telemetry_source"),
+                )
             elif name == "atm_kiro_inspect_incident":
                 out = controller.atm_kiro_inspect_incident(
                     atm_id=args.get("atm_id", "ATM-GTN-MAD-0042"),
                     ubicacion=args.get("ubicacion", "Sucursal Getnet Gran Vía 28, Madrid"),
                     descripcion=args.get(
                         "descripcion",
-                        "La tarjeta Getnet 4548 1234 5678 9012 quedó bloqueada y retenida en ATM-GTN-MAD-0042.",
+                        "La tarjeta bancaria Getnet 4548 1234 5678 9012 quedó bloqueada y retenida en ATM-GTN-MAD-0042.",
                     ),
                 )
             elif name == "alm_autonomous_zero_touch_cycle":
@@ -364,7 +444,7 @@ def run_stdio_server(base_url: str) -> None:
 
 
 def run_selftest(base_url: str) -> int:
-    print("=== [Getnet Autonomous ALM] Self-Test del Servidor MCP de Observabilidad (CloudWatch + Prometheus + AWS_Kiro) ===")
+    print("=== [Getnet Autonomous ALM] Self-Test del Servidor MCP (Dynatrace + AWS CloudWatch + Prometheus + RAG + AWS_Kiro) ===")
     controller = ObservabilityMcpController(base_url=base_url)
     t0 = time.perf_counter()
 
@@ -375,19 +455,31 @@ def run_selftest(base_url: str) -> int:
         f"PAN Redacted: {'**** 9012' in kiro_out['panRedactedDescription']}"
     )
 
+    dt_out = controller.dynatrace_get_davis_problems()
+    print(
+        f"2. Dynatrace Davis AI MCP: {dt_out['connectionStatus']} ({dt_out['environmentUrl']}) | "
+        f"Entidades Smartscape: {len(dt_out['monitoredEntities'])}"
+    )
+
     cw_out = controller.cloudwatch_get_alarms()
-    print(f"2. AWS CloudWatch Monitor: {cw_out['totalAlarms']} alarmas monitorizadas en namespace {cw_out['namespace']}")
+    print(f"3. AWS CloudWatch MCP: {cw_out['totalAlarms']} alarmas monitorizadas en namespace {cw_out['namespace']}")
 
     prom_out = controller.prometheus_query_metrics()
     print(
-        f"3. OpenSource Monitor (Prometheus/OpenTelemetry MCP): Estado {prom_out['status']} | "
+        f"4. OpenSource Monitor (Prometheus/OpenTelemetry MCP): Estado {prom_out['status']} | "
         f"Métricas recolectadas: {len(prom_out['metrics'])}"
+    )
+
+    rag_out = controller.rag_retrieve_incident_playbook("Tarjeta retenida ATM sin reverso ISO-8583 MTI 0420 y deadlock Redis")
+    print(
+        f"5. Base de Conocimiento RAG: Playbook recuperado {rag_out['agenticSynthesis']['selectedPlaybookId']} "
+        f"(Score: {rag_out['topScore']} | Agente: {rag_out['agenticSynthesis']['autonomousAgent']})"
     )
 
     cycle_out = controller.execute_autonomous_alm_cycle(inject_first=True)
     elapsed_ms = int((time.perf_counter() - t0) * 1000)
     print(
-        f"4. Ciclo Completo ALM Sin Human-in-the-Loop: {cycle_out.get('status')} "
+        f"6. Ciclo Completo ALM Sin Human-in-the-Loop: {cycle_out.get('status')} "
         f"(Incidente ATM: {cycle_out.get('atmIncidentStatus')} | Incidente Sistemas: {cycle_out.get('sysIncidentStatus')} | "
         f"Release: {cycle_out.get('deployedRelease')} en {elapsed_ms} ms)"
     )
@@ -395,7 +487,7 @@ def run_selftest(base_url: str) -> int:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Servidor MCP de Observabilidad CloudWatch + Prometheus + AWS_Kiro (Getnet)")
+    parser = argparse.ArgumentParser(description="Servidor MCP de Observabilidad Dynatrace + CloudWatch + Prometheus + RAG + AWS_Kiro (Getnet)")
     parser.add_argument("--base-url", default=os.environ.get("GETNET_BASE_URL", "http://127.0.0.1:8080"))
     parser.add_argument("--selftest", action="store_true", help="Ejecuta autodiagnóstico MCP y ciclo autónomo ALM")
     args = parser.parse_args()

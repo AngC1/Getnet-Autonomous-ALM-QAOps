@@ -1,21 +1,20 @@
-# Especificación SDD — Getnet Autonomous Production ALM (Zero Human-in-the-Loop)
+# Especificación SDD — Ciclo ALM Autónomo en Producción Sin Human-in-the-Loop, Conectores MCP (Dynatrace + CloudWatch) y Motor RAG
 
-Este documento complementa `specs/sdd-segurcaixa-servicios-clientes.md` y detalla la arquitectura de **Ciclo Completo ALM en Producción sin Human-in-the-Loop** para la demostración ejecutiva ante el **CIO de Getnet (Grupo Santander)**.
+## 1. Máquina de Estados del Ciclo Autónomo (8 Estados) y Orquestación de 5 Agentes
 
-## 1. Arquitectura Cerrada Zero-Touch (6 Etapas Autónomas)
+| Orden | Estado (`stateId`) | Agente Responsable | Herramientas MCP Invocadas | Transición de Salida |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | `S1_TELEMETRY_STREAM` | `Kiro-ATM-Vision-Agent` + `Observability-MCP-Agent` | `atm_kiro_inspect_incident`, `dynatrace_get_davis_problems`, `cloudwatch_get_alarms` | Ingesta de vídeo ATM + Spans PurePath Dynatrace + Alarmas CloudWatch |
+| **2** | `S2_ANOMALY_DETECTION` | `Kiro-ATM-Vision-Agent` | `validate_incident`, `redact_pan` | PAN enmascarado (`4548 **** **** 9012`) y apertura de `GTN-INC-ATM-001` y `GTN-INC-SYS-002` |
+| **3** | `S3_MCP_CORRELATION` | `Observability-MCP-Agent` | `dynatrace_execute_dql`, `cloudwatch_query_logs_insights`, `prometheus_query_metrics` | Correlación de `DT-PROB-2026-8841` (Dynatrace) con `CW-ALARM-GTN-CARDLOCK-P99` (CloudWatch) |
+| **4** | `S4_RAG_KNOWLEDGE_LOOKUP` | `RAG-Knowledge-Architect-Agent` | `rag_retrieve_incident_playbook` | Recuperación de Playbooks `RAG-PB-ATM-001` (`99%`) y `RAG-PB-SYS-002` (`99%`) |
+| **5** | `S5_RCA_TRIAGE_SYNTHESIS` | `RAG-Knowledge-Architect-Agent` + `Kiro-ATM-Vision-Agent` | `process_incident`, `assemble_report` | Síntesis de plan Zero-Touch: reverso `MTI 0420` + `redis_lock_ttl_ms=3000` |
+| **6** | `S6_SELF_HEALING_HOTFIX` | `Self-Healing-Patch-Agent` | `alm_autonomous_zero_touch_cycle` | Aplicación en caliente de `PATCH-GTN-ATM-0420` y `PATCH-GTN-SYS-REDIS` |
+| **7** | `S7_CANARY_QAOPS_GATE` | `QAOps-Xray-Certifier-Agent` | `selenium_execute_tarjetas_flow`, `ai_jmeter_assistant` | Release `v2026.11.2-AUTONOMOUS-PRO` validada con 12 tests Selenium + 2 tests JMeter IA |
+| **8** | `S8_ALM_XRAY_CLOSED` | `QAOps-Xray-Certifier-Agent` | `alm_sync_test_result` | `14/14` casos `PASSED` y `2/2` incidencias `RESOLVED` en Jira Xray |
 
-```mermaid
-flowchart LR
-    A["1. Detección en PRO\n(ATM AWS_Kiro + CloudWatch/Prometheus MCP)"] --> B["2. Triaje Cognitivo\n(PAN Redaction PCI-DSS + Creación Issue Jira Xray)"]
-    B --> C["3. Análisis RCA\n(Logs Insights + PromQL + AST Diff)"]
-    C --> D["4. Re-Fixing Autónomo\n(Hotfix EMV 0420 + Redis Lock TTL & Circuit Breaker)"]
-    D --> E["5. Quality Gates & Re-Deploy\n(Selenium MCP + Pytest 12 E2E + JMeter IA)"]
-    E --> F["6. Cuadro de Mando CIO\n(Jira Xray 14/14 PASSED · MTTR < 9s)"]
-```
-
-## 2. Invariantes de las 2 Incidencias de Producción
-
-| ID Incidente Jira | Origen / Sensor | Síntoma en Producción | Causa Raíz (RCA) | Hotfix Autónomo (Re-Fixing) | Test Xray Verificador |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **`GTN-INC-ATM-001`** | **Funcional ATM** (`AWS_Kiro-main`: `atm_sentinel.py` + `brand_verifier/incident.py`) | Tarjeta retenida en `ATM-GTN-MAD-0042` (`ERROR_TARJETA_RETENIDA_SIN_REVERSO`, HTTP 409) | `enable_emv_reversal_0420 = False` en `card_lock_engine` al bloquear por evento de ranura/PIN | Activa reverso automático `ISO-8583 MTI 0420`, libera bloqueo lógico y emite token digital | `GTN-TC-013` (`TL-GTN-113`) |
-| **`GTN-INC-SYS-002`** | **Sistemas PRO** (`AWS CloudWatch` + `Prometheus OpenSource MCP Server`) | Latencia P95 = 1840 ms, saturación HikariCP (98.5%) y Deadlock Redis en `getnet-card-blocker-svc` | Lock distribuido en tabla `CARD_BLOCK_STATE` sin TTL (`redis_lock_ttl_ms = 0`) ni caché de baremos/reglas | Configura `redis_lock_ttl_ms = 1500`, activa Circuit Breaker + Caché Redis y drena pool de conexiones | `GTN-TC-014` (`TL-GTN-114`) |
+## 2. Conectores MCP Server (`POST /api/v1/mcp/connect`)
+- **Dynatrace Davis AI & Grail DQL (`getnet-dynatrace-davis-mcp`)**: Inspección de `DT-PROB-2026-8841`, topología Smartscape (`SERVICE-GETNET-CARD-BLOCKER`, `PROCESS_GROUP-REDIS-CARD-MUTEX`, `CUSTOM_DEVICE-ATM-MAD-0042`) y consultas DQL en vivo.
+- **AWS CloudWatch (`getnet-aws-cloudwatch-mcp`)**: Inspección de alarma `CW-ALARM-GTN-CARDLOCK-P99` y ejecución de consultas en CloudWatch Logs Insights (`/aws/ecs/getnet-card-blocker-svc`).
+- **AWS Kiro ATM Sentinel (`getnet-kiro-atm-edge-mcp`)**: Validación de eventos de cajero `ATM-GTN-MAD-0042` y redacción de PAN según PCI-DSS 4.0.
+- **Prometheus & OpenTelemetry (`getnet-prometheus-otel-mcp`)**: Scraping OpenMetrics en `/api/v1/observability/prometheus`.

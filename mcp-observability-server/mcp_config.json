@@ -1,17 +1,16 @@
 {
   "mcpServers": {
-    "getnet-selenium-qaops": {
-      "command": "python",
-      "args": ["mcp-selenium-server/server.py"],
-      "env": {
-        "GETNET_BASE_URL": "http://127.0.0.1:8080"
-      }
-    },
-    "getnet-observability-cloudwatch-prometheus": {
+    "getnet-observability-dynatrace-cloudwatch-kiro": {
       "command": "python",
       "args": ["mcp-observability-server/server.py"],
       "env": {
-        "GETNET_BASE_URL": "http://127.0.0.1:8080"
+        "GETNET_BASE_URL": "http://127.0.0.1:8080",
+        "DYNATRACE_ENV_URL": "https://getnet-prod.live.dynatrace.com",
+        "AWS_REGION": "eu-west-1",
+        "CLOUDWATCH_LOG_GROUP": "/aws/ecs/getnet-card-blocker-svc",
+        "PROMETHEUS_SCRAPE_URL": "http://127.0.0.1:8080/api/v1/observability/prometheus",
+        "KIRO_ATM_BUCKET": "getnet-atm-incidents-pro",
+        "RAG_KNOWLEDGE_BASE_PATH": "rag-knowledge-base/incident_knowledge_base.json"
       }
     }
   }

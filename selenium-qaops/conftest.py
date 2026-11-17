@@ -1,12 +1,11 @@
 """
-Configuración Pytest QAOps (Ayesa Digital) para pruebas Selenium E2E y sincronización
-en tiempo real con el Hub ALM (Jira Xray / TestLink / Redmine).
+Configuración Pytest QAOps (Ayesa Digital · Getnet Grupo Santander) para pruebas Selenium E2E
+de Tarjetas Bancarias y sincronización en tiempo real con el Hub ALM (Jira Xray / TestLink / Redmine).
 """
 
 from __future__ import annotations
 
 import os
-import time
 from typing import Dict, Generator, List
 
 import pytest
@@ -16,13 +15,13 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.remote.webdriver import WebDriver
 
-BASE_URL = os.environ.get("ADESLAS_BASE_URL", "http://127.0.0.1:8080")
+BASE_URL = os.environ.get("GETNET_BASE_URL", "http://127.0.0.1:8080")
 EXECUTION_RESULTS: List[Dict[str, object]] = []
 
 
 def pytest_configure(config):
     config.addinivalue_line(
-        "markers", "xray(key): Vincula el test automatizado con el Test Case de Jira Xray / TestLink / Redmine"
+        "markers", "xray(key): Vincula el test automatizado de tarjetas con el Test Case de Jira Xray / TestLink / Redmine"
     )
 
 

@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "system": "Getnet (Grupo Santander) — Autonomous Production ALM RAG Knowledge Base",
+    "version": "2026.11.2-RAG-PRO",
+    "embeddingModel": "getnet-banking-incident-hybrid-v3 (TF-IDF Cosine + BM25 Telemetry Fingerprint)",
+    "vectorDimensions": 384,
+    "domain": "Tarjetas Bancarias (Emisión, Bloqueo ATM, Autorización ISO-8583, 3D-Secure 2.2, Liquidación EMV)",
+    "totalDocuments": 8,
+    "lastIndexed": "2026-11-17T20:52:00Z"
+  },
+  "playbooks": [
+    {
+      "playbookId": "RAG-PB-ATM-001",
+      "title": "Retención Física de Tarjeta Bancaria en Cajero ATM sin Reverso EMV ISO-8583 MTI 0420",
+      "category": "FUNCIONAL_TARJETAS_ATM",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-ATM-001",
+      "linkedDefectId": "GTN-BUG-201",
+      "telemetrySources": ["AWS_Kiro-main Vision Sentinel", "Switch ISO-8583 Getnet", "Dynatrace Custom Device ATM"],
+      "keywords": [
+        "tarjeta", "retenida", "bloqueo", "atm", "cajero", "ranura", "slot", "card_stuck",
+        "iso-8583", "mti 0420", "0420", "reverso", "emv", "kiro", "race_condition",
+        "4548", "pci-dss", "skimming", "timeout", "dispensador", "lectora"
+      ],
+      "symptomSignature": {
+        "atmEvent": "CARD_STUCK / TIMEOUT_LECTORA_CHIP_EMV",
+        "iso8583Code": "RC 68 (Response received too late) / Sin trama MTI 0420",
+        "dynatraceEvent": "CUSTOM_INFO: ATM-GTN-MAD-0042 Motorized Card Reader Jammed > 12s",
+        "cloudwatchLogPattern": "ERROR [ATM-Sentinel-Kiro] EMV_LOCK_RACE_CONDITION: Card trapped in slot without reversal frame"
+      },
+      "behaviorModel": {
+        "triggerCondition": "El cliente inserta su tarjeta bancaria EMV en el cajero ATM y se produce un micro-corte o timeout (>3000ms) entre el lector motorizado y el switch autorizador antes de confirmar el cierre de sesión EMV.",
+        "propagationPath": "Lectora Motorizada ATM (Estado CARD_STUCK) -> Edge Agent AWS_Kiro-main detecta anomalía visual en slot -> API /api/v1/tarjetas/bloqueo recibe evento sin flag de reverso -> Core bancario mantiene la tarjeta en estado INCONSISTENT_LOCK (riesgo de cargo duplicado o fraude físico).",
+        "businessImpact": "Riesgo operativo y reputacional alto: el titular pierde físicamente su tarjeta bancaria en el cajero sin bloqueo preventivo confirmado en el core ni anulación del cargo en curso."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-atm-edge-connector / portal-getnet/app.py (POST /api/v1/tarjetas/bloqueo)",
+        "defectType": "EMV_LOCK_RACE_CONDITION",
+        "explanation": "Cuando el sensor óptico del cajero reporta retención mecánica (CARD_STUCK) simultáneamente a un timeout de red, el flujo estándar omitía la generación síncrona del mensaje de reverso financiero ISO-8583 MTI 0420 antes de cambiar el estado del PAN a BLOCKED_PREVENTIVE."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent + Kiro-ATM-Vision-Agent",
+        "steps": [
+          "1. Validar payload de telemetría ATM con brand_verifier.incident.validate_incident (AWS_Kiro-main).",
+          "2. Aplicar enmascaramiento PCI-DSS inmediato sobre el PAN (redact_pan -> 4548 **** **** 9012) antes de indexar logs.",
+          "3. Activar flag de contingencia en caliente: atm_emv_fallback_reversal = True en el microservicio de bloqueo de tarjetas.",
+          "4. Emitir trama automática de reverso EMV ISO-8583 MTI 0420 (REV-EMV-2026-XXXXX) hacia el switch adquirente Getnet.",
+          "5. Actualizar estado de la tarjeta bancaria a BLOCKED_PREVENTIVE y generar orden de emisión de tarjeta sustitutiva digital en Wallet."
+        ],
+        "configPatch": {
+          "atm_emv_fallback_reversal": true,
+          "iso8583_reversal_mti": "0420",
+          "pci_dss_pan_redaction": "STRICT_MASK_MIDDLE_8"
+        },
+        "targetRelease": "v2026.11.2-AUTONOMOUS-PRO"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-002", "GTN-TC-013"],
+        "slaCriteria": "HTTP 200 OK en POST /api/v1/tarjetas/bloqueo, estado BLOCKED_PREVENTIVE y código REV-EMV-2026-* presente.",
+        "mttrManual": "3h 45m",
+        "mttrAutonomous": "5.8s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-SYS-002",
+      "title": "Deadlock de Mutex Distribuido Redis y Saturación HikariCP en Microservicio de Bloqueo de Tarjetas",
+      "category": "SISTEMAS_OBSERVABILIDAD_CLOUD",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-SYS-002",
+      "linkedDefectId": "GTN-BUG-202",
+      "telemetrySources": ["Dynatrace Davis AI", "AWS CloudWatch Alarms & Logs Insights", "Prometheus / OpenTelemetry MCP"],
+      "keywords": [
+        "redis", "deadlock", "mutex", "ttl", "hikaricp", "pool", "saturacion", "latencia",
+        "p95", "p99", "cloudwatch", "dynatrace", "davis", "purepath", "503", "timeout",
+        "getnet-card-blocker-svc", "circuit_breaker", "resilience4j", "conexiones"
+      ],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-PROB-2026-8841: Response time degradation & Connection Pool exhaustion on getnet-card-blocker-svc (PurePath P99 > 2400ms)",
+        "cloudwatchAlarm": "CW-ALARM-GTN-CARDLOCK-P99 = ALARM (Threshold > 800ms, Actual P95 = 1840ms)",
+        "prometheusMetric": "getnet_redis_mutex_deadlocks_total = 19, getnet_hikaricp_active_connections_pct = 98.5%"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Ráfagas concurrentes de solicitudes de bloqueo preventivo de tarjetas bancarias desde la red de cajeros ATM cuando el parámetro redis_lock_ttl_ms se despliega con valor 0 (sin expiración automática).",
+        "propagationPath": "Petición concurrente adquiere lock Redis por PAN -> Fallo transitorio de red impide liberar el lock -> Sin TTL (redis_lock_ttl_ms=0), el lock queda huérfano indefinidamente -> Hilos del pool HikariCP quedan bloqueados esperando el mutex -> Saturación del 98.5% del pool -> Caída en cascada con HTTP 503 Service Unavailable.",
+        "businessImpact": "Degradación severa del SLA de bloqueo de tarjetas bancarias (P95 sube de 48ms a 1840ms) con tasa de error del 24% en peticiones críticas de seguridad de tarjetas."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-card-blocker-svc (ConfigMap Redis Lock & HikariCP Pool)",
+        "defectType": "REDIS_LOCK_TTL_MISSING",
+        "explanation": "La ausencia de TTL en el comando SET NX de Redis para el mutex de bloqueo de tarjeta (lock:card:<pan_hash>) provoca contención permanente ante cualquier timeout aguas abajo, agotando los 100 workers de HikariCP."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Observability-MCP-Agent + Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Correlacionar problema Davis AI (DT-PROB-2026-8841) en Dynatrace MCP con la alarma CW-ALARM-GTN-CARDLOCK-P99 en AWS CloudWatch MCP.",
+          "2. Ejecutar consulta DQL/Logs Insights para identificar los claves Redis huérfanas sin TTL en getnet-card-blocker-svc.",
+          "3. Inyectar parche de configuración en caliente: establecer redis_lock_ttl_ms = 3000 y activar circuit_breaker_enabled = True.",
+          "4. Purgar locks huérfanos en el clúster Redis y drenar conexiones colgadas del pool HikariCP (reducción del 98.5% al 24.0%).",
+          "5. Ejecutar despliegue Canary automatizado (v2026.11.2-AUTONOMOUS-PRO) y verificar transición de alarma CloudWatch a estado OK."
+        ],
+        "configPatch": {
+          "redis_lock_ttl_ms": 3000,
+          "circuit_breaker_enabled": true,
+          "hikaricp_leak_detection_threshold_ms": 2000
+        },
+        "targetRelease": "v2026.11.2-AUTONOMOUS-PRO"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-011", "GTN-TC-012", "GTN-TC-014"],
+        "slaCriteria": "CloudWatch Alarm State = OK, Dynatrace Davis Problem = CLOSED, Latencia P95 < 120ms, Deadlocks Redis = 0.",
+        "mttrManual": "4h 20m",
+        "mttrAutonomous": "6.2s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-ISO-003",
+      "title": "Fallo de Autorización 3D-Secure 2.2 / ISO-8583 RC 91 (Issuer Switch Inoperative) en Tarjetas Corporativas",
+      "category": "AUTORIZACION_TARJETAS_ISO8583",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-ISO-003",
+      "linkedDefectId": "GTN-BUG-203",
+      "telemetrySources": ["Dynatrace PurePath ISO-8583", "AWS CloudWatch Metrics", "Motor Autorizador Getnet"],
+      "keywords": [
+        "iso-8583", "rc 91", "91", "3ds2", "3d-secure", "autorizacion", "corporativa",
+        "switch", "issuer", "stand-in", "stip", "mti 0100", "mti 0110", "visa", "mastercard"
+      ],
+      "symptomSignature": {
+        "iso8583Code": "RC 91 — Issuer or switch is inoperative en tramas MTI 0110",
+        "dynatraceEvent": "DT-PROB-2026-8902: High failure rate on external ACS 3DS2 endpoint",
+        "cloudwatchLogPattern": "WARN [ISO8583-Router] Primary Issuer Route Timeout > 2500ms for BIN 454881"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Latencia superior a 2500ms en el enlace primario con el servidor ACS 3D-Secure 2.2 o el switch emisor durante picos de facturación de tarjetas corporativas.",
+        "propagationPath": "Petición de autorización de tarjeta MTI 0100 -> Timeout en ruta primaria -> Rechazo con RC 91 si el modo Stand-In Processing (STIP) no conmuta automáticamente a la ruta secundaria.",
+        "businessImpact": "Denegación de operaciones legítimas con tarjetas bancarias activas en comercios y cajeros."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-iso8583-auth-router",
+        "defectType": "STIP_FALLBACK_THRESHOLD_TOO_HIGH",
+        "explanation": "El umbral de conmutación al procesador Stand-In (STIP) estaba fijado en 5000ms, superando el timeout de 3000ms del terminal adquirente."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Detectar incremento de RC 91 mediante telemetría MCP Dynatrace y Prometheus.",
+          "2. Ajustar dinámicamente stip_failover_timeout_ms = 1200ms y activar enrutamiento activo-activo por BIN.",
+          "3. Verificar mediante test funcional GTN-TC-004 la emisión de código de autorización AUT-GTN-2026-XXXXX."
+        ],
+        "configPatch": {
+          "stip_failover_timeout_ms": 1200,
+          "enable_bin_secondary_route": true
+        },
+        "targetRelease": "v2026.11.2-AUTONOMOUS-PRO"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-004", "GTN-TC-005"],
+        "slaCriteria": "Tasa de aprobación de tarjetas activas >= 99.8%, denegación inmediata de tarjetas en lista negra (4548000099990000).",
+        "mttrManual": "2h 10m",
+        "mttrAutonomous": "4.9s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-PCI-004",
+      "title": "Fuga Potencial de PAN en Claro en Trazas de Error de Bloqueo de Tarjetas (Cumplimiento PCI-DSS 4.0 Req 3.4)",
+      "category": "SEGURIDAD_PCI_DSS_TARJETAS",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-PCI-004",
+      "linkedDefectId": "GTN-BUG-204",
+      "telemetrySources": ["AWS_Kiro-main brand_verifier.incident", "AWS CloudWatch Log Anomaly Detector"],
+      "keywords": [
+        "pci-dss", "pan", "enmascarado", "redact_pan", "privacidad", "seguridad",
+        "16 digitos", "log", "traza", "cvv", "cumplimiento", "tokenizacion", "truncado"
+      ],
+      "symptomSignature": {
+        "cloudwatchLogPattern": "SECURITY_ALERT: Regex match \\b(?:\\d[ -]*?){13,19}\\b detected in unredacted payload",
+        "dynatraceEvent": "DT-SEC-2026-104: Sensitive Cardholder Data pattern detected in exception stacktrace"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Excepciones no controladas en la ingesta de eventos de tarjetas bancarias que serializan el objeto JSON original antes de pasar por el filtro de sanitización PCI-DSS.",
+        "propagationPath": "Payload con PAN de 16 dígitos -> Excepción de validación -> Logger escribe payload crudo -> Incumplimiento PCI-DSS 4.0 Requisito 3.4.",
+        "businessImpact": "Riesgo regulatorio crítico en auditoría PCI-DSS si un PAN completo se almacena sin truncar en sistemas de observabilidad."
+      },
+      "rootCauseAnalysis": {
+        "component": "AWS_Kiro-main/brand_verifier/incident.py & portal-getnet/app.py",
+        "defectType": "PRE_LOG_PAN_REDACTION_BYPASS",
+        "explanation": "El middleware de logging capturaba el cuerpo de la petición antes de invocar la función determinista redact_pan()."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Kiro-ATM-Vision-Agent + Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Interceptar todo payload entrante con brand_verifier.incident.redact_pan() antes de cualquier escritura en disco, S3 o CloudWatch.",
+          "2. Sustituir secuencias de 13 a 19 dígitos por el formato seguro 4548 **** **** 9012 o [PAN-REDACTED].",
+          "3. Verificar mediante inspección de respuestas JSON en GTN-TC-002 y GTN-TC-013 que ningún endpoint expone el PAN en claro."
+        ],
+        "configPatch": {
+          "enforce_pre_log_pan_redaction": true,
+          "redaction_function": "brand_verifier.incident.redact_pan"
+        },
+        "targetRelease": "v2026.11.2-AUTONOMOUS-PRO"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-002", "GTN-TC-013"],
+        "slaCriteria": "0 apariciones de PAN de 16 dígitos en claro en logs de CloudWatch, Dynatrace y respuestas API.",
+        "mttrManual": "5h 00m",
+        "mttrAutonomous": "3.4s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-HSM-005",
+      "title": "Desincronización de Clave ZPK/CVK en HSM Thales payShield durante Rotación Automática de Tarjetas EMV",
+      "category": "CRIPTOGRAFIA_HSM_TARJETAS",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-HSM-005",
+      "linkedDefectId": "GTN-BUG-205",
+      "telemetrySources": ["Dynatrace OneAgent HSM Extension", "Prometheus Exporter HSM", "AWS CloudWatch"],
+      "keywords": [
+        "hsm", "thales", "payshield", "zpk", "cvk", "pin", "arqc", "arpc", "criptograma",
+        "emv", "chip", "rotacion", "clave", "rc 55", "rc 82"
+      ],
+      "symptomSignature": {
+        "iso8583Code": "RC 82 (Negative CAM, dCVV, iCVV, or CVV results) en validación de criptograma ARQC",
+        "dynatraceEvent": "DT-PROB-2026-9104: HSM Command Error Code 01 (Verification Failure) spike > 8%"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Rotación horaria de la clave ZPK/CVK entre el switch adquirente Getnet y el clúster HSM sin ventana de solapamiento (grace period) para tramas en vuelo.",
+        "propagationPath": "Cajero ATM cifra PIN block con ZPK N-1 -> HSM valida únicamente contra ZPK N -> Error criptográfico -> Denegación falsa de tarjeta bancaria.",
+        "businessImpact": "Rechazo de transacciones con chip EMV y PIN válido durante los primeros 90 segundos tras la rotación de claves."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-hsm-crypto-gateway",
+        "defectType": "HSM_KEY_ROTATION_NO_DUAL_WINDOW",
+        "explanation": "El validador de criptogramas EMV descartaba inmediatamente la clave anterior al activar el nuevo índice LMK/ZPK."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Habilitar ventana dual de validación criptográfica (dual_key_grace_window_sec = 300) en getnet-hsm-crypto-gateway.",
+          "2. Reintentar validación de ARQC contra el slot N-1 cuando el slot N devuelve código HSM 01 dentro de la ventana de gracia.",
+          "3. Certificar flujo de autorización de tarjetas en Jira Xray."
+        ],
+        "configPatch": {
+          "dual_key_grace_window_sec": 300,
+          "arqc_fallback_prev_key": true
+        },
+        "targetRelease": "v2026.11.2-AUTONOMOUS-PRO"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-004", "GTN-TC-011"],
+        "slaCriteria": "0 errores criptográficos RC 82 durante rotación de claves HSM.",
+        "mttrManual": "3h 15m",
+        "mttrAutonomous": "7.1s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-CHB-006",
+      "title": "Anomalía en Validación de Disputas y Contracargos (Chargebacks Visa/Mastercard) por Efectivo No Dispensado en ATM",
+      "category": "DISPUTAS_CONTRACARGOS_TARJETAS",
+      "severity": "MEDIUM",
+      "linkedIncidentId": "GTN-INC-CHB-006",
+      "linkedDefectId": "GTN-BUG-206",
+      "telemetrySources": ["Portal Servicios Tarjetas Getnet", "AWS CloudWatch Logs", "Jira Xray QAOps"],
+      "keywords": [
+        "disputa", "contracargo", "chargeback", "efectivo", "no dispensado", "reclamacion",
+        "cargo duplicado", "fraude", "justificante", "pdf", "visa", "mastercard", "importe"
+      ],
+      "symptomSignature": {
+        "cloudwatchLogPattern": "WARN [Dispute-Engine] Chargeback validation rejected or malformed attachment payload",
+        "dynatraceEvent": "Business Event: High validation error rate on /api/v1/tarjetas/disputas"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Presentación de disputas de tarjetas bancarias con importes fuera de umbral normativo (>15.000 EUR o <=0 EUR) o adjuntos potencialmente peligrosos (.exe, .bat).",
+        "propagationPath": "Formulario de Disputas de Tarjetas -> API /api/v1/tarjetas/disputas -> Regla de validación antifraude y sanitización MIME.",
+        "businessImpact": "Protección de la pasarela de disputas frente a inyección de archivos maliciosos y reclamaciones con importes inválidos."
+      },
+      "rootCauseAnalysis": {
+        "component": "portal-getnet/app.py (POST /api/v1/tarjetas/disputas)",
+        "defectType": "STRICT_MIME_AND_AMOUNT_GUARDRAIL",
+        "explanation": "Política de seguridad bancaria que exige validación determinista de extensión (.pdf, .jpg, .png) y rango de importe (0 < importe <= 15000 EUR)."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "QAOps-Xray-Certifier-Agent",
+        "steps": [
+          "1. Verificar reglas de validación de importe y whitelist de extensiones en el microservicio de disputas de tarjetas.",
+          "2. Ejecutar pruebas de regresión automatizadas GTN-TC-007, GTN-TC-008 y GTN-TC-009 con Selenium Headless.",
+          "3. Registrar evidencias en Jira Xray."
+        ],
+        "configPatch": {
+          "max_dispute_amount_eur": 15000.0,
+          "allowed_attachment_extensions": [".pdf", ".jpg", ".jpeg", ".png"]
+        },
+        "targetRelease": "v2026.11.2-AUTONOMOUS-PRO"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-007", "GTN-TC-008", "GTN-TC-009"],
+        "slaCriteria": "HTTP 201 para disputas válidas y HTTP 400 determinista para importes fuera de rango o archivos .exe.",
+        "mttrManual": "1h 30m",
+        "mttrAutonomous": "4.2s"
+      }
+    }
+  ]
+}

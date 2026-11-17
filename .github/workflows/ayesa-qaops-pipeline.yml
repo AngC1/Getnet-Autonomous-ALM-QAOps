@@ -1,43 +1,33 @@
-name: Getnet Autonomous Production ALM & QAOps (Zero Human-in-the-Loop)
+name: Getnet Autonomous ALM & QAOps Pipeline (Zero Human-in-the-Loop)
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  getnet-autonomous-alm-certification:
-    name: Getnet ALM Gate (AWS_Kiro ATM + CloudWatch/Prometheus MCP + Selenium MCP + JMeter AI + Jira Xray)
+  getnet-autonomous-alm-qaops:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Execute Full Autonomous ALM & QAOps Suite (14/14 Jira Xray Tests + 2/2 PRO Incidents Resolved)
+      - name: Run RAG Engine Self-Test
+        run: |
+          python rag-knowledge-base/rag_engine.py --selftest
+
+      - name: Run Complete Autonomous ALM & Bank Card QAOps Suite
         run: |
           python run_qaops_suite.py
-
-      - name: Upload Getnet QAOps & Jira Xray Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: getnet-autonomous-alm-certification-bundle
-          path: |
-            alm-backlog/jira-xray/backlog_xray_export.json
-            alm-backlog/testlink/segurcaixa_testplan_testlink.xml
-            alm-backlog/redmine/redmine_issues_backlog.csv
-            jmeter-ai/results/
-            selenium-qaops/reports/

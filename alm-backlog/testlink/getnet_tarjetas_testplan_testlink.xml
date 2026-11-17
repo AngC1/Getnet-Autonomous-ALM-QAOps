@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Getnet_Tarjetas_Bancarias_Autonomous_ALM_TestPlan">
+  <testsuite name="Operativa_Tarjetas_Bancarias_y_ALM_Zero_Touch">
+    <testcase internalid="TL-GTN-101" name="GTN-TC-001: Catalogo de servicios operativos de tarjetas bancarias Getnet" status="PASSED"/>
+    <testcase internalid="TL-GTN-102" name="GTN-TC-002: Busqueda de Parque de Tarjetas Bancarias en Madrid (Visa Debito EMV)" status="PASSED"/>
+    <testcase internalid="TL-GTN-103" name="TL-GTN-103: Busqueda de Guardia ATM 24h para programa Red Euro6000 ATM" status="PASSED"/>
+    <testcase internalid="TL-GTN-104" name="GTN-TC-004: Autorizacion online ISO-8583 exitosa con PAN de tarjeta valido" status="PASSED"/>
+    <testcase internalid="TL-GTN-105" name="GTN-TC-005: Rechazo de autorizacion ISO-8583 con PAN invalido" status="PASSED"/>
+    <testcase internalid="TL-GTN-106" name="GTN-TC-006: Derivacion de operacion de tarjeta a PENDIENTE_REVISION_RIESGOS" status="PASSED"/>
+    <testcase internalid="TL-GTN-107" name="GTN-TC-007: Disputa y Chargeback de tarjeta bancaria con abono provisional del 90%" status="PASSED"/>
+    <testcase internalid="TL-GTN-108" name="GTN-TC-008: Rechazo de Disputa y Chargeback con IBAN invalido" status="PASSED"/>
+    <testcase internalid="TL-GTN-109" name="GTN-TC-009: Login Area Titular y Tarjeta Bancaria Digital Tokenizada" status="PASSED"/>
+    <testcase internalid="TL-GTN-110" name="GTN-TC-010: Solicitud de Soporte Criptografico EMV y HSM 24h" status="PASSED"/>
+    <testcase internalid="TL-GTN-111" name="GTN-TC-011: Performance Gate JMeter IA en Parque de Tarjetas y Bloqueo ATM" status="PASSED"/>
+    <testcase internalid="TL-GTN-112" name="GTN-TC-012: Stress Test JMeter IA en Autorizacion ISO-8583 y Disputas de Tarjetas" status="PASSED"/>
+    <testcase internalid="TL-GTN-113" name="GTN-TC-013: Ciclo Autonomo ALM Incidencia Funcional Tarjeta ATM (AWS_Kiro + RAG)" status="PASSED"/>
+    <testcase internalid="TL-GTN-114" name="GTN-TC-014: Ciclo Autonomo ALM Incidencia Sistemas Dynatrace y CloudWatch MCP + RAG" status="PASSED"/>
+  </testsuite>
+</testsuites>
