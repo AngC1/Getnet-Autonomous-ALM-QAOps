@@ -106,7 +106,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 246
+      "lastExecutionTimeMs": 231
     },
     {
       "key": "GTN-TC-002",
@@ -116,7 +116,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 289
+      "lastExecutionTimeMs": 272
     },
     {
       "key": "GTN-TC-003",
@@ -126,7 +126,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 240
+      "lastExecutionTimeMs": 227
     },
     {
       "key": "GTN-TC-004",
@@ -136,7 +136,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 294
+      "lastExecutionTimeMs": 832
     },
     {
       "key": "GTN-TC-005",
@@ -146,7 +146,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 294
+      "lastExecutionTimeMs": 762
     },
     {
       "key": "GTN-TC-006",
@@ -156,7 +156,7 @@
       "priority": "High",
       "type": "API & Business Rule",
       "status": "PASSED",
-      "lastExecutionTimeMs": 47
+      "lastExecutionTimeMs": 45
     },
     {
       "key": "GTN-TC-007",
@@ -166,7 +166,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 254
+      "lastExecutionTimeMs": 269
     },
     {
       "key": "GTN-TC-008",
@@ -176,7 +176,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 797
+      "lastExecutionTimeMs": 795
     },
     {
       "key": "GTN-TC-009",
@@ -186,7 +186,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 173
+      "lastExecutionTimeMs": 207
     },
     {
       "key": "GTN-TC-010",
@@ -196,7 +196,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 184
+      "lastExecutionTimeMs": 736
     },
     {
       "key": "GTN-TC-011",
@@ -206,7 +206,7 @@
       "priority": "High",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 50
+      "lastExecutionTimeMs": 51
     },
     {
       "key": "GTN-TC-012",
@@ -216,7 +216,7 @@
       "priority": "Critical",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 58
+      "lastExecutionTimeMs": 61
     },
     {
       "key": "GTN-TC-013",
@@ -226,7 +226,7 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (AWS Kiro + RAG)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 285
+      "lastExecutionTimeMs": 387
     },
     {
       "key": "GTN-TC-014",
@@ -236,7 +236,7 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (Dynatrace + CloudWatch MCP)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 23
+      "lastExecutionTimeMs": 37
     }
   ],
   "productionIncidents": [
@@ -250,7 +250,7 @@
       "rootCause": "Flag enable_emv_reversal_0420=False en card_lock_engine omite el envío del reverso MTI 0420 al bloquear preventivamente la tarjeta.",
       "autoFixApplied": "Activado enable_emv_reversal_0420=True, emitido reverso REV-EMV-2026 y aprovisionado token digital TOK-GTN-WALLET-9012.",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-17T22:12:40+00:00"
+      "resolvedAt": "2026-11-17T22:57:57+00:00"
     },
     {
       "key": "GTN-INC-SYS-002",
@@ -262,7 +262,7 @@
       "rootCause": "Ausencia de TTL en lock Redis de bloqueo de tarjetas provoca bloqueo indefinido de conexiones bajo ráfagas concurrentes.",
       "autoFixApplied": "Inyectado redis_lock_ttl_ms=3000, activado Circuit Breaker Resilience4j y redesplegada versión v2026.11.2-AUTONOMOUS-PRO (P95 = 42.5 ms).",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-17T22:12:40+00:00"
+      "resolvedAt": "2026-11-17T22:57:57+00:00"
     }
   ],
   "defects": [

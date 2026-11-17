@@ -1,34 +1,41 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-ES">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getnet (Grupo Santander) | Portal Operativo de Tarjetas Bancarias EMV, Cajeros ATM &amp; Ciclo ALM Zero-Touch</title>
+  <title>Soluciones de pago y tarjetas bancarias para empresas | Getnet España (Grupo Santander)</title>
   <style>
     :root {
-      --getnet-red: #ec0000;
-      --getnet-dark: #111827;
-      --getnet-navy: #0f172a;
-      --getnet-light: #fef2f2;
-      --getnet-blue: #0052cc;
-      --getnet-green: #059669;
-      --text-main: #1e293b;
-      --text-muted: #475569;
-      --border: #e2e8f0;
-      --bg: #f8fafc;
+      --getnet-red: #EC0000;
+      --getnet-red-hover: #CC0000;
+      --getnet-red-soft: #FFF0F0;
+      --getnet-sky: #F5F9FB;
+      --getnet-sky-border: #D9E8F0;
+      --getnet-tag-bg: #E6F2F8;
+      --getnet-tag-text: #005C8A;
+      --getnet-charcoal: #191919;
+      --getnet-dark: #222222;
+      --getnet-body: #595959;
+      --getnet-border: #E5E9EC;
+      --getnet-white: #FFFFFF;
+      --getnet-green: #008A5E;
+      --square-color: #EC0000;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
-      line-height: 1.5;
+      font-family: 'Santander Micro Text', 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--getnet-white);
+      color: var(--getnet-charcoal);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* Barra Superior QAOps & CIO Demo (Discreta y Corporativa Getnet) */
     .qaops-banner {
-      background: linear-gradient(90deg, #090d16 0%, #7f1d1d 100%);
-      color: #fff;
-      font-size: 0.82rem;
-      padding: 9px 24px;
+      background: #191919;
+      color: #F5F9FB;
+      font-size: 0.79rem;
+      padding: 8px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -36,328 +43,738 @@
       flex-wrap: wrap;
       gap: 10px;
     }
-    .qaops-banner a {
-      color: #fecaca;
-      text-decoration: none;
-      font-weight: 700;
-      margin-left: 10px;
-      padding: 5px 11px;
-      border-radius: 5px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255,255,255,0.2);
+    .qaops-banner code {
+      color: #FF8080;
+      font-family: 'Consolas', monospace;
     }
-    .qaops-banner a:hover { background: rgba(255, 255, 255, 0.25); color: #fff; }
+    .qaops-banner-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .qaops-banner a {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.76rem;
+      transition: all 0.18s ease;
+    }
+    .qaops-banner a:hover {
+      background: var(--getnet-red);
+      border-color: var(--getnet-red);
+      color: #FFFFFF;
+    }
 
+    /* Cabecera Oficial Estilo https://www.getnet.net/es/ (#santandercloud-header / .cc001header) */
     header.site-header {
-      background: #ffffff;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+      background: var(--getnet-white);
+      box-shadow: 0 2px 16px rgba(25, 25, 25, 0.06);
       position: sticky;
       top: 0;
-      z-index: 50;
-      border-bottom: 3px solid var(--getnet-red);
+      z-index: 100;
+      border-bottom: 1px solid var(--getnet-border);
     }
     .header-inner {
-      max-width: 1280px;
+      max-width: 1320px;
       margin: 0 auto;
-      padding: 15px 24px;
+      padding: 16px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+    }
+    .brand-svg-wrap {
+      display: flex;
+      align-items: center;
       gap: 12px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-logo {
+    .brand-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--getnet-border);
+    }
+    .brand-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--getnet-charcoal);
+      letter-spacing: -0.2px;
+    }
+    .brand-subtitle {
+      font-size: 0.74rem;
+      color: var(--getnet-body);
+      font-weight: 500;
+    }
+
+    /* Menú de Navegación Superior Getnet.net/es */
+    .getnet-nav {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+    .getnet-nav a {
+      color: var(--getnet-charcoal);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 6px 0;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      cursor: pointer;
+    }
+    .getnet-nav a:hover, .getnet-nav a.active-nav {
+      color: var(--getnet-red);
+      border-bottom-color: var(--getnet-red);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .phone-pill {
+      background: var(--getnet-sky);
+      color: var(--getnet-charcoal);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid var(--getnet-sky-border);
+    }
+
+    /* Botones Píldora Oficiales Getnet (button-with-color-red & button-transparent-with-color) */
+    .btn-primary {
+      background: var(--getnet-red);
+      color: var(--getnet-white);
+      border: 1.5px solid var(--getnet-red);
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 0.88rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(236, 0, 0, 0.2);
+    }
+    .btn-primary:hover {
+      background: var(--getnet-red-hover);
+      border-color: var(--getnet-red-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(236, 0, 0, 0.28);
+    }
+    .btn-outline {
+      background: var(--getnet-white);
+      color: var(--getnet-red);
+      border: 1.5px solid var(--getnet-red);
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 0.86rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-outline:hover {
+      background: var(--getnet-red-soft);
+    }
+
+    /* Hero Banner Estilo https://www.getnet.net/es/ (.cc010imageandtextbanner.sky-blue-background) */
+    .hero {
+      background: var(--getnet-sky);
+      color: var(--getnet-charcoal);
+      padding: 48px 28px;
+      border-bottom: 1px solid var(--getnet-sky-border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background: var(--getnet-red);
+    }
+    .hero-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.45fr 1.15fr;
+      gap: 40px;
+      align-items: center;
+    }
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; }
+    }
+    .highlight-red {
+      display: inline-block;
+      color: var(--getnet-red);
+      font-weight: 800;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      margin-bottom: 10px;
+    }
+    .c-tag-info {
+      display: inline-block;
+      background: var(--getnet-tag-bg);
+      color: var(--getnet-tag-text);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 4px 11px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--getnet-charcoal);
+      margin-bottom: 14px;
+      line-height: 1.18;
+      letter-spacing: -0.5px;
+    }
+    .hero p {
+      font-size: 1.02rem;
+      color: var(--getnet-body);
+      max-width: 720px;
+      margin-bottom: 22px;
+    }
+    .hero-cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Escaparate Visual Derecha Hero: Tarjeta Corporativa Getnet EMV + KPIs QAOps */
+    .hero-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .getnet-card-visual {
+      background: linear-gradient(135deg, #EC0000 0%, #B30000 55%, #191919 100%);
+      color: #FFFFFF;
+      border-radius: 20px;
+      padding: 24px 26px;
+      box-shadow: 0 20px 40px rgba(236, 0, 0, 0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .getnet-card-visual::after {
+      content: "";
+      position: absolute;
+      right: -30px;
+      bottom: -30px;
+      width: 140px;
+      height: 140px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.08);
+      transform: rotate(18deg);
+    }
+    .card-visual-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .emv-chip {
       width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #ec0000 0%, #991b1b 100%);
-      color: #fff;
-      font-weight: 900;
-      font-size: 1.25rem;
+      height: 34px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%);
+      border: 1px solid rgba(255,255,255,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 10px rgba(236, 0, 0, 0.25);
+      font-size: 0.65rem;
+      color: #78350F;
+      font-weight: 900;
     }
-    .brand-title { font-size: 1.3rem; font-weight: 900; color: var(--getnet-dark); letter-spacing: -0.3px; }
-    .brand-subtitle { font-size: 0.78rem; color: var(--getnet-red); font-weight: 700; }
-    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .phone-pill {
-      background: var(--getnet-light);
-      color: #991b1b;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 0.83rem;
+    .card-visual-pan {
+      font-family: 'Consolas', monospace;
+      font-size: 1.3rem;
+      letter-spacing: 3px;
+      margin-bottom: 14px;
       font-weight: 700;
-      border: 1px solid #fecaca;
     }
-    .btn-primary {
-      background: var(--getnet-red);
-      color: #fff;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s;
-      font-size: 0.9rem;
-    }
-    .btn-primary:hover { background: #b91c1c; }
-    .btn-outline {
-      background: #fff;
-      color: var(--getnet-red);
-      border: 1.5px solid var(--getnet-red);
-      padding: 9px 15px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.88rem;
-    }
-    .btn-outline:hover { background: var(--getnet-light); }
-
-    .hero {
-      background: linear-gradient(125deg, #0f172a 0%, #7f1d1d 60%, #dc2626 100%);
-      color: #fff;
-      padding: 36px 24px;
-    }
-    .hero-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.8fr 1.2fr;
-      gap: 28px;
-      align-items: center;
-    }
-    .breadcrumb { font-size: 0.82rem; opacity: 0.85; margin-bottom: 8px; }
-    .hero h1 { font-size: 1.95rem; margin-bottom: 12px; line-height: 1.22; }
-    .hero p { font-size: 0.98rem; opacity: 0.94; max-width: 720px; }
-    .hero-kpis {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 12px;
-      padding: 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .kpi-box { background: rgba(15, 23, 42, 0.55); padding: 10px 12px; border-radius: 8px; }
-    .kpi-box strong { display: block; font-size: 1.3rem; color: #fca5a5; }
-    .kpi-box span { font-size: 0.77rem; }
-
-    .main-container { max-width: 1280px; margin: 26px auto 60px; padding: 0 24px; }
-    .section-heading {
-      font-size: 1.32rem;
-      color: var(--getnet-dark);
-      margin-bottom: 16px;
+    .card-visual-bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
+      font-size: 0.78rem;
+      opacity: 0.92;
     }
-    .services-grid {
+
+    .hero-kpis {
+      background: var(--getnet-white);
+      border: 1px solid var(--getnet-sky-border);
+      border-radius: 16px;
+      padding: 16px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 16px;
-      margin-bottom: 30px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(25, 25, 25, 0.05);
     }
-    .service-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
+    @media (max-width: 680px) {
+      .hero-kpis { grid-template-columns: 1fr 1fr; }
+    }
+    .kpi-box {
+      background: var(--getnet-sky);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      border-bottom: 3px solid var(--getnet-red);
+    }
+    .kpi-box strong {
+      display: block;
+      font-size: 1.2rem;
+      color: var(--getnet-red);
+      font-weight: 800;
+    }
+    .kpi-box span {
+      font-size: 0.73rem;
+      color: var(--getnet-body);
+      font-weight: 600;
+    }
+
+    /* Banda de Propuesta de Valor Oficial de https://www.getnet.net/es/ */
+    .getnet-pillars-strip {
+      background: var(--getnet-white);
+      border-bottom: 1px solid var(--getnet-border);
+      padding: 32px 28px;
+    }
+    .pillars-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    @media (max-width: 960px) {
+      .pillars-inner { grid-template-columns: 1fr; }
+    }
+    .pillar-box {
+      background: var(--getnet-sky);
+      border-radius: 16px;
+      padding: 22px 24px;
+      border: 1px solid var(--getnet-sky-border);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .pillar-box h3 {
+      font-size: 1.08rem;
+      color: var(--getnet-charcoal);
+      margin: 6px 0 8px;
+      font-weight: 800;
+    }
+    .pillar-box p {
+      font-size: 0.87rem;
+      color: var(--getnet-body);
+    }
+
+    /* Contenedor Principal */
+    .main-container {
+      max-width: 1320px;
+      margin: 36px auto 64px;
+      padding: 0 28px;
+    }
+    .section-heading {
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-heading h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--getnet-charcoal);
+      letter-spacing: -0.3px;
+    }
+
+    /* Tarjetas de Soluciones Getnet (.cc023cards / .service-card) */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+      margin-bottom: 42px;
+    }
+    .service-card {
+      background: var(--getnet-white);
+      border: 1px solid var(--getnet-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       cursor: pointer;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(25, 25, 25, 0.04);
+    }
+    .service-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 24px;
+      width: 42px;
+      height: 4px;
+      background: var(--getnet-red);
+      border-radius: 0 0 4px 4px;
     }
     .service-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 32px rgba(25, 25, 25, 0.1);
       border-color: var(--getnet-red);
     }
-    .service-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .service-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
     .service-icon {
-      font-size: 1.7rem;
-      background: var(--getnet-light);
-      width: 46px;
-      height: 46px;
-      border-radius: 10px;
+      font-size: 1.65rem;
+      background: var(--getnet-red-soft);
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
-    .service-card h3 { font-size: 1.05rem; color: var(--getnet-dark); }
-    .service-card p { font-size: 0.89rem; color: var(--text-muted); margin-bottom: 14px; }
+    .service-card h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--getnet-charcoal);
+      line-height: 1.3;
+    }
+    .service-card p {
+      font-size: 0.9rem;
+      color: var(--getnet-body);
+      margin-bottom: 18px;
+    }
     .service-card-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.83rem;
+      font-size: 0.85rem;
       color: var(--getnet-red);
       font-weight: 700;
+      padding-top: 12px;
+      border-top: 1px solid var(--getnet-border);
     }
 
+    /* Barra de Pestañas Estilo Píldora Getnet */
     .tabs-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 22px;
+      background: var(--getnet-sky);
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid var(--getnet-sky-border);
+      margin-bottom: 20px;
     }
     .tab-btn {
-      background: #e2e8f0;
-      color: var(--getnet-dark);
+      background: transparent;
+      color: var(--getnet-charcoal);
       border: none;
-      padding: 11px 16px;
-      border-radius: 8px 8px 0 0;
+      padding: 11px 18px;
+      border-radius: 999px;
       font-weight: 700;
       cursor: pointer;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
+      transition: all 0.18s ease;
     }
-    .tab-btn.active { background: var(--getnet-red); color: #fff; }
+    .tab-btn:hover {
+      background: rgba(236, 0, 0, 0.08);
+      color: var(--getnet-red);
+    }
+    .tab-btn.active {
+      background: var(--getnet-red);
+      color: var(--getnet-white);
+      box-shadow: 0 4px 12px rgba(236, 0, 0, 0.25);
+    }
+
     .tab-panel {
       display: none;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 0 10px 10px 10px;
-      padding: 26px;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+      background: var(--getnet-white);
+      border: 1px solid var(--getnet-border);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 10px 28px rgba(25, 25, 25, 0.05);
     }
     .tab-panel.active { display: block; }
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 16px;
-      margin-bottom: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 20px;
     }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 0.84rem; font-weight: 700; color: var(--getnet-dark); }
+    .form-group label {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--getnet-charcoal);
+    }
     .form-group input, .form-group select, .form-group textarea {
-      padding: 10px 12px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 6px;
+      padding: 11px 14px;
+      border: 1.5px solid #CED6DE;
+      border-radius: 10px;
       font-size: 0.92rem;
-      color: var(--text-main);
+      color: var(--getnet-charcoal);
+      background: var(--getnet-white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--getnet-red);
+      box-shadow: 0 0 0 3px rgba(236, 0, 0, 0.12);
     }
 
     .results-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-      gap: 14px;
-      margin-top: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+      margin-top: 22px;
     }
     .center-card {
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--getnet-red);
-      border-radius: 8px;
-      padding: 16px;
-      background: #fff;
+      border: 1px solid var(--getnet-border);
+      border-left: 5px solid var(--getnet-red);
+      border-radius: 12px;
+      padding: 18px;
+      background: var(--getnet-sky);
+      transition: transform 0.15s;
     }
-    .center-card h4 { color: var(--getnet-dark); margin-bottom: 4px; font-size: 0.98rem; }
+    .center-card:hover { transform: translateY(-2px); }
+    .center-card h4 {
+      color: var(--getnet-charcoal);
+      margin-bottom: 6px;
+      font-size: 1rem;
+      font-weight: 800;
+    }
     .badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 99px;
+      padding: 4px 10px;
+      border-radius: 999px;
       font-size: 0.74rem;
       font-weight: 700;
       margin-right: 6px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
-    .badge-blue { background: #eff6ff; color: #1d4ed8; }
-    .badge-green { background: #dcfce7; color: #166534; }
-    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: var(--getnet-tag-bg); color: var(--getnet-tag-text); }
+    .badge-green { background: #DCFCE7; color: #166534; }
+    .badge-red { background: #FEE2E2; color: #B91C1C; }
 
     .alert-box {
-      margin-top: 18px;
-      padding: 16px 18px;
-      border-radius: 8px;
+      margin-top: 20px;
+      padding: 18px 20px;
+      border-radius: 12px;
       font-size: 0.93rem;
       display: none;
     }
     .alert-box.show { display: block; }
-    .alert-success { background: #ecfdf5; border: 1.5px solid #10b981; color: #065f46; }
-    .alert-error { background: #fef2f2; border: 1.5px solid #ef4444; color: #991b1b; }
-    .alert-warning { background: #fffbeb; border: 1.5px solid #f59e0b; color: #92400e; }
+    .alert-success { background: #ECFDF5; border: 1.5px solid #10B981; color: #065F46; }
+    .alert-error { background: #FEF2F2; border: 1.5px solid #EF4444; color: #991B1B; }
+    .alert-warning { background: #FFFBEB; border: 1.5px solid #F59E0B; color: #92400E; }
 
     .digital-card {
-      background: linear-gradient(135deg, #0f172a 0%, #991b1b 60%, #ec0000 100%);
-      color: #fff;
-      border-radius: 14px;
-      padding: 22px;
-      max-width: 450px;
+      background: linear-gradient(135deg, #EC0000 0%, #990000 55%, #191919 100%);
+      color: #FFFFFF;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 460px;
       margin-top: 16px;
-      box-shadow: 0 10px 24px rgba(153, 27, 27, 0.3);
+      box-shadow: 0 14px 30px rgba(236, 0, 0, 0.25);
     }
     .digital-card-num {
       font-family: 'Consolas', monospace;
-      font-size: 1.25rem;
-      letter-spacing: 2px;
+      font-size: 1.28rem;
+      letter-spacing: 2.5px;
       margin: 14px 0;
-      color: #fecaca;
+      color: #FFFFFF;
+      font-weight: 700;
     }
+
+    /* Footer Corporativo Oficial Estilo https://www.getnet.net/es/ */
+    footer.getnet-footer {
+      background: #191919;
+      color: #D1D5DB;
+      padding: 44px 28px 32px;
+      border-top: 4px solid var(--getnet-red);
+    }
+    .footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+    }
+    .footer-links a {
+      color: #D1D5DB;
+      text-decoration: none;
+    }
+    .footer-links a:hover { color: #FFFFFF; text-decoration: underline; }
   </style>
 </head>
 <body>
 
-  <!-- Barra de Control QAOps & Autonomous ALM (Getnet CIO Demo) -->
+  <!-- Barra Superior QAOps & Autonomous ALM (Getnet CIO Demo) -->
   <div class="qaops-banner" data-testid="qaops-banner">
     <div>
-      <strong>GETNET (GRUPO SANTANDER) · AUTONOMOUS PRODUCTION ALM (TARJETAS BANCARIAS)</strong> · Ciclo Zero Human-in-the-Loop (<code>AWS_Kiro ATM Sentinel</code> + <code>Dynatrace &amp; CloudWatch MCP</code> + <code>Motor RAG</code> + <code>Jira Xray</code>)
+      <strong>GETNET ESPAÑA (GRUPO SANTANDER) · AUTONOMOUS PRODUCTION ALM</strong> · Operativa 100% Tarjetas Bancarias EMV &amp; ATM (<code>AWS_Kiro</code> + <code>Dynatrace &amp; CloudWatch MCP</code> + <code>Motor RAG</code> + <code>Jira Xray</code>)
     </div>
-    <div>
-      <a href="/alm-dashboard" id="link-alm-dashboard" data-testid="link-alm-dashboard">📊 Cuadro de Mando CIO en Jira Xray (Flujo de Agentes, MCP &amp; RAG)</a>
-      <a href="/presentacion" id="link-presentacion">📽️ Presentación CIO Getnet</a>
-      <a href="/api/v1/observability/status" target="_blank" id="link-api-obs">🔭 Estado Dynatrace, CloudWatch &amp; Kiro</a>
-      <a href="/api/v1/health" target="_blank" id="link-api-health">⚡ API Health</a>
+    <div class="qaops-banner-links">
+      <a href="/alm-dashboard" id="link-alm-dashboard" data-testid="link-alm-dashboard">📊 Cuadro de Mando CIO en Jira Xray (Estados, Agentes, MCP &amp; RAG)</a>
+      <a href="/presentacion" id="link-presentacion">📽️ Presentación Ejecutiva CIO</a>
+      <a href="/api/v1/observability/status" target="_blank" id="link-api-obs">🔭 Telemetría Dynatrace &amp; CloudWatch</a>
+      <a href="/api/v1/health" target="_blank" id="link-api-health">⚡ Health API</a>
     </div>
   </div>
 
-  <!-- Cabecera Corporativa Getnet -->
-  <header class="site-header">
+  <!-- Cabecera Corporativa Oficial Getnet España (https://www.getnet.net/es/) -->
+  <header class="site-header" id="santandercloud-header">
     <div class="header-inner">
       <div class="brand">
-        <div class="brand-logo">G</div>
+        <div class="brand-svg-wrap">
+          <!-- Logo Vectorial Oficial de Getnet (https://www.getnet.net/content/dam/getnet/logos/Getnet.svg) -->
+          <svg width="128" height="28" viewBox="0 0 113 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Getnet Logo Oficial">
+            <path d="M59.3311 5.96402C57.5749 5.96402 55.0239 6.32762 52.7051 6.89321V23.4672H56.3486V9.34498C57.3428 9.17833 58.3697 9.07985 59.2301 9.07985C62.8737 9.07985 63.7341 10.3398 63.7341 12.9582V23.4672H67.3776V12.3295C67.3801 8.31731 65.4272 5.96402 59.3311 5.96402ZM15.1065 20.3514C14.1124 20.5509 13.0198 20.6822 12.0585 20.6822C7.02213 20.6822 3.84287 17.7658 3.84287 11.8321C3.84287 6.39579 6.79 3.31278 12.2225 3.31278C14.5413 3.31278 16.3631 3.71173 17.9855 4.24198C18.3161 3.21431 18.581 1.98716 18.6491 0.893846C16.9258 0.297949 14.7735 0 12.2225 0C4.47115 0 0 4.31015 0 11.9659C0 18.9929 4.075 24 11.7935 24C14.2789 24 16.9283 23.5354 18.8157 22.7729V10.9711H15.1065V20.3514ZM78.2805 5.96402C72.4846 5.96402 70.1986 9.87523 70.1986 14.8141C70.1986 20.4827 73.1457 23.8637 79.2418 23.8637C81.1973 23.8637 82.951 23.5657 84.6087 22.8032C84.8409 21.7098 85.0402 20.4499 85.1714 19.4878C83.3496 20.316 81.3285 20.7478 79.3402 20.7478C76.0954 20.7478 74.372 19.3212 73.9077 16.372H85.5347C85.6659 15.41 85.7341 14.5818 85.7341 13.5541C85.7341 9.3778 83.4808 5.96402 78.2805 5.96402ZM73.8421 13.3218C74.1399 10.5039 75.4973 9.01168 78.0811 9.01168C80.5993 9.01168 82.0552 10.6024 82.0552 13.3218H73.8421ZM97.7925 9.64293C97.9591 8.68091 98.0575 7.65323 98.1231 6.52709H92.3601V0.262599C91.2347 0.262599 89.8419 0.429248 88.7165 0.792846V18.1976C88.7165 22.2426 90.9698 23.8662 94.5124 23.8662C95.5393 23.8662 96.5991 23.7349 97.5932 23.3359C97.7925 22.3739 97.9238 21.2478 98.0247 20.2529C97.2299 20.5509 96.2357 20.7503 95.176 20.7503C93.4198 20.7503 92.3601 19.9221 92.3601 17.7658V9.64293H97.7925ZM49.7252 9.64293C49.8917 8.68091 49.9901 7.65323 50.0557 6.52709H44.2927V0.262599C43.1673 0.262599 41.7745 0.429248 40.6491 0.792846V18.1976C40.6491 22.2426 42.9024 23.8662 46.445 23.8662C47.4719 23.8662 48.5317 23.7349 49.5258 23.3359C49.7252 22.3739 49.8564 21.2478 49.9573 20.2529C49.1625 20.5509 48.1683 20.7503 47.1086 20.7503C45.3524 20.7503 44.2927 19.9221 44.2927 17.7658V9.64293H49.7252ZM30.2131 5.96402C24.4172 5.96402 22.1312 9.87523 22.1312 14.8141C22.1312 20.4827 25.0783 23.8637 31.1744 23.8637C33.1299 23.8637 34.8836 23.5657 36.5413 22.8032C36.7735 21.7098 36.9728 20.4499 37.104 19.4878C35.2822 20.316 33.2611 20.7478 31.2728 20.7478C28.028 20.7478 26.3046 19.3212 25.8403 16.372H37.4673C37.5985 15.41 37.6667 14.5818 37.6667 13.5541C37.6667 9.3778 35.4134 5.96402 30.2131 5.96402ZM25.7722 13.3218C26.0699 10.5039 27.4274 9.01168 30.0112 9.01168C32.5294 9.01168 33.9853 10.6024 33.9853 13.3218H25.7722ZM111.14 9.64293H113V7.78201H111.14V9.64293ZM111.14 5.92109H113V4.06018H111.14V5.92109ZM107.421 2.19926H109.281V0.338347H107.421V2.19926ZM103.702 9.64293H105.562V7.78201H103.702V9.64293ZM107.421 5.92109H109.281V4.06018H107.421V5.92109ZM111.14 0.338347V2.19926H113V0.338347H111.14ZM103.702 5.92109H105.562V4.06018H103.702V5.92109ZM103.702 2.19926H105.562V0.338347H103.702V2.19926ZM107.421 9.64293H109.281V7.78201H107.421V9.64293Z" fill="#EC0000"/>
+          </svg>
+        </div>
+        <div class="brand-divider"></div>
         <div>
           <div class="brand-title" id="header-brand-title">Getnet · Grupo Santander</div>
-          <div class="brand-subtitle">Plataforma Operativa de Tarjetas Bancarias EMV, Autorización ISO-8583, Chargebacks &amp; Cajeros ATM</div>
+          <div class="brand-subtitle">Soluciones de pago y tarjetas bancarias para empresas</div>
         </div>
       </div>
+
+      <nav class="getnet-nav" aria-label="Navegación Principal Getnet">
+        <a onclick="activateTab('tab-cuadro')" class="active-nav">Tu negocio · Parque Tarjetas</a>
+        <a onclick="activateTab('tab-autorizaciones')">Get Smart · ISO-8583</a>
+        <a onclick="activateTab('tab-disputas')">Get Checkout · Chargebacks</a>
+        <a onclick="activateTab('tab-bloqueo-atm')">Red ATM · AWS Kiro</a>
+        <a href="/alm-dashboard">Cuadro de Mando CIO</a>
+      </nav>
+
       <div class="header-actions">
-        <span class="phone-pill">🚨 SOC Tarjetas &amp; ATM Sentinel 24h: 900 50 50 40 · Release: {{ system_state.currentRelease }}</span>
-        <button class="btn-outline" onclick="activateTab('tab-bloqueo-atm')" data-testid="header-btn-bloqueo">🚨 Bloqueo Preventivo Tarjeta ATM</button>
-        <button class="btn-outline" onclick="activateTab('tab-cuadro')" data-testid="header-btn-cuadro">💳 Parque de Tarjetas EMV</button>
-        <button class="btn-primary" onclick="activateTab('tab-area-cliente')" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">🔐 Área Titular Tarjeta</button>
+        <span class="phone-pill">Soporte 24/7 · {{ system_state.currentRelease }}</span>
+        <button class="btn-outline" onclick="activateTab('tab-bloqueo-atm')" data-testid="header-btn-bloqueo">🚨 Bloqueo Preventivo ATM</button>
+        <button class="btn-outline" onclick="activateTab('tab-cuadro')" data-testid="header-btn-cuadro">💳 Parque de Tarjetas</button>
+        <button class="btn-primary" onclick="activateTab('tab-area-cliente')" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">Acceso Clientes · Área Titular</button>
       </div>
     </div>
   </header>
 
-  <!-- Hero Principal -->
+  <!-- Hero Principal Estilo https://www.getnet.net/es/ (.cc010imageandtextbanner.sky-blue-background) -->
   <section class="hero">
     <div class="hero-inner">
       <div>
-        <div class="breadcrumb">Inicio &gt; Getnet Card Core &gt; <strong>Operativa de Tarjetas Bancarias y Red ATM</strong></div>
-        <h1 id="hero-title" data-testid="hero-title">Getnet · Gestión integral de tarjetas bancarias EMV, bloqueo preventivo en cajeros ATM, autorizaciones ISO-8583 y disputas online</h1>
-        <p>Consulta el parque de tarjetas bancarias corporativas y particulares (Visa / Mastercard EMV), tramita autorizaciones ISO-8583 y 3D-Secure 2.2, gestiona disputas y contracargos (chargebacks), y simula el ciclo autónomo de bloqueo de tarjetas con <strong>AWS Kiro</strong>, <strong>Dynatrace MCP</strong>, <strong>AWS CloudWatch MCP</strong> y <strong>Motor RAG</strong> sin Human-in-the-Loop.</p>
+        <span class="highlight-red">SOLUCIONES DE PAGO PARA EMPRESAS · TARJETAS EMV &amp; CAJEROS ATM</span>
+        <h1 id="hero-title" data-testid="hero-title">Getnet · Soluciones de pago y gestión integral de tarjetas bancarias EMV, cajeros ATM, autorizaciones ISO-8583 y disputas online</h1>
+        <p>Getnet es la fintech líder en soluciones de pago en Iberia y América Latina, perteneciente al <strong>Grupo Santander</strong>. Tecnología compleja hecha sencilla para ti: gestiona el parque de tarjetas bancarias, pasarela de autorización EMV y auto-remediación en producción con <strong>AWS Kiro</strong>, <strong>Dynatrace MCP</strong>, <strong>AWS CloudWatch MCP</strong> y <strong>Motor RAG</strong> sin Human-in-the-Loop.</p>
+        <div class="hero-cta-row">
+          <button class="btn-primary" onclick="activateTab('tab-bloqueo-atm')">Probar Bloqueo Preventivo ATM (AWS Kiro) →</button>
+          <a href="/alm-dashboard" class="btn-outline" style="text-decoration:none;">Abrir Conectores MCP (Dynatrace &amp; CloudWatch)</a>
+        </div>
       </div>
-      <div class="hero-kpis" data-testid="hero-kpis">
-        <div class="kpi-box">
-          <strong>100% Tarjetas</strong>
-          <span>Visa &amp; Mastercard EMV / ATM</span>
+
+      <div class="hero-showcase">
+        <div class="getnet-card-visual">
+          <div class="card-visual-top">
+            <div>
+              <div style="font-size:0.72rem;font-weight:800;letter-spacing:1px;opacity:0.9;">GETNET CORPORATE PREMIER · GRUPO SANTANDER</div>
+              <div style="font-size:0.95rem;font-weight:800;">Visa Infinite Business EMV · Contactless</div>
+            </div>
+            <div class="emv-chip">EMV</div>
+          </div>
+          <div class="card-visual-pan">4548 •••• •••• 9012</div>
+          <div class="card-visual-bottom">
+            <span>PROTECCIÓN PCI-DSS 4.0 · AWS KIRO REDACT_PAN</span>
+            <span>ISO-8583 MTI 0100 / 0420</span>
+          </div>
         </div>
-        <div class="kpi-box">
-          <strong>Zero-Touch</strong>
-          <span>5 Agentes + Motor RAG</span>
+
+        <div class="hero-kpis" data-testid="hero-kpis">
+          <div class="kpi-box">
+            <strong>100% Tarjetas</strong>
+            <span>Visa &amp; Mastercard EMV</span>
+          </div>
+          <div class="kpi-box">
+            <strong>Zero-Touch</strong>
+            <span>5 Agentes + Motor RAG</span>
+          </div>
+          <div class="kpi-box">
+            <strong>&lt; 6 seg</strong>
+            <span>MTTR Auto-Fix PRO</span>
+          </div>
+          <div class="kpi-box">
+            <strong>14 / 14</strong>
+            <span>Tests Jira Xray</span>
+          </div>
         </div>
-        <div class="kpi-box">
-          <strong>&lt; 6 seg</strong>
-          <span>MTTR Auto-Fix &amp; Re-Deploy</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pilares Oficiales de Getnet España (https://www.getnet.net/es/) -->
+  <section class="getnet-pillars-strip">
+    <div class="pillars-inner">
+      <div class="pillar-box">
+        <div>
+          <span class="c-tag-info">EN TU COMERCIO FÍSICO Y RED ATM</span>
+          <h3>El ecosistema de tarjetas y terminales más vendido — Get Smart &amp; Red ATM</h3>
+          <p>Acepta pagos con tarjeta chip EMV, Contactless y Wallet NFC con supervisión de seguridad física 24/7 en cajeros mediante <code>AWS_Kiro-main</code>.</p>
         </div>
-        <div class="kpi-box">
-          <strong>14 / 14</strong>
-          <span>Casos de Tarjetas Jira Xray</span>
+      </div>
+      <div class="pillar-box">
+        <div>
+          <span class="c-tag-info">PAGOS ONLINE Y AUTORIZACIÓN EMV</span>
+          <h3>Todo lo que necesitas para procesar tarjetas — Get Checkout &amp; ISO-8583</h3>
+          <p>Pasarela de autorización instantánea MTI 0100/0110, autenticación reforzada 3D-Secure 2.2 y gestión automatizada de disputas y chargebacks.</p>
+        </div>
+      </div>
+      <div class="pillar-box">
+        <div>
+          <span class="c-tag-info">SOPORTE 24/7 CON EQUIPO ESPECIALIZADO</span>
+          <h3>Observabilidad MCP (Dynatrace &amp; CloudWatch) + Base RAG Zero-Touch</h3>
+          <p>Detección, triaje, análisis RCA en modelo RAG, re-fixing en caliente y Canary Re-Deploy sin intervención humana certificado en Jira Xray.</p>
         </div>
       </div>
     </div>
@@ -366,14 +783,18 @@
   <!-- Contenido Principal -->
   <main class="main-container">
     <div class="section-heading">
-      <h2>Catálogo de Operativa Funcional de Tarjetas Bancarias Getnet</h2>
-      <span style="font-size:0.85rem;color:var(--text-muted);">Todos los casos funcionales están centrados exclusivamente en el ciclo de vida de tarjetas bancarias</span>
+      <div>
+        <span class="highlight-red">NUESTRAS SOLUCIONES DE TARJETAS BANCARIAS</span>
+        <h2>Tecnología compleja hecha sencilla para tu operativa de tarjetas</h2>
+      </div>
+      <span style="font-size:0.86rem;color:var(--getnet-body);font-weight:600;">6 Módulos Funcionales de Tarjetas Bancarias · 14 Casos Certificados en Jira Xray</span>
     </div>
 
     <div class="services-grid" id="catalogo-servicios-grid" data-testid="catalogo-servicios-grid">
       {% for srv in servicios %}
       <article class="service-card" id="{{ srv.id }}" data-testid="service-card-{{ srv.codigo }}" onclick="activateTab('{{ srv.tab_target }}')">
         <div>
+          <span class="c-tag-info">SOLUCIÓN GETNET TARJETAS</span>
           <div class="service-card-header">
             <div class="service-icon">{{ srv.icono }}</div>
             <h3>{{ srv.titulo }}</h3>
@@ -381,7 +802,7 @@
           <p>{{ srv.descripcion }}</p>
         </div>
         <div class="service-card-footer">
-          <span>Abrir operativa de tarjeta →</span>
+          <span>Saber más · Abrir operativa →</span>
           <span>SLA &lt; {{ srv.sla_respuesta_ms }}ms</span>
         </div>
       </article>
@@ -391,17 +812,18 @@
     <!-- Pestañas de Gestión Interactiva de Tarjetas Bancarias -->
     <div class="tabs-bar" role="tablist">
       <button class="tab-btn active" id="btn-tab-cuadro" data-testid="btn-tab-cuadro" onclick="activateTab('tab-cuadro')">💳 1. Parque de Tarjetas EMV &amp; Red ATM</button>
-      <button class="tab-btn" id="btn-tab-autorizaciones" data-testid="btn-tab-autorizaciones" onclick="activateTab('tab-autorizaciones')">🔐 2. Autorizaciones de Tarjetas ISO-8583</button>
-      <button class="tab-btn" id="btn-tab-disputas" data-testid="btn-tab-disputas" onclick="activateTab('tab-disputas')">🛡️ 3. Disputas &amp; Chargebacks de Tarjetas</button>
-      <button class="tab-btn" id="btn-tab-area-cliente" data-testid="btn-tab-area-cliente" onclick="activateTab('tab-area-cliente')">📲 4. Área Titular &amp; Tarjeta Digital Wallet</button>
-      <button class="tab-btn" id="btn-tab-videoconsulta" data-testid="btn-tab-videoconsulta" onclick="activateTab('tab-videoconsulta')">🛠️ 5. Soporte Criptográfico EMV / HSM 24h</button>
-      <button class="tab-btn" id="btn-tab-bloqueo-atm" data-testid="btn-tab-bloqueo-atm" onclick="activateTab('tab-bloqueo-atm')">🚨 6. Bloqueo de Tarjetas en ATM (AWS Kiro + Dynatrace + CloudWatch)</button>
+      <button class="tab-btn" id="btn-tab-autorizaciones" data-testid="btn-tab-autorizaciones" onclick="activateTab('tab-autorizaciones')">🔐 2. Autorizaciones ISO-8583 (Get Smart)</button>
+      <button class="tab-btn" id="btn-tab-disputas" data-testid="btn-tab-disputas" onclick="activateTab('tab-disputas')">🛡️ 3. Disputas &amp; Chargebacks (Get Checkout)</button>
+      <button class="tab-btn" id="btn-tab-area-cliente" data-testid="btn-tab-area-cliente" onclick="activateTab('tab-area-cliente')">📲 4. Área Titular &amp; Wallet Digital</button>
+      <button class="tab-btn" id="btn-tab-videoconsulta" data-testid="btn-tab-videoconsulta" onclick="activateTab('tab-videoconsulta')">🛠️ 5. Soporte Criptográfico EMV / HSM 24/7</button>
+      <button class="tab-btn" id="btn-tab-bloqueo-atm" data-testid="btn-tab-bloqueo-atm" onclick="activateTab('tab-bloqueo-atm')">🚨 6. Bloqueo ATM (AWS Kiro + Dynatrace + CloudWatch)</button>
     </div>
 
     <!-- PANEL 1: PARQUE DE TARJETAS BANCARIAS EMV & RED DE CAJEROS ATM -->
     <section class="tab-panel active" id="tab-cuadro" data-testid="panel-parque-tarjetas">
-      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Buscador de Parque de Tarjetas Bancarias Emitidas, Nodos Emisores y Cajeros ATM 24h</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Filtra por provincia, tipo de tarjeta bancaria EMV o programa corporativo Getnet / Santander.</p>
+      <span class="c-tag-info">PARQUE EMISOR Y ADQUIRENTE GETNET</span>
+      <h3 style="color:var(--getnet-charcoal);margin-bottom:6px;font-size:1.3rem;">Buscador de Parque de Tarjetas Bancarias Emitidas, Nodos Emisores y Cajeros ATM 24h</h3>
+      <p style="font-size:0.92rem;color:var(--getnet-body);margin-bottom:20px;">Filtra por provincia, tipo de tarjeta bancaria EMV o programa corporativo Getnet / Grupo Santander.</p>
 
       <form id="form-parque-tarjetas" onsubmit="buscarParqueTarjetas(event)">
         <div class="form-grid">
@@ -444,7 +866,7 @@
           </div>
         </div>
         <button type="submit" class="btn-primary" id="btn-buscar-cuadro" data-testid="btn-buscar-cuadro">🔍 Buscar en Parque de Tarjetas</button>
-        <span id="cm-contador" data-testid="cm-contador" style="margin-left:14px;font-weight:700;color:var(--getnet-dark);">
+        <span id="cm-contador" data-testid="cm-contador" style="margin-left:14px;font-weight:700;color:var(--getnet-charcoal);">
           Mostrando {{ parque_inicial|length }} nodos de tarjetas bancarias activos
         </span>
       </form>
@@ -453,7 +875,7 @@
         {% for c in parque_inicial %}
         <div class="center-card" data-testid="center-card-item">
           <h4>{{ c.nombre }}</h4>
-          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:4px;">👨‍💻 {{ c.responsable }}</div>
+          <div style="font-size:0.88rem;color:var(--getnet-body);margin-bottom:4px;">👨‍💻 {{ c.responsable }}</div>
           <div style="font-size:0.86rem;">📍 {{ c.direccion }} ({{ c.provincia }}) · 📞 <strong>{{ c.telefono }}</strong></div>
           <div>
             <span class="badge badge-blue">{{ c.tipo_tarjeta }}</span>
@@ -467,8 +889,9 @@
 
     <!-- PANEL 2: AUTORIZACIONES ISO-8583 Y 3D-SECURE 2.2 DE TARJETAS BANCARIAS -->
     <section class="tab-panel" id="tab-autorizaciones" data-testid="panel-autorizaciones">
-      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Pasarela de Autorización Online de Tarjetas Bancarias ISO-8583 (MTI 0100 / 0110)</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Introduce el PAN de la tarjeta bancaria (12-16 dígitos) y el tipo de operación EMV para validación instantánea.</p>
+      <span class="c-tag-info">PASARELA DE PAGOS GET SMART · ISO-8583</span>
+      <h3 style="color:var(--getnet-charcoal);margin-bottom:6px;font-size:1.3rem;">Pasarela de Autorización Online de Tarjetas Bancarias ISO-8583 (MTI 0100 / 0110)</h3>
+      <p style="font-size:0.92rem;color:var(--getnet-body);margin-bottom:20px;">Introduce el PAN de la tarjeta bancaria (12-16 dígitos) y el tipo de operación EMV para validación instantánea.</p>
 
       <form id="form-autorizaciones" onsubmit="enviarAutorizacion(event)">
         <div class="form-grid">
@@ -503,8 +926,9 @@
 
     <!-- PANEL 3: DISPUTAS, CONTRACARGOS (CHARGEBACKS) Y FRAUDE EN TARJETAS -->
     <section class="tab-panel" id="tab-disputas" data-testid="panel-disputas">
-      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Gestión de Disputas, Contracargos (Chargebacks Visa/Mastercard) y Efectivo No Dispensado en ATM</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Programas Getnet Corporate Premier (90% abono provisional inmediato) y Estándar (80%). Registra la disputa de tarjeta y calcula el abono en cuenta IBAN.</p>
+      <span class="c-tag-info">GET CHECKOUT · PROTECCIÓN ANTIFRAUDE</span>
+      <h3 style="color:var(--getnet-charcoal);margin-bottom:6px;font-size:1.3rem;">Gestión de Disputas, Contracargos (Chargebacks Visa/Mastercard) y Efectivo No Dispensado en ATM</h3>
+      <p style="font-size:0.92rem;color:var(--getnet-body);margin-bottom:20px;">Programas Getnet Corporate Premier (90% abono provisional inmediato) y Estándar (80%). Registra la disputa de tarjeta y calcula el abono en cuenta IBAN.</p>
 
       <form id="form-disputas" onsubmit="enviarDisputaTarjeta(event)">
         <div class="form-grid">
@@ -536,8 +960,9 @@
 
     <!-- PANEL 4: ÁREA TITULAR Y TARJETA BANCARIA DIGITAL TOKENIZADA -->
     <section class="tab-panel" id="tab-area-cliente" data-testid="panel-area-cliente">
-      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Acceso al Área Titular y Tarjeta Bancaria Digital Tokenizada (Wallet Getnet)</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Accede con credenciales de prueba QAOps de tarjetas (NIF: <code>12345678Z</code> / Clave: <code>Getnet2026!</code>).</p>
+      <span class="c-tag-info">PORTAL DE CLIENTES GETNET ESPAÑA</span>
+      <h3 style="color:var(--getnet-charcoal);margin-bottom:6px;font-size:1.3rem;">Acceso al Área Titular y Tarjeta Bancaria Digital Tokenizada (Wallet Getnet)</h3>
+      <p style="font-size:0.92rem;color:var(--getnet-body);margin-bottom:20px;">Accede con credenciales de prueba QAOps de tarjetas (NIF: <code>12345678Z</code> / Clave: <code>Getnet2026!</code>).</p>
 
       <form id="form-login-cliente" onsubmit="loginAreaTitular(event)">
         <div class="form-grid" style="max-width:620px;">
@@ -558,8 +983,9 @@
 
     <!-- PANEL 5: SOPORTE CRIPTOGRÁFICO EMV, PIN BLOCK HSM Y 3DS2 24H -->
     <section class="tab-panel" id="tab-videoconsulta" data-testid="panel-videoconsulta">
-      <h3 style="color:var(--getnet-dark);margin-bottom:6px;">Soporte Criptográfico EMV, Custodia HSM y Desbloqueo de Tarjetas 24h</h3>
-      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px;">Solicita asistencia técnica inmediata con especialistas en criptogramas ARQC/ARPC, rotación de claves HSM Thales y cajeros ATM.</p>
+      <span class="c-tag-info">SOPORTE 24/7 CON EQUIPO ESPECIALIZADO</span>
+      <h3 style="color:var(--getnet-charcoal);margin-bottom:6px;font-size:1.3rem;">Soporte Criptográfico EMV, Custodia HSM y Desbloqueo de Tarjetas 24h</h3>
+      <p style="font-size:0.92rem;color:var(--getnet-body);margin-bottom:20px;">Solicita asistencia técnica inmediata con especialistas en criptogramas ARQC/ARPC, rotación de claves HSM Thales y cajeros ATM.</p>
 
       <form id="form-videoconsulta" onsubmit="reservarSoporteTarjetas(event)">
         <div class="form-grid">
@@ -592,10 +1018,11 @@
 
     <!-- PANEL 6: APLICATIVO DE SISTEMA DE BLOQUEO DE TARJETAS EN ATM (AWS_KIRO) + DYNATRACE & CLOUDWATCH MCP -->
     <section class="tab-panel" id="tab-bloqueo-atm" data-testid="panel-bloqueo-atm">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
         <div>
-          <h3 style="color:var(--getnet-dark);">🚨 Aplicativo de Sistema: Bloqueo de Tarjetas Bancarias en ATM (<code>AWS_Kiro-main</code>) + Conectores MCP (Dynatrace &amp; CloudWatch)</h3>
-          <p style="font-size:0.89rem;color:var(--text-muted);">Simula en vivo una incidencia funcional de bloqueo de tarjeta desde el cajero <code>ATM-GTN-MAD-0042</code> y una incidencia de sistemas en <code>Dynatrace / CloudWatch</code> resueltas con el <strong>Motor RAG</strong> sin Human-in-the-Loop.</p>
+          <span class="c-tag-info">AUTONOMOUS PRODUCTION ALM · ZERO HUMAN-IN-THE-LOOP</span>
+          <h3 style="color:var(--getnet-charcoal);font-size:1.3rem;">🚨 Sistema de Bloqueo de Tarjetas Bancarias en ATM (<code>AWS_Kiro-main</code>) + Conectores MCP (Dynatrace &amp; CloudWatch)</h3>
+          <p style="font-size:0.9rem;color:var(--getnet-body);">Simula en vivo una incidencia funcional de bloqueo de tarjeta desde el cajero <code>ATM-GTN-MAD-0042</code> y una incidencia de sistemas en <code>Dynatrace / CloudWatch</code> resueltas con el <strong>Motor RAG</strong> sin Human-in-the-Loop.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button type="button" class="btn-outline" id="btn-portal-inject-incident" onclick="simularFalloProduccion()">🔥 1. Inyectar Fallo en PRO (ATM + Dynatrace + CloudWatch)</button>
@@ -638,6 +1065,28 @@
     </section>
   </main>
 
+  <!-- Pie de Página Oficial Estilo https://www.getnet.net/es/ -->
+  <footer class="getnet-footer">
+    <div class="footer-inner">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <svg width="113" height="24" viewBox="0 0 113 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Getnet">
+          <path d="M59.3311 5.96402C57.5749 5.96402 55.0239 6.32762 52.7051 6.89321V23.4672H56.3486V9.34498C57.3428 9.17833 58.3697 9.07985 59.2301 9.07985C62.8737 9.07985 63.7341 10.3398 63.7341 12.9582V23.4672H67.3776V12.3295C67.3801 8.31731 65.4272 5.96402 59.3311 5.96402ZM15.1065 20.3514C14.1124 20.5509 13.0198 20.6822 12.0585 20.6822C7.02213 20.6822 3.84287 17.7658 3.84287 11.8321C3.84287 6.39579 6.79 3.31278 12.2225 3.31278C14.5413 3.31278 16.3631 3.71173 17.9855 4.24198C18.3161 3.21431 18.581 1.98716 18.6491 0.893846C16.9258 0.297949 14.7735 0 12.2225 0C4.47115 0 0 4.31015 0 11.9659C0 18.9929 4.075 24 11.7935 24C14.2789 24 16.9283 23.5354 18.8157 22.7729V10.9711H15.1065V20.3514ZM78.2805 5.96402C72.4846 5.96402 70.1986 9.87523 70.1986 14.8141C70.1986 20.4827 73.1457 23.8637 79.2418 23.8637C81.1973 23.8637 82.951 23.5657 84.6087 22.8032C84.8409 21.7098 85.0402 20.4499 85.1714 19.4878C83.3496 20.316 81.3285 20.7478 79.3402 20.7478C76.0954 20.7478 74.372 19.3212 73.9077 16.372H85.5347C85.6659 15.41 85.7341 14.5818 85.7341 13.5541C85.7341 9.3778 83.4808 5.96402 78.2805 5.96402ZM73.8421 13.3218C74.1399 10.5039 75.4973 9.01168 78.0811 9.01168C80.5993 9.01168 82.0552 10.6024 82.0552 13.3218H73.8421ZM97.7925 9.64293C97.9591 8.68091 98.0575 7.65323 98.1231 6.52709H92.3601V0.262599C91.2347 0.262599 89.8419 0.429248 88.7165 0.792846V18.1976C88.7165 22.2426 90.9698 23.8662 94.5124 23.8662C95.5393 23.8662 96.5991 23.7349 97.5932 23.3359C97.7925 22.3739 97.9238 21.2478 98.0247 20.2529C97.2299 20.5509 96.2357 20.7503 95.176 20.7503C93.4198 20.7503 92.3601 19.9221 92.3601 17.7658V9.64293H97.7925ZM49.7252 9.64293C49.8917 8.68091 49.9901 7.65323 50.0557 6.52709H44.2927V0.262599C43.1673 0.262599 41.7745 0.429248 40.6491 0.792846V18.1976C40.6491 22.2426 42.9024 23.8662 46.445 23.8662C47.4719 23.8662 48.5317 23.7349 49.5258 23.3359C49.7252 22.3739 49.8564 21.2478 49.9573 20.2529C49.1625 20.5509 48.1683 20.7503 47.1086 20.7503C45.3524 20.7503 44.2927 19.9221 44.2927 17.7658V9.64293H49.7252ZM30.2131 5.96402C24.4172 5.96402 22.1312 9.87523 22.1312 14.8141C22.1312 20.4827 25.0783 23.8637 31.1744 23.8637C33.1299 23.8637 34.8836 23.5657 36.5413 22.8032C36.7735 21.7098 36.9728 20.4499 37.104 19.4878C35.2822 20.316 33.2611 20.7478 31.2728 20.7478C28.028 20.7478 26.3046 19.3212 25.8403 16.372H37.4673C37.5985 15.41 37.6667 14.5818 37.6667 13.5541C37.6667 9.3778 35.4134 5.96402 30.2131 5.96402ZM25.7722 13.3218C26.0699 10.5039 27.4274 9.01168 30.0112 9.01168C32.5294 9.01168 33.9853 10.6024 33.9853 13.3218H25.7722ZM111.14 9.64293H113V7.78201H111.14V9.64293ZM111.14 5.92109H113V4.06018H111.14V5.92109ZM107.421 2.19926H109.281V0.338347H107.421V2.19926ZM103.702 9.64293H105.562V7.78201H103.702V9.64293ZM107.421 5.92109H109.281V4.06018H107.421V5.92109ZM111.14 0.338347V2.19926H113V0.338347H111.14ZM103.702 5.92109H105.562V4.06018H103.702V5.92109ZM103.702 2.19926H105.562V0.338347H103.702V2.19926ZM107.421 9.64293H109.281V7.78201H107.421V9.64293Z" fill="#EC0000"/>
+        </svg>
+        <div style="font-size:0.8rem;">
+          <strong>PagoNxt Merchant Solutions, S.L. (Getnet Europe · Grupo Santander)</strong><br/>
+          <span>Certificación PCI-DSS 4.0 · ISO-8583 EMV · Autonomous Production ALM Zero-Touch</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="/servicios-para-clientes">Portal Tarjetas Bancarias</a>
+        <a href="/alm-dashboard">Cuadro de Mando CIO Jira Xray</a>
+        <a href="/presentacion">Presentación CIO</a>
+        <a href="/api/v1/rag/knowledge-base" target="_blank">Base RAG Incidencias</a>
+        <a href="/api/v1/observability/status" target="_blank">Dynatrace &amp; CloudWatch MCP</a>
+      </div>
+    </div>
+  </footer>
+
   <script>
     function activateTab(tabId) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -676,7 +1125,7 @@
       container.innerHTML = data.resultados.map(c => `
         <div class="center-card" data-testid="center-card-item">
           <h4>${c.nombre}</h4>
-          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:4px;">👨‍💻 ${c.responsable}</div>
+          <div style="font-size:0.88rem;color:var(--getnet-body);margin-bottom:4px;">👨‍💻 ${c.responsable}</div>
           <div style="font-size:0.86rem;">📍 ${c.direccion} (${c.provincia}) · 📞 <strong>${c.telefono}</strong></div>
           <div>
             <span class="badge badge-blue">${c.tipo_tarjeta}</span>
