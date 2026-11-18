@@ -44,10 +44,12 @@ import atm_sentinel  # noqa: E402
 from rag_engine import IncidentRAGEngine  # noqa: E402
 from getnet_products_engineering import (  # noqa: E402
     get_all_products_engineering,
+    get_cicd_canary_harness_state,
     get_tpv_live_state,
     inject_tpv_incident,
     process_tpv_payment,
     simulate_and_heal_product_incident,
+    trigger_github_actions_canary_redeploy,
 )
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -116,6 +118,18 @@ MCP_CONNECTIONS_STATE: Dict[str, Dict[str, Any]] = {
         "s3Bucket": "s3://getnet-atm-incidents-pro",
         "status": "CONNECTED",
         "latencyMs": 14,
+        "lastSync": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+    },
+    "github_actions": {
+        "provider": "GitHub Actions CI/CD & Canary Release Harness MCP",
+        "serverName": "getnet-github-actions-cicd-mcp",
+        "transport": "JSON-RPC 2.0 over stdio / GitHub REST API v3",
+        "repository": "AngC1/Getnet-Autonomous-ALM-QAOps",
+        "endpointUrl": "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions",
+        "workflowFile": ".github/workflows/canary-redeploy-qaops.yml",
+        "canaryStrategy": "Canary 10% -> 50% -> 100% (Zero-Touch Auto-Promotion)",
+        "status": "CONNECTED",
+        "latencyMs": 24,
         "lastSync": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     },
 }
@@ -207,15 +221,19 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
     {
         "stateId": "S7_CANARY_QAOPS_GATE",
         "order": 7,
-        "name": "Re-Deploy Canary & Quality Gate Tarjetas",
-        "badge": "RE-DEPLOY & GATE",
-        "agent": "QAOps-Xray-Certifier-Agent",
-        "mcpTools": ["selenium_execute_tarjetas_flow", "jmeter_ai_card_stress_gate"],
+        "name": "Re-Deploy Canary (GitHub Actions CI/CD MCP) & Quality Gate",
+        "badge": "CANARY CI/CD MCP",
+        "agent": "Self-Healing-Patch-Agent + QAOps-Xray-Certifier-Agent",
+        "mcpTools": [
+            "github_actions_trigger_canary_redeploy",
+            "selenium_execute_tarjetas_flow",
+            "jmeter_ai_card_stress_gate",
+        ],
         "status": "COMPLETED",
         "durationMs": 1450,
-        "inputSignal": "Release v2026.11.2-AUTONOMOUS-PRO + 12 Tests Selenium E2E Tarjetas + 2 Tests JMeter IA",
-        "outputTransition": "14/14 Casos de Prueba de Tarjetas Bancarias PASSED (Latencia P95 = 42.5ms, Apdex = 1.0)",
-        "inspectorDetail": "{\n  \"state\": \"S7_CANARY_QAOPS_GATE\",\n  \"deployedRelease\": \"v2026.11.2-AUTONOMOUS-PRO\",\n  \"seleniumE2E\": \"12/12 PASSED (DOM Pruning -93.1% tokens)\",\n  \"jmeterAiGate\": \"2/2 PASSED (P95 = 42.5ms, Apdex = 1.0)\"\n}",
+        "inputSignal": "GitHub Actions CI/CD MCP (AngC1/Getnet-Autonomous-ALM-QAOps/actions) · Canary 10% -> 50% -> 100% + Harness QAOps",
+        "outputTransition": "Workflow canary-redeploy-qaops.yml PASSED · 25/25 Casos Jira Xray PASSED (P95 = 42.5ms, Apdex = 1.0)",
+        "inspectorDetail": "{\n  \"state\": \"S7_CANARY_QAOPS_GATE\",\n  \"mcpServer\": \"getnet-github-actions-cicd-mcp\",\n  \"actionsUrl\": \"https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions\",\n  \"workflowFile\": \".github/workflows/canary-redeploy-qaops.yml\",\n  \"canaryRollout\": \"10% -> 50% -> 100% PROMOTED\",\n  \"deployedRelease\": \"v2026.11.2-AUTONOMOUS-PRO\",\n  \"seleniumE2E\": \"14/14 PASSED (DOM Pruning -93.1% tokens)\",\n  \"jmeterAiGate\": \"2/2 PASSED (P95 = 42.5ms, Apdex = 1.0)\"\n}",
     },
     {
         "stateId": "S8_ALM_XRAY_CLOSED",
@@ -281,32 +299,32 @@ AUTONOMOUS_AGENTS_ROSTER: List[Dict[str, Any]] = [
     {
         "agentId": "AGT-04-SELF-HEAL",
         "name": "Self-Healing-Patch-Agent",
-        "role": "Ingeniero Autónomo de Hotfixing & Canary Re-Deploy en Producción",
+        "role": "Ingeniero Autónomo de Hotfixing & Canary Re-Deploy en Producción (GitHub Actions CI/CD MCP)",
         "currentState": "S6_SELF_HEALING_HOTFIX -> S7_CANARY_QAOPS_GATE",
         "status": "ACTIVE_READY",
         "model": "Getnet Autonomous Patch Synthesizer (Zero-Touch)",
-        "mcpServer": "getnet-observability-dynatrace-cloudwatch-atm-mcp (alm_autonomous_zero_touch_cycle)",
+        "mcpServer": "getnet-github-actions-cicd-mcp + getnet-observability-dynatrace-cloudwatch-atm-mcp",
         "responsibilities": [
             "Inyecta en caliente enable_emv_reversal_0420=True y emite el reverso financiero ISO-8583 MTI 0420.",
             "Aplica redis_lock_ttl_ms=3000 y activa Circuit Breaker Resilience4j para drenar el pool HikariCP al 18.4%.",
-            "Promociona la release Canary v2026.11.2-AUTONOMOUS-PRO sin intervención humana.",
+            "Dispara el workflow Canary Release (10% -> 50% -> 100%) vía MCP en https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions.",
         ],
-        "lastAction": "Parches PATCH-GTN-ATM-0420 y PATCH-GTN-SYS-REDIS aplicados en v2026.11.2-AUTONOMOUS-PRO.",
+        "lastAction": "Parches aplicados y Canary Re-Deploy promocionado al 100% vía GitHub Actions CI/CD MCP.",
     },
     {
         "agentId": "AGT-05-QAOPS-XRAY",
         "name": "QAOps-Xray-Certifier-Agent",
-        "role": "Auditor Autónomo de Calidad Funcional (Selenium MCP), Rendimiento (JMeter IA) y Jira Xray",
+        "role": "Auditor Autónomo de Calidad Funcional (Selenium MCP), Rendimiento (JMeter IA), CI/CD Harness y Jira Xray",
         "currentState": "S7_CANARY_QAOPS_GATE -> S8_ALM_XRAY_CLOSED",
         "status": "ACTIVE_READY",
         "model": "Getnet QAOps Verification Harness",
-        "mcpServer": "getnet-selenium-qaops",
+        "mcpServer": "getnet-selenium-qaops + getnet-github-actions-cicd-mcp",
         "responsibilities": [
-            "Ejecuta los 12 tests E2E de tarjetas bancarias con Selenium Headless y DOM Pruning (-92.8% tokens).",
-            "Lanza el test de estrés JMeter IA sobre los endpoints de bloqueo y autorización de tarjetas.",
-            "Publica la matriz 14/14 PASSED en Jira Xray, TestLink y Redmine cerrando el ciclo ALM.",
+            "Ejecuta los 14 tests E2E de tarjetas y productos Getnet con Selenium Headless y DOM Pruning (-93.1% tokens).",
+            "Verifica los Quality Gates del workflow canary-redeploy-qaops.yml en GitHub Actions y el test JMeter IA.",
+            "Publica la matriz 25/25 PASSED en Jira Xray, TestLink y Redmine cerrando el ciclo ALM.",
         ],
-        "lastAction": "14/14 Test Cases de Tarjetas Bancarias certificados PASSED en el Cuadro de Mando Jira Xray.",
+        "lastAction": "25/25 Test Cases certificados PASSED tras Canary Release en GitHub Actions y Jira Xray.",
     },
 ]
 
@@ -336,6 +354,7 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
     "lastCycleTimestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     "stateMachineFlow": STATE_MACHINE_FLOW,
     "agentsRoster": AUTONOMOUS_AGENTS_ROSTER,
+    "cicdCanaryDeploy": get_cicd_canary_harness_state(),
     "pipelineStages": [
         {
             "step": "1. DETECCIÓN EN PRO (GETNET ATM + DYNATRACE + CLOUDWATCH)",
@@ -378,13 +397,13 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
             ),
         },
         {
-            "step": "5. RE-DEPLOY CANARY & QUALITY GATES TARJETAS",
-            "actor": "QAOps-Xray-Certifier-Agent (Selenium MCP + JMeter IA)",
+            "step": "5. RE-DEPLOY CANARY (GITHUB ACTIONS CI/CD MCP) & QUALITY GATES",
+            "actor": "Self-Healing-Patch-Agent + QAOps-Xray-Certifier-Agent (getnet-github-actions-cicd-mcp)",
             "status": "COMPLETED",
             "durationMs": 1590,
             "detail": (
-                "Desplegada release v2026.11.2-AUTONOMOUS-PRO. Certificados 14/14 casos funcionales y de estrés "
-                "de tarjetas bancarias (GTN-TC-001 a GTN-TC-014 PASSED). Latencia P95 = 42.5ms."
+                "Ejecutado workflow canary-redeploy-qaops.yml en https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions "
+                "(Canary 10% -> 50% -> 100%). Certificados 25/25 casos en Jira Xray. Latencia P95 = 42.5ms."
             ),
         },
         {
@@ -998,6 +1017,7 @@ def servicios_para_clientes_view():
         mcp_connections=MCP_CONNECTIONS_STATE,
         getnet_products=get_all_products_engineering(),
         tpv_state=get_tpv_live_state(),
+        cicd_harness=get_cicd_canary_harness_state(),
     )
 
 
@@ -1019,6 +1039,7 @@ def alm_dashboard_view():
         rag_meta=RAG_ENGINE.kb_data.get("metadata", {}),
         getnet_products=get_all_products_engineering(),
         tpv_state=get_tpv_live_state(),
+        cicd_harness=get_cicd_canary_harness_state(),
     )
 
 
@@ -1671,6 +1692,19 @@ def api_mcp_connect_and_test():
         tool_name = "prometheus_query_metrics"
         tool_args = {"query": custom_query or "getnet_card_block_latency_p95_ms"}
         result_payload = obs_resp.get("prometheus", {})
+    elif provider in ("github_actions", "cicd"):
+        provider = "github_actions"
+        tool_name = "github_actions_trigger_canary_redeploy"
+        tool_args = {
+            "repository": "AngC1/Getnet-Autonomous-ALM-QAOps",
+            "workflow_file": ".github/workflows/canary-redeploy-qaops.yml",
+            "canary_strategy": custom_query or "Canary 10% -> 50% -> 100% (Zero-Touch Auto-Promotion)",
+        }
+        result_payload = trigger_github_actions_canary_redeploy(
+            release_tag=SYSTEM_INCIDENT_STATE.get("currentRelease", "v2026.11.2-AUTONOMOUS-PRO"),
+            target_scope="ALL (Core Tarjetas + ATM + 11 Productos Getnet)",
+            triggered_by="MCP Modal Handshake (getnet-github-actions-cicd-mcp)",
+        )
     else:
         tool_name = "getnet_atm_inspect_incident"
         tool_args = {"atm_id": "ATM-GTN-MAD-0042"}
@@ -1892,11 +1926,17 @@ def api_autonomous_alm_cycle():
     SELENIUM_LATEST_REPORT["failed"] = 0
     SELENIUM_LATEST_REPORT["timestamp"] = now_str
 
+    cicd_out = trigger_github_actions_canary_redeploy(
+        release_tag="v2026.11.2-AUTONOMOUS-PRO",
+        target_scope="GTN-INC-ATM-001 + GTN-INC-SYS-002 (Core Tarjetas & ATM)",
+        triggered_by="Self-Healing-Patch-Agent + QAOps-Xray-Certifier-Agent (S7_CANARY_QAOPS_GATE)",
+    )
     AUTONOMOUS_ALM_STATE.update(
         {
             "overallStatus": "HEALTHY · 2/2 INCIDENCIAS DE TARJETAS RESUELTAS Y REDESPLEGADAS EN PRO",
             "deployedRelease": "v2026.11.2-AUTONOMOUS-PRO",
             "lastCycleTimestamp": now_str,
+            "cicdCanaryDeploy": get_cicd_canary_harness_state(),
         }
     )
     AUTONOMOUS_ALM_STATE["atmDetail"].update(
@@ -1914,11 +1954,11 @@ def api_autonomous_alm_cycle():
         0,
         {
             "execKey": f"GTN-EXEC-2026-{100 + len(EXECUTION_HISTORY) + 1}",
-            "buildName": f"Build #{100 + len(EXECUTION_HISTORY) + 1} · Ciclo Completo ALM Zero-Touch (RAG + Auto-Fix & Re-Deploy PRO)",
-            "runner": "5 Agentes Autónomos (Getnet ATM + Dynatrace + CloudWatch MCP + Motor RAG + Jira Xray)",
+            "buildName": f"Build #{100 + len(EXECUTION_HISTORY) + 1} · Ciclo Completo ALM Zero-Touch (RAG + Auto-Fix & Canary Re-Deploy GitHub Actions MCP)",
+            "runner": "5 Agentes Autónomos + getnet-github-actions-cicd-mcp (Canary 10%->50%->100%)",
             "environment": "PRODUCTION (v2026.11.2-AUTONOMOUS-PRO)",
-            "testsScope": "GTN-INC-ATM-001 & GTN-INC-SYS-002 RESOLVED · 14/14 Xray Card Tests PASSED",
-            "passed": 14,
+            "testsScope": "GTN-INC-ATM-001 & GTN-INC-SYS-002 RESOLVED · 25/25 Xray Tests PASSED",
+            "passed": 25,
             "failed": 0,
             "durationMs": elapsed_ms,
             "status": "PASSED",
@@ -1942,10 +1982,61 @@ def api_autonomous_alm_cycle():
             "panRedacted": pan_masked,
             "emvReversalCode": cod_rev,
             "deployedRelease": "v2026.11.2-AUTONOMOUS-PRO",
+            "cicdCanaryDeploy": cicd_out,
             "elapsedMs": elapsed_ms,
             "autonomousAlm": AUTONOMOUS_ALM_STATE,
         }
     )
+
+
+@app.route("/api/v1/cicd/status", methods=["GET"])
+def api_cicd_status():
+    """Devuelve el estado del MCP Server de CI/CD conectado a GitHub Actions como parte del Harness Canary Release."""
+    return jsonify(
+        {
+            "ok": True,
+            "mcpConnection": MCP_CONNECTIONS_STATE.get("github_actions", {}),
+            "canaryHarness": get_cicd_canary_harness_state(),
+        }
+    )
+
+
+@app.route("/api/v1/cicd/canary-redeploy", methods=["POST"])
+def api_cicd_canary_redeploy():
+    """Dispara en vivo el Canary Release Re-Deploy vía GitHub Actions CI/CD MCP Server."""
+    payload = request.get_json(silent=True) or {}
+    release_tag = str(payload.get("releaseTag", "v2026.11.3-CANARY-PRO")).strip()
+    target_scope = str(payload.get("targetScope", "ALL (Core Tarjetas + ATM + 11 Productos Getnet)")).strip()
+    triggered_by = str(
+        payload.get("triggeredBy", "Manual / Autonomous Canary Trigger via getnet-github-actions-cicd-mcp")
+    ).strip()
+
+    out = trigger_github_actions_canary_redeploy(
+        release_tag=release_tag,
+        target_scope=target_scope,
+        triggered_by=triggered_by,
+    )
+    SYSTEM_INCIDENT_STATE["currentRelease"] = release_tag
+    AUTONOMOUS_ALM_STATE["deployedRelease"] = release_tag
+    AUTONOMOUS_ALM_STATE["cicdCanaryDeploy"] = out["canaryHarness"]
+    MCP_CONNECTIONS_STATE["github_actions"]["lastSync"] = out["run"]["timestamp"]
+
+    EXECUTION_HISTORY.insert(
+        0,
+        {
+            "execKey": out["run"]["runId"],
+            "buildName": f"Canary Re-Deploy ({release_tag}) · GitHub Actions CI/CD MCP (10% -> 50% -> 100%)",
+            "runner": "getnet-github-actions-cicd-mcp (AngC1/Getnet-Autonomous-ALM-QAOps)",
+            "environment": "PRODUCTION Canary Rollout (eu-west-1)",
+            "testsScope": f"{target_scope} · 25/25 Jira Xray PASSED",
+            "passed": 25,
+            "failed": 0,
+            "durationMs": 2820,
+            "status": "PASSED",
+            "timestamp": out["run"]["timestamp"],
+        },
+    )
+    return jsonify(out)
 
 
 # ---------------------------------------------------------------------------

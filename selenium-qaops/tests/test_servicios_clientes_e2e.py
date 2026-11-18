@@ -364,4 +364,33 @@ def test_tc016_panel_inyeccion_incidencias_tpv_y_autofix(driver, base_url):
     alm_tpv_panel = driver.find_element("id", "section-tpv-incident-injector")
     assert alm_tpv_panel.is_displayed()
 
+    # 6. Verificar MCP Server de CI/CD conectado a GitHub Actions como parte del Harness Canary Release
+    cicd_mcp_res = requests.post(
+        f"{base_url}/api/v1/mcp/connect",
+        json={"provider": "github_actions"},
+        timeout=5,
+    )
+    assert cicd_mcp_res.status_code == 200
+    cicd_mcp_data = cicd_mcp_res.json()
+    assert cicd_mcp_data["ok"] is True
+    assert cicd_mcp_data["connection"]["serverName"] == "getnet-github-actions-cicd-mcp"
+    assert "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" in cicd_mcp_data["connection"]["endpointUrl"]
+
+    canary_res = requests.post(
+        f"{base_url}/api/v1/cicd/canary-redeploy",
+        json={"releaseTag": "v2026.11.3-CANARY-PRO", "targetScope": "ALL"},
+        timeout=5,
+    )
+    assert canary_res.status_code == 200
+    canary_data = canary_res.json()
+    assert canary_data["ok"] is True
+    assert canary_data["mcpServer"] == "getnet-github-actions-cicd-mcp"
+    assert canary_data["actionsUrl"] == "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions"
+    assert len(canary_data["canaryHarness"]["stages"]) == 4
+
+    cicd_section = driver.find_element("id", "section-cicd-canary-harness")
+    assert cicd_section.is_displayed()
+    gha_card = driver.find_element("id", "card-mcp-github-actions")
+    assert gha_card.is_displayed()
+
 

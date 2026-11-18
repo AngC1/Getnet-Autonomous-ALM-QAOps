@@ -267,6 +267,28 @@ class ObservabilityMcpController:
         )
         return res.json()
 
+    def github_actions_trigger_canary_redeploy(
+        self,
+        release_tag: str = "v2026.11.3-CANARY-PRO",
+        target_scope: str = "ALL (Core Tarjetas + ATM + 11 Productos Getnet)",
+    ) -> Dict[str, Any]:
+        """Dispara el workflow de Canary Release Re-Deploy en GitHub Actions (AngC1/Getnet-Autonomous-ALM-QAOps/actions)."""
+        res = requests.post(
+            f"{self.base_url}/api/v1/cicd/canary-redeploy",
+            json={
+                "releaseTag": release_tag,
+                "targetScope": target_scope,
+                "triggeredBy": "getnet-github-actions-cicd-mcp (Harness Canary Release)",
+            },
+            timeout=10,
+        )
+        return res.json()
+
+    def github_actions_get_canary_harness_status(self) -> Dict[str, Any]:
+        """Consulta el estado del MCP Server de CI/CD GitHub Actions y los Quality Gates del Canary Release."""
+        res = requests.get(f"{self.base_url}/api/v1/cicd/status", timeout=5)
+        return res.json()
+
 
 MCP_TOOLS_SCHEMA = [
     {
@@ -353,6 +375,22 @@ MCP_TOOLS_SCHEMA = [
             },
         },
     },
+    {
+        "name": "github_actions_trigger_canary_redeploy",
+        "description": "Dispara vía MCP el workflow Canary Release Re-Deploy (.github/workflows/canary-redeploy-qaops.yml) en https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions como parte del Harness QAOps.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "release_tag": {"type": "string", "default": "v2026.11.3-CANARY-PRO"},
+                "target_scope": {"type": "string", "default": "ALL"},
+            },
+        },
+    },
+    {
+        "name": "github_actions_get_canary_harness_status",
+        "description": "Consulta el estado del MCP Server de CI/CD GitHub Actions y los 4 stages del Canary Release Harness (10% -> 50% -> 100%).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
 ]
 
 
@@ -407,6 +445,13 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
                 )
             elif name == "alm_autonomous_zero_touch_cycle":
                 out = controller.execute_autonomous_alm_cycle(inject_first=args.get("inject_first", True))
+            elif name == "github_actions_trigger_canary_redeploy":
+                out = controller.github_actions_trigger_canary_redeploy(
+                    release_tag=args.get("release_tag", "v2026.11.3-CANARY-PRO"),
+                    target_scope=args.get("target_scope", "ALL"),
+                )
+            elif name == "github_actions_get_canary_harness_status":
+                out = controller.github_actions_get_canary_harness_status()
             else:
                 raise ValueError(f"Herramienta MCP desconocida: {name}")
 
@@ -477,13 +522,19 @@ def run_selftest(base_url: str) -> int:
     )
 
     cycle_out = controller.execute_autonomous_alm_cycle(inject_first=True)
+    cicd_out = controller.github_actions_trigger_canary_redeploy()
     elapsed_ms = int((time.perf_counter() - t0) * 1000)
     print(
         f"6. Ciclo Completo ALM Sin Human-in-the-Loop: {cycle_out.get('status')} "
         f"(Incidente ATM: {cycle_out.get('atmIncidentStatus')} | Incidente Sistemas: {cycle_out.get('sysIncidentStatus')} | "
         f"Release: {cycle_out.get('deployedRelease')} en {elapsed_ms} ms)"
     )
-    return 0 if cycle_out.get("ok") else 1
+    print(
+        f"7. GitHub Actions CI/CD MCP (Canary Release Harness): {cicd_out.get('mcpServer')} -> "
+        f"Run {cicd_out.get('run', {}).get('runId')} ({cicd_out.get('run', {}).get('trafficSplit')}) | "
+        f"URL: {cicd_out.get('actionsUrl')}"
+    )
+    return 0 if (cycle_out.get("ok") and cicd_out.get("ok")) else 1
 
 
 if __name__ == "__main__":

@@ -1,61 +1,61 @@
 timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,bytes,Latency
-1795036647180,16.38,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,1277,16.38
-1795036647181,15.61,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,466,15.61
-1795036647181,15.71,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,404,15.71
-1795036647181,58.03,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,526,58.03
-1795036647182,17.33,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,466,17.33
-1795036647182,20.29,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-01,text,true,1382,20.29
-1795036647182,55.27,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,526,55.27
-1795036647183,16.78,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,1277,16.78
-1795036647183,20.31,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,404,20.31
-1795036647183,21.16,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-02,text,true,1382,21.16
-1795036647183,21.75,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,404,21.75
-1795036647183,59.83,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,526,59.83
-1795036647196,11.37,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-03,text,true,1382,11.37
-1795036647196,12.7,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,1277,12.7
-1795036647197,13.2,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,466,13.2
-1795036647199,11.59,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,404,11.59
-1795036647200,12.76,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-04,text,true,1382,12.76
-1795036647202,12.2,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,1277,12.2
-1795036647203,12.43,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,466,12.43
-1795036647204,53.05,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,526,53.05
-1795036647206,12.01,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-05,text,true,1382,12.01
-1795036647207,11.5,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,1277,11.5
-1795036647209,10.65,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,466,10.65
-1795036647209,10.81,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,404,10.81
-1795036647209,52.33,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,526,52.33
-1795036647213,9.4,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,1277,9.4
-1795036647214,9.86,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,466,9.86
-1795036647216,7.43,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,404,7.43
-1795036647216,7.6,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-06,text,true,1382,7.6
-1795036647216,8.16,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,466,8.16
-1795036647216,6.89,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,404,6.89
-1795036647216,6.35,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-07,text,true,1382,6.35
-1795036647216,6.45,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,1277,6.45
-1795036647216,6.37,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,404,6.37
-1795036647216,49.91,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,526,49.91
-1795036647216,48.73,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,526,48.73
-1795036647216,46.86,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,526,46.86
-1795036647229,6.07,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-08,text,true,1382,6.07
-1795036647231,5.91,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,1277,5.91
-1795036647232,7.6,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,466,7.6
-1795036647234,7.83,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,404,7.83
-1795036647236,8.55,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-09,text,true,1382,8.55
-1795036647237,11.22,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,1277,11.22
-1795036647238,9.87,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,466,9.87
-1795036647239,51.06,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,526,51.06
-1795036647240,9.99,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-10,text,true,1382,9.99
-1795036647240,9.05,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,466,9.05
-1795036647240,11.3,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,1277,11.3
-1795036647240,49.39,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,526,49.39
-1795036647247,8.05,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,404,8.05
-1795036647248,9.39,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,1277,9.39
-1795036647249,9.39,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,466,9.39
-1795036647250,7.4,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,404,7.4
-1795036647250,47.42,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,526,47.42
-1795036647254,8.74,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-11,text,true,1382,8.74
-1795036647256,7.55,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,466,7.55
-1795036647256,10.42,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,404,10.42
-1795036647256,50.74,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,526,50.74
-1795036647261,9.4,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-12,text,true,1382,9.4
-1795036647263,9.47,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,1277,9.47
+1795039045290,15.03,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,466,15.03
+1795039045290,14.98,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,466,14.98
+1795039045290,16.93,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,1277,16.93
+1795039045290,16.0,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-01,text,true,1382,16.0
+1795039045290,16.53,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,404,16.53
+1795039045290,54.76,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-01,text,true,526,54.76
+1795039045290,57.28,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,526,57.28
+1795039045292,18.07,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,1277,18.07
+1795039045292,18.54,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-02,text,true,1382,18.54
+1795039045292,21.18,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-02,text,true,404,21.18
+1795039045292,21.03,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,404,21.03
+1795039045292,59.0,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,526,59.0
+1795039045305,9.59,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-03,text,true,1382,9.59
+1795039045306,10.02,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,1277,10.02
+1795039045306,11.5,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-03,text,true,466,11.5
+1795039045306,12.28,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,404,12.28
+1795039045306,13.44,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-04,text,true,1382,13.44
+1795039045310,10.9,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,466,10.9
+1795039045310,12.31,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,1277,12.31
+1795039045313,50.62,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-04,text,true,526,50.62
+1795039045314,9.32,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,1277,9.32
+1795039045314,12.18,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-05,text,true,1382,12.18
+1795039045316,9.12,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,466,9.12
+1795039045318,8.61,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,404,8.61
+1795039045318,48.83,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-05,text,true,526,48.83
+1795039045320,7.72,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,1277,7.72
+1795039045322,8.34,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,466,8.34
+1795039045322,7.82,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,404,7.82
+1795039045322,7.04,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-06,text,true,1382,7.04
+1795039045322,47.91,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-06,text,true,526,47.91
+1795039045326,7.89,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,466,7.89
+1795039045326,7.35,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,404,7.35
+1795039045326,47.03,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,526,47.03
+1795039045330,6.73,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-07,text,true,1382,6.73
+1795039045331,6.16,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-07,text,true,1277,6.16
+1795039045331,57.69,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,526,57.69
+1795039045333,5.33,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,404,5.33
+1795039045336,4.88,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-08,text,true,1382,4.88
+1795039045337,4.87,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,1277,4.87
+1795039045337,4.48,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-08,text,true,466,4.48
+1795039045339,4.45,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,404,4.45
+1795039045339,4.49,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-09,text,true,1382,4.49
+1795039045339,5.6,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,1277,5.6
+1795039045339,6.01,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,466,6.01
+1795039045344,7.6,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-10,text,true,1382,7.6
+1795039045344,7.61,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,1277,7.61
+1795039045344,46.29,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-09,text,true,526,46.29
+1795039045347,6.62,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,466,6.62
+1795039045348,7.14,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,404,7.14
+1795039045348,46.06,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-10,text,true,526,46.06
+1795039045351,5.24,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,1277,5.24
+1795039045351,5.69,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,466,5.69
+1795039045351,5.41,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,404,5.41
+1795039045351,46.34,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-11,text,true,526,46.34
+1795039045356,4.49,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-11,text,true,1382,4.49
+1795039045356,4.35,POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,466,4.35
+1795039045356,43.67,POST /api/v1/tarjetas/autorizaciones (Control Antifraude),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,526,43.67
+1795039045359,4.36,POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,404,4.36
+1795039045360,4.58,GET /api/v1/tarjetas/parque (Parque Tarjetas EMV),200,OK,TG_Getnet_Tarjetas_VU-12,text,true,1382,4.58
+1795039045360,4.99,POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro),201,OK,TG_Getnet_Tarjetas_VU-12,text,true,1277,4.99

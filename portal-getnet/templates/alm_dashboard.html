@@ -322,6 +322,7 @@
     .mcp-conn-card.cloudwatch { border-top: 4px solid #D97706; }
     .mcp-conn-card.prometheus { border-top: 4px solid #005C8A; }
     .mcp-conn-card.kiro { border-top: 4px solid #EC0000; }
+    .mcp-conn-card.github-actions { border-top: 4px solid #059669; }
 
     /* Tablas y Píldoras */
     table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
@@ -510,6 +511,7 @@
       <button class="btn btn-purple" onclick="openMcpModal('dynatrace')" id="btn-open-mcp-dynatrace">🔌 Ventana MCP Dynatrace</button>
       <button class="btn btn-blue" onclick="openMcpModal('cloudwatch')" id="btn-open-mcp-cloudwatch">☁️ Ventana MCP AWS CloudWatch</button>
       <button class="btn" onclick="openMcpModal('getnet_atm')" id="btn-open-mcp-kiro">🏧 Ventana MCP Getnet ATM</button>
+      <button class="btn btn-green" onclick="openMcpModal('github_actions')" id="btn-open-mcp-github-actions" data-testid="btn-open-mcp-github-actions">⚙️ Ventana MCP GitHub Actions CI/CD</button>
       <a class="btn" href="/servicios-para-clientes">💳 Portal Operativo Tarjetas &amp; TPV</a>
       <a class="btn" href="/presentacion">📽️ Presentación CIO</a>
       <a class="btn btn-red" href="/api/v1/alm/export/jira-xray">⬇ Exportar Xray JSON</a>
@@ -523,10 +525,11 @@
       <strong style="font-size:0.8rem;color:var(--getnet-red);text-transform:uppercase;letter-spacing:0.5px;">🧭 Ir a Sección:</strong>
       <a class="btn" href="#section-tpv-incident-injector">🏪 1. Inyección Incidencias TPV</a>
       <a class="btn" href="#section-visual-agent-flow">🔄 2. Estados S1..S8 y 5 Agentes</a>
-      <a class="btn" href="#section-mcp-connectors">🔌 3. Conectores MCP</a>
-      <a class="btn" href="#section-rag-knowledge-base">🧠 4. Motor RAG (17 Playbooks)</a>
-      <a class="btn" href="#section-getnet-products-engineering">🧬 5. Ingeniería 11 Productos (Harness/Context/Loop/Prompt)</a>
-      <a class="btn" href="#section-xray-matrix">🧪 6. Matriz Jira Xray (25 Tests)</a>
+      <a class="btn" href="#section-mcp-connectors">🔌 3. Conectores MCP (5)</a>
+      <a class="btn" href="#section-cicd-canary-harness">🚀 4. Harness Re-Deploy Canary (GitHub Actions MCP)</a>
+      <a class="btn" href="#section-rag-knowledge-base">🧠 5. Motor RAG (17 Playbooks)</a>
+      <a class="btn" href="#section-getnet-products-engineering">🧬 6. Ingeniería 11 Productos</a>
+      <a class="btn" href="#section-xray-matrix">🧪 7. Matriz Jira Xray (25 Tests)</a>
     </nav>
 
     <!-- BANNER DE SIMULACIÓN EN VIVO PARA EL CIO DE GETNET -->
@@ -691,14 +694,14 @@
       </div>
     </div>
 
-    <!-- SECCIÓN 2: VENTANAS Y PANEL DE CONEXIÓN MCP SERVER CON DYNATRACE, AWS CLOUDWATCH, PROMETHEUS Y GETNET ATM -->
+    <!-- SECCIÓN 2: VENTANAS Y PANEL DE CONEXIÓN MCP SERVER CON DYNATRACE, AWS CLOUDWATCH, PROMETHEUS, GETNET ATM Y GITHUB ACTIONS CI/CD -->
     <div class="card" id="section-mcp-connectors">
       <h2>
-        <span>🔌 Conectores MCP Server en Producción (Dynatrace Davis AI · AWS CloudWatch · Prometheus · Getnet ATM)</span>
-        <span class="status-pill status-info">PROTOCOLO JSON-RPC 2.0 ACTIVO</span>
+        <span>🔌 Conectores MCP Server en Producción (Dynatrace · CloudWatch · Prometheus · Getnet ATM · GitHub Actions CI/CD)</span>
+        <span class="status-pill status-info">5 SERVIDORES MCP JSON-RPC 2.0 ACTIVOS</span>
       </h2>
       <p style="font-size:0.88rem;color:var(--muted);">
-        Configura, prueba y lanza consultas en vivo hacia las herramientas de observabilidad empresarial mediante el protocolo <strong>Model Context Protocol (MCP)</strong>.
+        Configura, prueba y lanza consultas o despliegues Canary en vivo hacia las herramientas de observabilidad empresarial y el pipeline CI/CD de GitHub Actions mediante el protocolo <strong>Model Context Protocol (MCP)</strong>.
       </p>
 
       <div class="mcp-cards-grid">
@@ -765,6 +768,55 @@
           </div>
           <button class="btn" onclick="openMcpModal('prometheus')">📊 Abrir Ventana de Conexión MCP Prometheus</button>
         </div>
+
+        <!-- Conector 5: GitHub Actions CI/CD & Canary Release Harness MCP -->
+        <div class="mcp-conn-card github-actions" id="card-mcp-github-actions" data-testid="card-mcp-github-actions">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="color:#191919;font-size:0.98rem;">⚙️ GitHub Actions CI/CD &amp; Canary Release MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.github_actions.status }} ({{ mcp_connections.github_actions.latencyMs }}ms)</span>
+            </div>
+            <div style="font-size:0.84rem;color:#334155;margin-bottom:10px;display:grid;gap:4px;">
+              <div><strong>Repo Actions:</strong> <a href="{{ mcp_connections.github_actions.endpointUrl }}" target="_blank" style="color:#EC0000;font-weight:700;text-decoration:none;">{{ mcp_connections.github_actions.repository }}/actions ↗</a></div>
+              <div><strong>Servidor MCP:</strong> <code>{{ mcp_connections.github_actions.serverName }}</code></div>
+              <div><strong>Workflow Canary:</strong> <code>{{ mcp_connections.github_actions.workflowFile }}</code></div>
+              <div><strong>Estrategia:</strong> <code>{{ mcp_connections.github_actions.canaryStrategy }}</code></div>
+            </div>
+          </div>
+          <button class="btn btn-green" onclick="openMcpModal('github_actions')" id="btn-card-mcp-github-actions">⚙️ Abrir Ventana MCP GitHub Actions CI/CD</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2B: HARNESS DEL RE-DEPLOY CANARY RELEASE · MCP SERVER DE CI/CD CONECTADO A GITHUB ACTIONS -->
+    <div class="card" id="section-cicd-canary-harness" data-testid="section-cicd-canary-harness" style="border-top:4px solid #059669;">
+      <h2>
+        <span>🚀 Harness del Re-Deploy Canary Release · MCP Server de CI/CD conectado a GitHub Actions (<code>{{ cicd_harness.mcpServer }}</code>)</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span class="status-pill status-passed" id="cicd-harness-status-badge">{{ cicd_harness.status }}</span>
+          <button class="btn btn-green" id="btn-trigger-canary-redeploy" data-testid="btn-trigger-canary-redeploy" onclick="triggerCanaryRedeployMcp()">🚀 Lanzar Re-Deploy Canary (10% &rarr; 50% &rarr; 100%) vía MCP</button>
+          <a class="btn btn-red" href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" id="link-github-actions-repo" data-testid="link-github-actions-repo">🔗 Ver GitHub Actions en Vivo ↗</a>
+        </div>
+      </h2>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:12px;">
+        Durante el <strong>Estado S7 (<code>S7_CANARY_QAOPS_GATE</code>)</strong> del ciclo autónomo ALM y en cada auto-remediación de tarjetas bancarias o terminales TPV, el agente <code>Self-Healing-Patch-Agent</code> invoca la herramienta MCP <code>github_actions_trigger_canary_redeploy</code> sobre el repositorio <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:700;">https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions</a> (workflow <code>{{ cicd_harness.workflowFile }}</code>) para validar los Quality Gates antes de promocionar el tráfico al 100%.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-bottom:16px;">
+        {% for stg in cicd_harness.stages %}
+        <div style="background:var(--getnet-sky);border:1.5px solid var(--getnet-sky-border);border-left:5px solid #059669;border-radius:12px;padding:15px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span class="status-pill status-passed">{{ stg.status }}</span>
+            <code style="font-size:0.76rem;">{{ stg.durationMs }} ms</code>
+          </div>
+          <h4 style="font-size:0.92rem;margin-bottom:6px;font-weight:800;">{{ stg.name }}</h4>
+          <div style="font-size:0.81rem;color:var(--muted);"><strong>Quality Gate:</strong> {{ stg.gateCheck }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="cicd-canary-live-output" data-testid="cicd-canary-live-output" style="padding:14px 18px;background:#ECFDF5;border:1.5px solid #10B981;border-radius:10px;font-size:0.86rem;color:#065F46;">
+        <strong>⚙️ Última Ejecución Certificada en GitHub Actions CI/CD MCP:</strong> Run <code>{{ cicd_harness.lastRunId }}</code> · Release <code>{{ cicd_harness.currentRelease }}</code> · Estrategia <code>{{ cicd_harness.canaryStrategy }}</code> · Repo: <a href="{{ cicd_harness.actionsUrl }}" target="_blank" style="color:#EC0000;font-weight:800;">{{ cicd_harness.actionsUrl }} ↗</a>
       </div>
     </div>
 
@@ -1139,6 +1191,14 @@
         token: "OPENMETRICS_BEARER_TOKEN_LOCAL",
         entity: "getnet-card-blocker-svc (Scrape Interval: 5s)",
         query: "getnet_card_block_latency_p95_ms{service='getnet-card-blocker-svc',env='prod'}"
+      },
+      github_actions: {
+        title: "⚙️ Ventana de Conexión MCP Server — GitHub Actions CI/CD & Canary Release Harness",
+        subtitle: "Servidor MCP: getnet-github-actions-cicd-mcp · Tool: github_actions_trigger_canary_redeploy",
+        endpoint: "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions",
+        token: "ghs_GETNET_AUTONOMOUS_ALM_CICD_MCP_****************",
+        entity: "AngC1/Getnet-Autonomous-ALM-QAOps (.github/workflows/canary-redeploy-qaops.yml)",
+        query: "workflow_dispatch --workflow canary-redeploy-qaops.yml --canary-split 10->50->100 --run-qaops-harness"
       }
     };
 
@@ -1293,9 +1353,32 @@
       window.location.reload();
     }
 
+    async function triggerCanaryRedeployMcp() {
+      const box = document.getElementById('cicd-canary-live-output');
+      box.innerHTML = `⏳ Invocando MCP Server <code>getnet-github-actions-cicd-mcp</code> (Tool: <code>github_actions_trigger_canary_redeploy</code>) en <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:700;">GitHub Actions</a>...`;
+      const res = await fetch('/api/v1/cicd/canary-redeploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          releaseTag: 'v2026.11.3-CANARY-PRO',
+          targetScope: 'ALL (Core Tarjetas + ATM + 11 Productos Getnet)',
+          triggeredBy: 'Cuadro de Mando CIO via getnet-github-actions-cicd-mcp'
+        })
+      });
+      const data = await res.json();
+      const run = data.run || {};
+      box.innerHTML = `
+        <strong>🚀 CANARY RELEASE COMPLETADO Y PROMOCIONADO AL 100% VÍA GITHUB ACTIONS CI/CD MCP:</strong><br/>
+        • <strong>Workflow Run ID:</strong> <code>${run.runId}</code> · <strong>Workflow:</strong> <code>${data.workflowFile}</code> · <strong>Release:</strong> <code>${run.releaseTag}</code><br/>
+        • <strong>Estrategia Canary:</strong> <code>${run.trafficSplit}</code> · <strong>Quality Gates:</strong> <strong style="color:#059669;">${run.harnessGates}</strong><br/>
+        • <strong>Repositorio GitHub Actions:</strong> <a href="${data.actionsUrl}" target="_blank" style="color:#EC0000;font-weight:800;">${data.actionsUrl} ↗</a>
+      `;
+      showAlmToast(`🚀 Canary Release ${run.runId} promocionado al 100%`);
+    }
+
     async function runProductEngineeringCycle(productId) {
       const box = document.getElementById('alm-product-cycle-output');
-      box.innerHTML = `⏳ Ejecutando ciclo <strong>Context + Prompt + Loop + Harness Engineering</strong> para <code>${productId}</code>...`;
+      box.innerHTML = `⏳ Ejecutando ciclo <strong>Context + Prompt + Loop + Harness Engineering + Canary Re-Deploy MCP</strong> para <code>${productId}</code>...`;
       const res = await fetch('/api/v1/products/simulate-and-heal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1303,14 +1386,15 @@
       });
       const data = await res.json();
       const first = (data.results || [])[0] || {};
+      const cicdRun = (data.cicdCanaryDeploy && data.cicdCanaryDeploy.run) ? data.cicdCanaryDeploy.run : {};
       box.innerHTML = `
         <strong>✅ CICLO ZERO-TOUCH COMPLETADO (${data.totalProductsProcessed} producto(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
         • <strong>Producto:</strong> ${first.productName} · Incidencia <code>${first.incidentKey}</code> -> <span style="color:#059669;font-weight:800;">${first.incidentStatus}</span><br/>
         • <strong>Context Engineering:</strong> Playbook RAG <code>${first.contextLoaded.ragPlaybookId}</code> · MCP: <code>${(first.contextLoaded.mcpSources || []).join(' | ')}</code><br/>
         • <strong>Prompt Engineering:</strong> <code>${first.promptExecuted.pattern}</code> -> Output JSON Schema: <code>${JSON.stringify(first.promptExecuted.deterministicOutput)}</code><br/>
-        • <strong>Loop &amp; Harness Engineering:</strong> Patch <code>${JSON.stringify(first.remediation.configPatch)}</code> (MTTR: <strong>${first.remediation.mttrAutonomous}</strong>) · Test Jira Xray <code>${first.verification.testKey}</code>: <strong style="color:#059669;">${first.verification.xrayStatus}</strong>
+        • <strong>Loop &amp; Canary Re-Deploy Harness:</strong> Patch <code>${JSON.stringify(first.remediation.configPatch)}</code> (MTTR: <strong>${first.remediation.mttrAutonomous}</strong>) · GitHub Actions Run <code>${cicdRun.runId || 'GHA-RUN-2026'}</code> (<a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:800;">Ver GitHub Actions ↗</a>) · Test Jira Xray <code>${first.verification.testKey}</code>: <strong style="color:#059669;">${first.verification.xrayStatus}</strong>
       `;
-      showAlmToast(`🧬 ${first.verification.testKey} PASSED (${first.productName})`);
+      showAlmToast(`🧬 ${first.verification.testKey} PASSED · Canary ${cicdRun.runId || 'OK'}`);
     }
 
     async function almInjectTpv(productId) {
@@ -1395,10 +1479,12 @@
         kpi.textContent = '4 / 4 OK';
       }
       const first = (data.results || [])[0] || {};
+      const cicdRun = (data.cicdCanaryDeploy && data.cicdCanaryDeploy.run) ? data.cicdCanaryDeploy.run : {};
       out.innerHTML = `
-        <strong>🤖 AUTO-REMEDIACIÓN TPV COMPLETADA (${data.totalProductsProcessed} TPV(s) reparada(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
+        <strong>🤖 AUTO-REMEDIACIÓN TPV + RE-DEPLOY CANARY GITHUB ACTIONS COMPLETADO (${data.totalProductsProcessed} TPV(s) reparada(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
         • <strong>TPV Reparada:</strong> ${first.productName} · Incidente <code>${first.incidentKey}</code> -> <strong style="color:#059669;">${first.incidentStatus}</strong><br/>
         • <strong>Playbook RAG Aplicado:</strong> <code>${first.contextLoaded.ragPlaybookId}</code> · <strong>Patch OTA:</strong> <code>${JSON.stringify(first.remediation.configPatch)}</code><br/>
+        • <strong>Canary Re-Deploy (GitHub Actions CI/CD MCP):</strong> Run <code>${cicdRun.runId || 'GHA-RUN-2026'}</code> (<code>10% &rarr; 50% &rarr; 100%</code>) · <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:800;">Ver GitHub Actions ↗</a><br/>
         • <strong>Certificación Jira Xray:</strong> Caso <code>${first.verification.testKey}</code> -> <strong style="color:#059669;">PASSED</strong> (MTTR: ${first.remediation.mttrAutonomous})
       `;
       showAlmToast(`🤖 TPV Auto-Reparada: ${first.verification.testKey} PASSED`);

@@ -1784,11 +1784,13 @@
         if (card) card.style.borderLeftColor = '#10B981';
       });
       const first = (data.results || [])[0] || {};
+      const cicdRun = (data.cicdCanaryDeploy && data.cicdCanaryDeploy.run) ? data.cicdCanaryDeploy.run : {};
       alertBox.className = 'alert-box show alert-success';
       alertBox.innerHTML = `
-        <strong>🤖 AUTO-REMEDIACIÓN TPV COMPLETADA (${data.totalProductsProcessed} TPV(s) reparada(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
+        <strong>🤖 AUTO-REMEDIACIÓN TPV + RE-DEPLOY CANARY GITHUB ACTIONS COMPLETADO (${data.totalProductsProcessed} TPV(s) reparada(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
         • <strong>TPV Reparada:</strong> ${first.productName} · Incidente <code>${first.incidentKey}</code> -> <strong>${first.incidentStatus}</strong><br/>
         • <strong>Playbook RAG Aplicado:</strong> <code>${first.contextLoaded.ragPlaybookId}</code> · <strong>Patch OTA:</strong> <code>${JSON.stringify(first.remediation.configPatch)}</code><br/>
+        • <strong>Harness Canary Re-Deploy (GitHub Actions CI/CD MCP):</strong> Run <code>${cicdRun.runId || 'GHA-RUN-2026'}</code> (<code>10% &rarr; 50% &rarr; 100%</code>) · <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:800;">Ver GitHub Actions ↗</a><br/>
         • <strong>Certificación Jira Xray:</strong> Caso <code>${first.verification.testKey}</code> -> <strong>PASSED</strong> (MTTR: ${first.remediation.mttrAutonomous})
       `;
       showToast(`🤖 TPV Auto-Reparada (${first.verification.testKey} PASSED)`);
@@ -1797,7 +1799,7 @@
     async function simulateAndHealGetnetProduct(productId) {
       const banner = document.getElementById('product-engineering-live-banner');
       banner.className = 'alert-box show alert-warning';
-      banner.innerHTML = `⏳ Ejecutando pipeline <strong>Context + Prompt + Loop + Harness Engineering</strong> para <code>${productId}</code>...`;
+      banner.innerHTML = `⏳ Ejecutando pipeline <strong>Context + Prompt + Loop + Harness Engineering + Canary Re-Deploy MCP</strong> para <code>${productId}</code>...`;
       const res = await fetch('/api/v1/products/simulate-and-heal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1805,6 +1807,7 @@
       });
       const data = await res.json();
       const first = (data.results || [])[0] || {};
+      const cicdRun = (data.cicdCanaryDeploy && data.cicdCanaryDeploy.run) ? data.cicdCanaryDeploy.run : {};
       banner.className = 'alert-box show alert-success';
       banner.innerHTML = `
         <strong>✅ CICLO COMPLETADO (${data.totalProductsProcessed} producto(s) Getnet verificado(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
@@ -1812,7 +1815,7 @@
         • <strong>1. Context Engineering:</strong> Playbook RAG <code>${first.contextLoaded.ragPlaybookId}</code> · Fuentes MCP: <code>${(first.contextLoaded.mcpSources || []).join(' | ')}</code><br/>
         • <strong>2. Prompt Engineering:</strong> Patrón <code>${first.promptExecuted.pattern}</code> · Output JSON: <code>${JSON.stringify(first.promptExecuted.deterministicOutput)}</code><br/>
         • <strong>3. Loop Engineering:</strong> <code>${first.remediation.loopId}</code> · Patch: <code>${JSON.stringify(first.remediation.configPatch)}</code> · MTTR: <strong>${first.remediation.mttrAutonomous}</strong> (vs ${first.remediation.mttrManual} manual)<br/>
-        • <strong>4. Harness Engineering:</strong> <code>${first.verification.harnessId}</code> · Caso Jira Xray <code>${first.verification.testKey}</code>: <strong>${first.verification.xrayStatus}</strong>
+        • <strong>4. Harness &amp; Canary Re-Deploy (GitHub Actions CI/CD MCP):</strong> <code>${first.verification.harnessId}</code> · Run <code>${cicdRun.runId || 'GHA-RUN-2026'}</code> (<a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:800;">GitHub Actions ↗</a>) · Caso Jira Xray <code>${first.verification.testKey}</code>: <strong>${first.verification.xrayStatus}</strong>
       `;
       showToast(`✅ ${first.verification.testKey} PASSED (${first.productName})`);
     }
@@ -1913,6 +1916,11 @@
         <div style="background:var(--getnet-sky);border:1px solid var(--getnet-sky-border);color:var(--getnet-charcoal);padding:13px;border-radius:12px;margin-bottom:10px;border-left:5px solid #D97706;">
           <strong>☁️ AWS CloudWatch (${cwAlarm.alarmName || 'CW-ALARM'})</strong><br/>
           Estado: <strong>${cwAlarm.state}</strong> · Valor: <code>${cwAlarm.currentValue}</code>
+        </div>
+        <div style="background:var(--getnet-sky);border:1px solid var(--getnet-sky-border);color:var(--getnet-charcoal);padding:13px;border-radius:12px;margin-bottom:10px;border-left:5px solid #059669;">
+          <strong>⚙️ GitHub Actions CI/CD MCP (Canary Release)</strong><br/>
+          Server: <code>getnet-github-actions-cicd-mcp</code><br/>
+          Rollout: <strong>10% &rarr; 50% &rarr; 100% PROMOTED</strong> · <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:800;">Actions ↗</a>
         </div>
         <div style="margin-top:14px;">
           <a href="/alm-dashboard" class="btn-primary" style="text-decoration:none;width:100%;justify-content:center;">📊 Ir al Cuadro de Mando CIO Completo →</a>
@@ -2127,12 +2135,14 @@
       alertBox.innerHTML = `⏳ Ejecutando Ciclo Autónomo ALM sin Human-in-the-Loop (Detección Getnet ATM + Dynatrace/CloudWatch MCP -> Consulta Motor RAG -> Triage -> Re-Fixing -> Re-Deploy)...`;
       const res = await fetch('/api/v1/alm/autonomous-cycle', { method: 'POST' });
       const data = await res.json();
+      const cicdRun = (data.cicdCanaryDeploy && data.cicdCanaryDeploy.run) ? data.cicdCanaryDeploy.run : {};
       alertBox.className = 'alert-box show alert-success';
       alertBox.innerHTML = `
         <strong>🤖 CICLO AUTÓNOMO ALM COMPLETADO (${data.deployedRelease}):</strong><br/>
         • Playbooks RAG aplicados: <code>${(data.ragPlaybooksApplied || []).join(', ')}</code><br/>
         • Incidente Funcional Getnet ATM (<code>${data.atmIncidentKey}</code>): <strong>${data.atmIncidentStatus}</strong> · Reverso EMV: <code>${data.emvReversalCode}</code><br/>
         • Incidente Sistemas Dynatrace/CloudWatch (<code>${data.sysIncidentKey}</code>): <strong>${data.sysIncidentStatus}</strong> · Redis Lock TTL=3000ms<br/>
+        • <strong>Harness Re-Deploy Canary (GitHub Actions CI/CD MCP):</strong> Run <code>${cicdRun.runId || 'GHA-RUN-2026'}</code> (<code>10% &rarr; 50% &rarr; 100%</code>) en <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="font-weight:800;color:#EC0000;">GitHub Actions ↗</a><br/>
         • <a href="/alm-dashboard" style="font-weight:700;color:#065f46;">Ver Cuadro de Mando Ejecutivo en Jira Xray (Flujo de Estados, Agentes, Ventanas MCP y Base RAG) →</a>
       `;
       showToast("🤖 Auto-Fix RAG completado: " + data.deployedRelease);

@@ -120,8 +120,20 @@
         <li><strong>S3 · Correlación MCP</strong> por <code>Observability-MCP-Agent</code> conectando con <strong>Dynatrace Davis AI (<code>DT-PROB-2026-8841</code>)</strong> y <strong>AWS CloudWatch (<code>CW-ALARM-GTN-CARDLOCK-P99</code>)</strong>.</li>
         <li><strong>S4 · Consulta Motor RAG</strong> → <strong>S5 · Síntesis RCA</strong> por <code>RAG-Knowledge-Architect-Agent</code> sobre <code>rag-knowledge-base/incident_knowledge_base.json</code> (17 Playbooks indexados).</li>
         <li><strong>S6 · Re-Fixing en Caliente</strong> por <code>Self-Healing-Patch-Agent</code> (Reverso <code>ISO-8583 MTI 0420</code> + <code>redis_lock_ttl_ms=3000</code>).</li>
-        <li><strong>S7 · Canary Re-Deploy &amp; Quality Gate</strong> → <strong>S8 · Cierre en Jira Xray</strong> por <code>QAOps-Xray-Certifier-Agent</code> (25/25 Tests de Tarjetas y Productos Getnet PASSED).</li>
+        <li><strong>S7 · Canary Re-Deploy (GitHub Actions CI/CD MCP) &amp; Quality Gate</strong> → <strong>S8 · Cierre en Jira Xray</strong>: El servidor MCP <code>getnet-github-actions-cicd-mcp</code> dispara y verifica el workflow <code>.github/workflows/canary-redeploy-qaops.yml</code> en <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:700;">https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions</a> (Rollout <code>10% &rarr; 50% &rarr; 100%</code> y 25/25 Tests Jira Xray PASSED).</li>
       </ul>
+    </div>
+    <div class="slide" style="border-left-color:#059669;">
+      <span class="highlight-red">HARNESS DEL RE-DEPLOY CANARY RELEASE · GITHUB ACTIONS CI/CD MCP</span>
+      <h2>2. MCP Server de CI/CD conectado a GitHub Actions en el Re-Deploy Canary</h2>
+      <ul>
+        <li><strong>Servidor MCP <code>getnet-github-actions-cicd-mcp</code></strong>: Conectado al repositorio <a href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank" style="color:#EC0000;font-weight:700;">AngC1/Getnet-Autonomous-ALM-QAOps/actions</a> (workflow <code>.github/workflows/canary-redeploy-qaops.yml</code>).</li>
+        <li><strong>4 Etapas del Harness Canary Release</strong>: 1) SAST Guardrail PCI-DSS 4.0 (<code>redact_pan</code>) + Motor RAG (17 Playbooks), 2) Rollout Canary <code>10% &rarr; 50%</code> con validación Dynatrace Davis AI, 3) Ejecución de suites Selenium E2E y JMeter IA, 4) Promoción automática al <code>100%</code> y sincronización de los 25 casos en Jira Xray.</li>
+      </ul>
+      <div class="nav-btns">
+        <a class="btn" href="/alm-dashboard#section-cicd-canary-harness">🚀 Abrir Harness Canary CI/CD en Cuadro de Mando CIO →</a>
+        <a class="btn btn-alt" href="https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions" target="_blank">🔗 Ver GitHub Actions en Vivo ↗</a>
+      </div>
     </div>
     <div class="slide">
       <span class="highlight-red">LABORATORIO INTERACTIVO DE TPV &amp; 11 PRODUCTOS OFICIALES GETNET.NET/ES</span>
