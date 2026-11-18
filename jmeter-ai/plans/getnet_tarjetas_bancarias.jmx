@@ -2,7 +2,7 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Getnet_Tarjetas_Bancarias_Load_Plan" enabled="true">
-      <stringProp name="TestPlan.comments">Plan de carga JMeter IA para Operativa de Tarjetas Bancarias Getnet (Parque EMV, Bloqueo ATM Kiro, Autorizaciones ISO-8583 y Disputas)</stringProp>
+      <stringProp name="TestPlan.comments">Plan de carga JMeter IA para Operativa de Tarjetas Bancarias Getnet (Parque EMV, Bloqueo Getnet ATM, Autorizaciones ISO-8583 y Disputas)</stringProp>
     </TestPlan>
   </hashTree>
 </jmeterTestPlan>

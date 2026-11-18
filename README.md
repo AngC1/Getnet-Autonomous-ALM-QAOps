@@ -3,7 +3,7 @@
 Plataforma de demostración ejecutiva para el **CIO de Getnet (Grupo Santander)** que simula el ciclo completo **ALM en Producción sin Human-in-the-Loop (Zero-Touch)** aplicado exclusivamente al dominio de **Tarjetas Bancarias EMV y Cajeros ATM**:
 
 1. **Flujo Visual de Máquina de 8 Estados (`S1` a `S8`) y Orquestación de 5 Agentes Autónomos**:
-   - `AGT-01 · Kiro-ATM-Vision-Agent`: Detección visual de retención de tarjeta en ranura ATM (`AWS_Kiro-main`) y enmascarado PCI-DSS (`redact_pan`).
+   - `AGT-01 · Getnet-ATM-Vision-Agent`: Detección visual de retención de tarjeta en ranura ATM (`Getnet_ATM`) y enmascarado PCI-DSS (`redact_pan`).
    - `AGT-02 · Observability-MCP-Agent`: Correlación en tiempo real vía **MCP Server** con **Dynatrace Davis AI (`DT-PROB-2026-8841`)**, **AWS CloudWatch (`CW-ALARM-GTN-CARDLOCK-P99`)** y **Prometheus OpenSource**.
    - `AGT-03 · RAG-Knowledge-Architect-Agent`: Consulta sobre el **Motor RAG de Comportamiento de Incidencias Bancarias (`rag-knowledge-base/`)** mediante similitud coseno TF-IDF + Boost BM25.
    - `AGT-04 · Self-Healing-Patch-Agent`: Inyección en caliente de parches (`enable_emv_reversal_0420=True` + emisión `ISO-8583 MTI 0420` y `redis_lock_ttl_ms=3000` + Circuit Breaker) y despliegue Canary (`v2026.11.2-AUTONOMOUS-PRO`).

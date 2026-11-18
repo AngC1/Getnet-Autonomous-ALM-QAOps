@@ -324,9 +324,69 @@
       white-space: pre-wrap;
       margin-top: 12px;
     }
+
+    /* MEJORA USABILIDAD 3 & 5: Modo Ejecutivo Claro Getnet + Barra de Progreso + Toast */
+    body.executive-light {
+      --bg-dark: #F5F9FB;
+      --bg-card: #FFFFFF;
+      --bg-card-alt: #F8FAFC;
+      --border: #CBD5E1;
+      --text: #191919;
+      --muted: #595959;
+    }
+    body.executive-light .card,
+    body.executive-light .kpi-card {
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    }
+    body.executive-light .state-node h4,
+    body.executive-light .agent-card h4 {
+      color: #191919;
+    }
+    body.executive-light .state-node .st-desc,
+    body.executive-light .agent-card ul {
+      color: #334155;
+    }
+    body.executive-light .agent-card {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+    }
+    body.executive-light code {
+      color: #B30000;
+    }
+    .alm-progress-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 14px;
+    }
+    .alm-progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #EC0000 0%, #F59E0B 50%, #10B981 100%);
+      transition: width 0.35s ease;
+    }
+    .alm-toast {
+      position: fixed;
+      top: 78px;
+      right: 24px;
+      z-index: 400;
+      background: #191919;
+      color: #FFFFFF;
+      border-left: 5px solid var(--getnet-red);
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+      display: none;
+    }
+    .alm-toast.show { display: block; }
   </style>
 </head>
 <body>
+  <div class="alm-toast" id="alm-toast" data-testid="alm-toast"></div>
 
   <!-- Barra Superior Oficial Getnet España + Jira Xray & Conectores MCP -->
   <header class="topbar">
@@ -339,13 +399,14 @@
       </div>
       <div class="topbar-title">
         <h1 id="alm-dashboard-title">Cuadro de Mando CIO Getnet · ALM Autónomo de Tarjetas Bancarias Sin Human-in-the-Loop</h1>
-        <span>Flujo Visual de 8 Estados · 5 Agentes IA · Ventanas MCP (<code>Dynatrace Davis AI</code> + <code>AWS CloudWatch</code>) · Base de Conocimiento <code>RAG</code></span>
+        <span>Flujo Visual de 8 Estados · 5 Agentes IA · Ventanas MCP (<code>Getnet ATM</code> + <code>Dynatrace Davis AI</code> + <code>AWS CloudWatch</code>) · Base de Conocimiento <code>RAG</code></span>
       </div>
     </div>
     <div class="topbar-actions">
+      <button class="btn" onclick="toggleExecutiveTheme()" id="btn-toggle-theme" data-testid="btn-toggle-theme">☀️ Modo Ejecutivo Claro Getnet</button>
       <button class="btn btn-purple" onclick="openMcpModal('dynatrace')" id="btn-open-mcp-dynatrace">🔌 Ventana MCP Dynatrace</button>
       <button class="btn btn-blue" onclick="openMcpModal('cloudwatch')" id="btn-open-mcp-cloudwatch">☁️ Ventana MCP AWS CloudWatch</button>
-      <button class="btn" onclick="openMcpModal('kiro_atm')" id="btn-open-mcp-kiro">🏧 Ventana MCP AWS Kiro ATM</button>
+      <button class="btn" onclick="openMcpModal('getnet_atm')" id="btn-open-mcp-kiro">🏧 Ventana MCP Getnet ATM</button>
       <a class="btn" href="/servicios-para-clientes">💳 Portal Operativo de Tarjetas</a>
       <a class="btn" href="/presentacion">📽️ Presentación CIO</a>
       <a class="btn btn-red" href="/api/v1/alm/export/jira-xray">⬇ Exportar Xray JSON</a>
@@ -358,13 +419,13 @@
     <div class="zero-touch-banner" data-testid="zero-touch-banner">
       <div>
         <h2>🤖 Centro de Mando Autónomo (Zero Human-in-the-Loop) · Dominio Exclusivo: Tarjetas Bancarias Getnet</h2>
-        <p>Simula en tiempo real una <strong>Incidencia Funcional de Tarjeta Retenida en Cajero ATM (<code>AWS_Kiro-main</code>)</strong> y una <strong>Incidencia de Sistemas en Producción (<code>Dynatrace Davis AI + AWS CloudWatch MCP</code>)</strong>. Observa cómo los <strong>5 Agentes Autónomos</strong> consultan el <strong>Motor RAG</strong>, aplican el Hotfix, redespliegan en Canary y certifican los 14 casos de tarjetas en Jira Xray.</p>
+        <p>Simula en tiempo real una <strong>Incidencia Funcional de Tarjeta Retenida en Cajero ATM (<code>Getnet_ATM</code>)</strong> y una <strong>Incidencia de Sistemas en Producción (<code>Dynatrace Davis AI + AWS CloudWatch MCP</code>)</strong>. Observa cómo los <strong>5 Agentes Autónomos</strong> consultan el <strong>Motor RAG</strong>, aplican el Hotfix, redespliegan en Canary y certifican los 14 casos de tarjetas en Jira Xray.</p>
         <div id="live-Banner-status" style="margin-top:8px;font-size:0.84rem;color:#6ee7b7;font-weight:700;">
           Estado Global: <span id="overall-alm-status">{{ autonomous.overallStatus }}</span> · Release Activa: <code id="active-release-code">{{ autonomous.deployedRelease }}</code>
         </div>
       </div>
       <div class="zero-touch-controls">
-        <button class="btn btn-red" id="btn-inject-incidents" onclick="injectProductionIncidents()">🔥 1. Simular Fallos en PRO (ATM + Dynatrace + CloudWatch)</button>
+        <button class="btn btn-red" id="btn-inject-incidents" onclick="injectProductionIncidents()">🔥 1. Simular Fallos en PRO (Getnet ATM + Dynatrace + CloudWatch)</button>
         <button class="btn btn-green" id="btn-run-autonomous-alm" onclick="runAutonomousAlmCycle()">⚡ 2. Ejecutar Ciclo ALM Autónomo (RAG + Auto-Fix)</button>
         <button class="btn btn-purple" id="btn-animate-states" onclick="animateStateMachineFlow()">▶️ 3. Animar Paso a Paso Estados y Agentes</button>
       </div>
@@ -373,7 +434,7 @@
     <!-- KPIs Ejecutivos CIO Getnet -->
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="label">Incidencia Funcional Tarjeta ATM</div>
+        <div class="label">Incidencia Funcional Getnet ATM</div>
         <div class="value" id="kpi-atm-inc" style="color: {{ '#ef4444' if system_state.atm_functional_bug_active else '#10b981' }};">
           {{ 'OPEN (P1)' if system_state.atm_functional_bug_active else 'RESOLVED' }}
         </div>
@@ -394,7 +455,7 @@
       <div class="kpi-card">
         <div class="label">Conectores MCP Server Activos</div>
         <div class="value" style="color:#38bdf8;">4 / 4 UP</div>
-        <div class="sub">Dynatrace · CloudWatch · Prometheus · Kiro</div>
+        <div class="sub">Dynatrace · CloudWatch · Prometheus · Getnet ATM</div>
       </div>
       <div class="kpi-card">
         <div class="label">MTTR Ciclo Autónomo ALM</div>
@@ -414,14 +475,18 @@
         <span>🔄 Flujo Visual de Estados del Ciclo ALM y Orquestación de los 5 Agentes Autónomos (Zero Human-in-the-Loop)</span>
         <span class="status-pill status-passed" id="state-machine-badge">MÁQUINA DE ESTADOS: 8 / 8 ESTADOS COMPLETADOS</span>
       </h2>
-      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:10px;">
-        Haz clic en cualquier estado (<code>S1</code> a <code>S8</code>) o pulsa <strong>"▶️ 3. Animar Paso a Paso Estados y Agentes"</strong> para inspeccionar cómo viaja el evento desde la ranura del cajero ATM y los agentes de Dynatrace/CloudWatch hasta el cierre certificado en Jira Xray.
+      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:6px;">
+        Haz clic en cualquier estado (<code>S1</code> a <code>S8</code>) o pulsa <strong>"▶️ 3. Animar Paso a Paso Estados y Agentes"</strong> para inspeccionar cómo viaja el evento desde la ranura del cajero <code>Getnet ATM</code> y los agentes de Dynatrace/CloudWatch hasta el cierre certificado en Jira Xray.
       </p>
+
+      <div class="alm-progress-track">
+        <div class="alm-progress-bar" id="alm-progress-bar"></div>
+      </div>
 
       <!-- Máquina Visual de 8 Estados -->
       <div class="state-flow-grid" id="state-machine-grid">
         {% for st in state_machine %}
-        <div class="state-node" id="node-{{ st.stateId }}" onclick="inspectStateNode('{{ st.stateId }}', '{{ st.name }}', '{{ st.agent }}', '{{ st.inputSignal }}', '{{ st.outputTransition }}')">
+        <div class="state-node" id="node-{{ st.stateId }}" data-detail="{{ st.inspectorDetail|default('') }}" onclick="inspectStateNode('{{ st.stateId }}', '{{ st.name }}', '{{ st.agent }}', '{{ st.inputSignal }}', '{{ st.outputTransition }}', this.getAttribute('data-detail'))">
           <div class="st-header">
             <span class="st-num">ESTADO {{ st.order }} · {{ st.badge }}</span>
             <span style="font-size:0.72rem;color:#94a3b8;">{{ st.durationMs }} ms</span>
@@ -435,8 +500,8 @@
         {% endfor %}
       </div>
 
-      <div id="state-inspector-banner" style="margin-top:14px;padding:12px 16px;background:#090d16;border:1px solid #38bdf8;border-radius:8px;font-size:0.82rem;color:#e2e8f0;">
-        <strong>🔍 Inspector de Transición de Estado en Vivo:</strong> Selecciona cualquier nodo superior o ejecuta la animación paso a paso para visualizar el intercambio de mensajes en el bus Multi-Agente (Protocolo A2A).
+      <div id="state-inspector-banner" style="margin-top:14px;padding:14px 18px;background:#090d16;border:1.5px solid #38bdf8;border-radius:10px;font-size:0.83rem;color:#e2e8f0;">
+        <strong>🔍 Inspector de Transición de Estado en Vivo (Click-to-Inspect):</strong> Selecciona cualquier nodo superior (<code>S1</code> a <code>S8</code>) o ejecuta la animación paso a paso para visualizar el payload técnico, los comandos MCP y el intercambio en el bus Multi-Agente (Protocolo A2A).
       </div>
 
       <!-- Cómo Trabajan los 5 Agentes Especializados -->
@@ -467,10 +532,10 @@
       </div>
     </div>
 
-    <!-- SECCIÓN 2: VENTANAS Y PANEL DE CONEXIÓN MCP SERVER CON DYNATRACE, AWS CLOUDWATCH, PROMETHEUS Y AWS KIRO -->
+    <!-- SECCIÓN 2: VENTANAS Y PANEL DE CONEXIÓN MCP SERVER CON DYNATRACE, AWS CLOUDWATCH, PROMETHEUS Y GETNET ATM -->
     <div class="card" id="section-mcp-connectors">
       <h2>
-        <span>🔌 Conectores MCP Server en Producción (Dynatrace Davis AI · AWS CloudWatch · Prometheus · AWS Kiro ATM)</span>
+        <span>🔌 Conectores MCP Server en Producción (Dynatrace Davis AI · AWS CloudWatch · Prometheus · Getnet ATM)</span>
         <span class="status-pill status-info">PROTOCOLO JSON-RPC 2.0 ACTIVO</span>
       </h2>
       <p style="font-size:0.84rem;color:var(--muted);">
@@ -510,20 +575,20 @@
           <button class="btn btn-blue" onclick="openMcpModal('cloudwatch')">☁️ Abrir Ventana de Conexión MCP CloudWatch</button>
         </div>
 
-        <!-- Conector 3: AWS Kiro ATM Sentinel MCP -->
+        <!-- Conector 3: Getnet ATM Sentinel MCP -->
         <div class="mcp-conn-card kiro">
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <strong style="color:#fecaca;font-size:0.95rem;">🔴 AWS Kiro ATM Sentinel Vision MCP</strong>
-              <span class="status-pill status-passed">{{ mcp_connections.kiro_atm.status }} ({{ mcp_connections.kiro_atm.latencyMs }}ms)</span>
+              <strong style="color:#fecaca;font-size:0.95rem;">🔴 Getnet ATM Sentinel Vision MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.getnet_atm.status }} ({{ mcp_connections.getnet_atm.latencyMs }}ms)</span>
             </div>
             <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
-              <div><strong>Nodo Cajero:</strong> <code>{{ mcp_connections.kiro_atm.atmNode }}</code></div>
-              <div><strong>Bucket S3:</strong> <code>{{ mcp_connections.kiro_atm.s3Bucket }}</code></div>
+              <div><strong>Nodo Cajero:</strong> <code>{{ mcp_connections.getnet_atm.atmNode }}</code></div>
+              <div><strong>Bucket S3:</strong> <code>{{ mcp_connections.getnet_atm.s3Bucket }}</code></div>
               <div><strong>Privacidad PAN:</strong> <code>brand_verifier.incident.redact_pan</code></div>
             </div>
           </div>
-          <button class="btn btn-red" onclick="openMcpModal('kiro_atm')">🏧 Abrir Ventana de Conexión MCP AWS Kiro</button>
+          <button class="btn btn-red" onclick="openMcpModal('getnet_atm')">🏧 Abrir Ventana de Conexión MCP Getnet ATM</button>
         </div>
 
         <!-- Conector 4: Prometheus OpenSource MCP -->
@@ -551,7 +616,7 @@
         <span class="status-pill status-purple">{{ rag_meta.embeddingModel }}</span>
       </h2>
       <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
-        El agente <code>RAG-Knowledge-Architect-Agent</code> indexa los patrones de comportamiento de las incidencias de tarjetas bancarias, sus huellas de telemetría (<code>AWS_Kiro</code>, <code>Dynatrace Davis AI</code>, <code>AWS CloudWatch</code>, <code>ISO-8583</code>) y prescribe la solución determinista que aplica <code>Self-Healing-Patch-Agent</code> sin Human-in-the-Loop.
+        El agente <code>RAG-Knowledge-Architect-Agent</code> indexa los patrones de comportamiento de las incidencias de tarjetas bancarias, sus huellas de telemetría (<code>Getnet_ATM</code>, <code>Dynatrace Davis AI</code>, <code>AWS CloudWatch</code>, <code>ISO-8583</code>) y prescribe la solución determinista que aplica <code>Self-Healing-Patch-Agent</code> sin Human-in-the-Loop.
       </p>
 
       <!-- Buscador Interactivo RAG -->
@@ -564,7 +629,7 @@
           <button class="btn btn-purple" onclick="runRagQuery()">🧠 Recuperar Playbook RAG &amp; Sintetizar Solución</button>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Tarjeta retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 Kiro')">🏧 Preset 1: Retención Tarjeta ATM (MTI 0420)</button>
+          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Tarjeta retenida en ranura cajero Getnet ATM sin reverso ISO-8583 MTI 0420')">🏧 Preset 1: Retención Tarjeta Getnet ATM (MTI 0420)</button>
           <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Dynatrace Davis AI DT-PROB-2026-8841 y CloudWatch deadlock Redis TTL 0 HikariCP')">🟣 Preset 2: Deadlock Redis &amp; HikariCP (Dynatrace/CW)</button>
           <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Fallo autorización 3D-Secure 2.2 ISO-8583 RC 91 Issuer Switch Inoperative')">🔐 Preset 3: Error ISO-8583 RC 91 (Stand-In STIP)</button>
           <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Fuga de PAN de 16 dígitos en logs PCI-DSS 4.0 redact_pan')">🛡️ Preset 4: Privacidad PCI-DSS (redact_pan)</button>
@@ -626,20 +691,20 @@
       </table>
     </div>
 
-    <!-- SECCIÓN 4: TELEMETRÍA EN VIVO DE LAS 2 INCIDENCIAS PRO (ATM KIRO vs DYNATRACE/CLOUDWATCH) -->
+    <!-- SECCIÓN 4: TELEMETRÍA EN VIVO DE LAS 2 INCIDENCIAS PRO (GETNET ATM vs DYNATRACE/CLOUDWATCH) -->
     <div class="grid-2">
       <div class="card">
         <h2>
-          <span>🏧 Incidencia Funcional Tarjeta ATM (<code>AWS_Kiro-main</code>)</span>
-          <span class="status-pill status-passed" id="badge-atm-status">{{ autonomous.atmKiroDetail.status }}</span>
+          <span>🏧 Incidencia Funcional Tarjeta ATM (<code>Getnet_ATM</code>)</span>
+          <span class="status-pill status-passed" id="badge-atm-status">{{ autonomous.atmDetail.status }}</span>
         </h2>
         <div style="font-size:0.82rem;display:grid;gap:8px;">
-          <div><strong>Ticket Jira Xray:</strong> <code>{{ autonomous.atmKiroDetail.incidentKey }}</code> · <strong>Playbook RAG:</strong> <code>{{ autonomous.atmKiroDetail.ragPlaybookId }}</code></div>
-          <div><strong>Cajero ATM:</strong> <code>{{ autonomous.atmKiroDetail.atmId }}</code> ({{ autonomous.atmKiroDetail.location }})</div>
-          <div><strong>Privacidad PCI-DSS (<code>redact_pan</code>):</strong> <code>{{ autonomous.atmKiroDetail.panRedacted }}</code></div>
-          <div><strong>Triaje Kiro:</strong> Categoría <code>{{ autonomous.atmKiroDetail.triage.categoria }}</code> · Riesgo Sentinel: <span class="status-pill status-failed">{{ autonomous.atmKiroDetail.sentinelRisk }} ({{ (autonomous.atmKiroDetail.confidence * 100)|int }}%)</span></div>
-          <div><strong>Causa Raíz:</strong> {{ autonomous.atmKiroDetail.triage.causa_probable }}</div>
-          <div><strong>Acción Autónoma:</strong> {{ autonomous.atmKiroDetail.triage.accion_recomendada }}</div>
+          <div><strong>Ticket Jira Xray:</strong> <code>{{ autonomous.atmDetail.incidentKey }}</code> · <strong>Playbook RAG:</strong> <code>{{ autonomous.atmDetail.ragPlaybookId }}</code></div>
+          <div><strong>Cajero ATM:</strong> <code>{{ autonomous.atmDetail.atmId }}</code> ({{ autonomous.atmDetail.location }})</div>
+          <div><strong>Privacidad PCI-DSS (<code>redact_pan</code>):</strong> <code>{{ autonomous.atmDetail.panRedacted }}</code></div>
+          <div><strong>Triaje Getnet ATM:</strong> Categoría <code>{{ autonomous.atmDetail.triage.categoria }}</code> · Riesgo Sentinel: <span class="status-pill status-failed">{{ autonomous.atmDetail.sentinelRisk }} ({{ (autonomous.atmDetail.confidence * 100)|int }}%)</span></div>
+          <div><strong>Causa Raíz:</strong> {{ autonomous.atmDetail.triage.causa_probable }}</div>
+          <div><strong>Acción Autónoma:</strong> {{ autonomous.atmDetail.triage.accion_recomendada }}</div>
         </div>
       </div>
 
@@ -805,11 +870,19 @@
         entity: "/aws/ecs/getnet-card-blocker-svc · CW-ALARM-GTN-CARDLOCK-P99",
         query: "fields @timestamp, @message | filter level in ['ERROR', 'FATAL'] | sort @timestamp desc | limit 20"
       },
-      kiro_atm: {
-        title: "🔴 Ventana de Conexión MCP Server — AWS Kiro ATM Sentinel Vision & PCI-DSS",
-        subtitle: "Servidor MCP: getnet-kiro-atm-edge-mcp · Tool: atm_kiro_inspect_incident (redact_pan)",
+      getnet_atm: {
+        title: "🔴 Ventana de Conexión MCP Server — Getnet ATM Sentinel Vision & PCI-DSS",
+        subtitle: "Servidor MCP: getnet-atm-edge-mcp · Tool: getnet_atm_inspect_incident (redact_pan)",
         endpoint: "s3://getnet-atm-incidents-pro (ATM-GTN-MAD-0042)",
-        token: "AWS_KIRO_BEDROCK_SONNET_4_5_ROLE",
+        token: "GETNET_ATM_BEDROCK_SONNET_4_5_ROLE",
+        entity: "ATM-GTN-MAD-0042 (Sucursal Getnet Gran Vía 28, Madrid)",
+        query: "inspect_atm_slot --atm-id ATM-GTN-MAD-0042 --enforce-pci-redact-pan --verify-mti-0420"
+      },
+      kiro_atm: {
+        title: "🔴 Ventana de Conexión MCP Server — Getnet ATM Sentinel Vision & PCI-DSS",
+        subtitle: "Servidor MCP: getnet-atm-edge-mcp · Tool: getnet_atm_inspect_incident (redact_pan)",
+        endpoint: "s3://getnet-atm-incidents-pro (ATM-GTN-MAD-0042)",
+        token: "GETNET_ATM_BEDROCK_SONNET_4_5_ROLE",
         entity: "ATM-GTN-MAD-0042 (Sucursal Getnet Gran Vía 28, Madrid)",
         query: "inspect_atm_slot --atm-id ATM-GTN-MAD-0042 --enforce-pci-redact-pan --verify-mti-0420"
       },
@@ -822,6 +895,23 @@
         query: "getnet_card_block_latency_p95_ms{service='getnet-card-blocker-svc',env='prod'}"
       }
     };
+
+    function showAlmToast(msg) {
+      const t = document.getElementById('alm-toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3800);
+    }
+
+    function toggleExecutiveTheme() {
+      const isLight = document.body.classList.toggle('executive-light');
+      const btn = document.getElementById('btn-toggle-theme');
+      if (btn) {
+        btn.textContent = isLight ? '🌙 Modo SOC Oscuro' : '☀️ Modo Ejecutivo Claro Getnet';
+      }
+      showAlmToast(isLight ? '☀️ Activado Modo Ejecutivo Claro Getnet (Alto Contraste Proyector)' : '🌙 Activado Modo SOC Oscuro');
+    }
 
     function openMcpModal(provider) {
       const cfg = MCP_PRESETS[provider] || MCP_PRESETS.dynatrace;
@@ -853,6 +943,7 @@
       });
       const data = await res.json();
       outBox.textContent = JSON.stringify(data.jsonrpc, null, 2);
+      showAlmToast("🔌 Handshake MCP JSON-RPC 2.0 completado (" + provider + ")");
     }
 
     async function runRagFromMcpModal() {
@@ -860,12 +951,12 @@
       closeMcpModal();
       const q = provider === 'dynatrace' || provider === 'cloudwatch'
         ? 'Dynatrace Davis AI DT-PROB-2026-8841 y CloudWatch deadlock Redis TTL 0 saturación HikariCP'
-        : 'Tarjeta retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 Kiro';
+        : 'Tarjeta retenida en ranura cajero Getnet ATM sin reverso ISO-8583 MTI 0420';
       setRagPreset(q);
       document.getElementById('section-rag-knowledge-base').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function inspectStateNode(stateId, name, agent, inputSig, outputTrans) {
+    function inspectStateNode(stateId, name, agent, inputSig, outputTrans, inspectorDetail) {
       document.querySelectorAll('.state-node').forEach(n => n.classList.remove('active-step'));
       const node = document.getElementById('node-' + stateId);
       if (node) node.classList.add('active-step');
@@ -874,23 +965,27 @@
         <strong>📍 Estado Seleccionado: <code>${stateId}</code> (${name})</strong><br/>
         • <strong>Agente Responsable:</strong> <code>${agent}</code><br/>
         • <strong>Señal de Entrada:</strong> ${inputSig}<br/>
-        • <strong>Resultado / Transición de Salida:</strong> <span style="color:#34d399;">${outputTrans}</span>
+        • <strong>Resultado / Transición de Salida:</strong> <span style="color:#34d399;">${outputTrans}</span><br/>
+        ${inspectorDetail ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #334155;color:#fde68a;"><strong>🔬 Detalle Técnico de Inspección:</strong> <code>${inspectorDetail}</code></div>` : ''}
       `;
     }
 
     async function animateStateMachineFlow() {
       const nodes = Array.from(document.querySelectorAll('.state-node'));
       const badge = document.getElementById('state-machine-badge');
+      const prog = document.getElementById('alm-progress-bar');
       badge.textContent = "⏳ SIMULANDO TRANSICIÓN DE ESTADOS Y AGENTES EN VIVO...";
       badge.className = "status-pill status-info";
       for (let i = 0; i < nodes.length; i++) {
         nodes.forEach(n => n.classList.remove('active-step'));
         nodes[i].classList.add('active-step');
+        if (prog) prog.style.width = (((i + 1) / nodes.length) * 100) + '%';
         nodes[i].click();
-        await new Promise(r => setTimeout(r, 550));
+        await new Promise(r => setTimeout(r, 450));
       }
       badge.textContent = "MÁQUINA DE ESTADOS: 8 / 8 ESTADOS COMPLETADOS (ZERO-TOUCH)";
       badge.className = "status-pill status-passed";
+      showAlmToast("✅ Recorrido completo S1 -> S8 finalizado");
     }
 
     function setRagPreset(queryText) {
@@ -920,11 +1015,13 @@
         <div style="margin-bottom:6px;color:#a7f3d0;"><strong>Parche Determinista Sintetizado:</strong> <code>${JSON.stringify(syn.recommendedConfigPatch)}</code></div>
         <div><strong>Quality Gate en Jira Xray:</strong> Casos requeridos <code>${(syn.xrayVerificationTests || []).join(', ')}</code></div>
       `;
+      showAlmToast("🧠 Playbook RAG recuperado: " + syn.selectedPlaybookId);
     }
 
     async function injectProductionIncidents() {
       const statusSpan = document.getElementById('overall-alm-status');
-      statusSpan.textContent = "🔥 INYECTANDO INCIDENCIAS EN CAJERO ATM Y DYNATRACE/CLOUDWATCH...";
+      statusSpan.textContent = "🔥 INYECTANDO INCIDENCIAS EN CAJERO GETNET ATM Y DYNATRACE/CLOUDWATCH...";
+      showAlmToast("🔥 Inyectando fallos en Getnet ATM y Dynatrace/CloudWatch...");
       await fetch('/api/v1/alm/inject-incidents', { method: 'POST' });
       window.location.reload();
     }
@@ -932,18 +1029,20 @@
     async function runAutonomousAlmCycle() {
       const statusSpan = document.getElementById('overall-alm-status');
       statusSpan.textContent = "⚡ EJECUTANDO 5 AGENTES + MOTOR RAG + HOTFIX + RE-DEPLOY CANARY...";
+      showAlmToast("⚡ Ejecutando Ciclo Autónomo ALM con Motor RAG...");
+      await animateStateMachineFlow();
       await fetch('/api/v1/alm/autonomous-cycle', { method: 'POST' });
       window.location.reload();
     }
 
     async function triggerLiveSelenium() {
-      alert("Ejecutando los 12 casos funcionales de tarjetas bancarias con Selenium Headless + MCP DOM Pruning...");
+      showAlmToast("🌐 Ejecutando 12 casos funcionales de tarjetas con Selenium Headless...");
       await fetch('/api/v1/qaops/trigger-selenium', { method: 'POST' });
       window.location.reload();
     }
 
     async function triggerLiveJmeter() {
-      alert("Ejecutando Stress Test JMeter IA sobre endpoints de bloqueo y autorización de tarjetas bancarias...");
+      showAlmToast("⚡ Ejecutando Stress Test JMeter IA sobre endpoints de tarjetas...");
       await fetch('/api/v1/qaops/trigger-jmeter', { method: 'POST' });
       window.location.reload();
     }

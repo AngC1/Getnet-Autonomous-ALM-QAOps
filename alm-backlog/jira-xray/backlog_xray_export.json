@@ -9,7 +9,7 @@
       "getnet-dynatrace-davis-mcp",
       "getnet-aws-cloudwatch-mcp",
       "getnet-prometheus-otel-mcp",
-      "getnet-kiro-atm-edge-mcp",
+      "getnet-atm-edge-mcp",
       "getnet-selenium-qaops"
     ],
     "ragEngine": "getnet-banking-incident-hybrid-v3 (rag-knowledge-base/incident_knowledge_base.json)"
@@ -37,7 +37,7 @@
     },
     {
       "key": "GTN-EP-05",
-      "summary": "Bloqueo Preventivo de Tarjetas en ATM (AWS_Kiro) con Reverso Automático ISO-8583 MTI 0420",
+      "summary": "Bloqueo Preventivo de Tarjetas en ATM (Getnet_ATM) con Reverso Automático ISO-8583 MTI 0420",
       "status": "DONE"
     },
     {
@@ -106,7 +106,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 231
+      "lastExecutionTimeMs": 255
     },
     {
       "key": "GTN-TC-002",
@@ -116,7 +116,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 272
+      "lastExecutionTimeMs": 246
     },
     {
       "key": "GTN-TC-003",
@@ -126,7 +126,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 227
+      "lastExecutionTimeMs": 195
     },
     {
       "key": "GTN-TC-004",
@@ -136,7 +136,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 832
+      "lastExecutionTimeMs": 255
     },
     {
       "key": "GTN-TC-005",
@@ -146,7 +146,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 762
+      "lastExecutionTimeMs": 773
     },
     {
       "key": "GTN-TC-006",
@@ -156,7 +156,7 @@
       "priority": "High",
       "type": "API & Business Rule",
       "status": "PASSED",
-      "lastExecutionTimeMs": 45
+      "lastExecutionTimeMs": 44
     },
     {
       "key": "GTN-TC-007",
@@ -166,7 +166,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 269
+      "lastExecutionTimeMs": 273
     },
     {
       "key": "GTN-TC-008",
@@ -176,7 +176,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 795
+      "lastExecutionTimeMs": 748
     },
     {
       "key": "GTN-TC-009",
@@ -186,7 +186,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 207
+      "lastExecutionTimeMs": 684
     },
     {
       "key": "GTN-TC-010",
@@ -196,7 +196,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 736
+      "lastExecutionTimeMs": 710
     },
     {
       "key": "GTN-TC-011",
@@ -206,7 +206,7 @@
       "priority": "High",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 51
+      "lastExecutionTimeMs": 50
     },
     {
       "key": "GTN-TC-012",
@@ -216,17 +216,17 @@
       "priority": "Critical",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 61
+      "lastExecutionTimeMs": 60
     },
     {
       "key": "GTN-TC-013",
       "testLinkId": "TL-GTN-113",
       "storyKey": "GTN-US-105",
-      "summary": "Ciclo ALM Zero-Touch: Detección de tarjeta retenida en ATM (AWS_Kiro), consulta Playbook RAG-PB-ATM-001, Hotfix reverso MTI 0420 y Re-Deploy",
+      "summary": "Ciclo ALM Zero-Touch: Detección de tarjeta retenida en ATM (Getnet_ATM), consulta Playbook RAG-PB-ATM-001, Hotfix reverso MTI 0420 y Re-Deploy",
       "priority": "Blocker",
-      "type": "Autonomous ALM (AWS Kiro + RAG)",
+      "type": "Autonomous ALM (Getnet ATM + RAG)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 387
+      "lastExecutionTimeMs": 785
     },
     {
       "key": "GTN-TC-014",
@@ -236,13 +236,13 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (Dynatrace + CloudWatch MCP)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 37
+      "lastExecutionTimeMs": 19
     }
   ],
   "productionIncidents": [
     {
       "key": "GTN-INC-ATM-001",
-      "source": "AWS_Kiro-main (atm_sentinel.py + brand_verifier/incident.py)",
+      "source": "Getnet_ATM (atm_sentinel.py + brand_verifier/incident.py)",
       "atmId": "ATM-GTN-MAD-0042",
       "summary": "Retención física de tarjeta bancaria (4548 **** **** 9012) en ranura de cajero ATM sin emisión de trama de reverso ISO-8583 MTI 0420",
       "severity": "CRITICAL (P1)",
@@ -250,7 +250,7 @@
       "rootCause": "Flag enable_emv_reversal_0420=False en card_lock_engine omite el envío del reverso MTI 0420 al bloquear preventivamente la tarjeta.",
       "autoFixApplied": "Activado enable_emv_reversal_0420=True, emitido reverso REV-EMV-2026 y aprovisionado token digital TOK-GTN-WALLET-9012.",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-17T22:57:57+00:00"
+      "resolvedAt": "2026-11-18T06:43:42+00:00"
     },
     {
       "key": "GTN-INC-SYS-002",
@@ -262,7 +262,7 @@
       "rootCause": "Ausencia de TTL en lock Redis de bloqueo de tarjetas provoca bloqueo indefinido de conexiones bajo ráfagas concurrentes.",
       "autoFixApplied": "Inyectado redis_lock_ttl_ms=3000, activado Circuit Breaker Resilience4j y redesplegada versión v2026.11.2-AUTONOMOUS-PRO (P95 = 42.5 ms).",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-17T22:57:57+00:00"
+      "resolvedAt": "2026-11-18T06:43:42+00:00"
     }
   ],
   "defects": [

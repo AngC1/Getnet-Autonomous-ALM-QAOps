@@ -1,12 +1,12 @@
 """
 Servidor MCP (Model Context Protocol) de Observabilidad Híbrida (Dynatrace Davis AI + AWS CloudWatch + OpenSource Prometheus/OTel),
-Base de Conocimiento RAG y Motor de Triaje Funcional ATM (AWS_Kiro) para Getnet — Ayesa Digital QAOps.
+Base de Conocimiento RAG y Motor de Triaje Funcional ATM (Getnet_ATM) para Getnet — Ayesa Digital QAOps.
 
 Permite a los agentes autónomos (Zero Human-in-the-Loop):
   1. Conectar vía MCP con Dynatrace (Davis AI Problem Feed, Smartscape Topology y consultas DQL PurePath).
   2. Consultar alarmas e insights de AWS CloudWatch (/aws/ecs/getnet-card-blocker-svc).
   3. Consultar métricas en tiempo real del monitor OpenSource (Prometheus / OpenTelemetry / Alertmanager).
-  4. Procesar incidencias funcionales de bloqueo de tarjetas bancarias desde cajeros ATM usando AWS_Kiro-main
+  4. Procesar incidencias funcionales de bloqueo de tarjetas bancarias desde cajeros ATM usando Getnet_ATM
      (enmascarado PCI-DSS de PAN, extracción de telemetría de vídeo y triaje cognitivo).
   5. Consultar la Base de Conocimiento RAG (rag-knowledge-base/) sobre comportamiento de incidencias bancarias.
   6. Orquestar el ciclo completo ALM en Producción sin Human-in-the-Loop:
@@ -33,14 +33,14 @@ from typing import Any, Dict, List, Optional
 import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-KIRO_DIR = PROJECT_ROOT / "AWS_Kiro-main" / "AWS_Kiro-main"
+GETNET_ATM_DIR = PROJECT_ROOT / "Getnet_ATM"
 RAG_DIR = PROJECT_ROOT / "rag-knowledge-base"
-for p in (KIRO_DIR, RAG_DIR):
+for p in (GETNET_ATM_DIR, RAG_DIR):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
 from brand_verifier.incident import (  # noqa: E402
-    process_incident as kiro_process_incident,
+    process_incident as getnet_atm_process_incident,
     redact_pan,
     scene_prompt,
     validate_incident,
@@ -52,14 +52,14 @@ from rag_engine import IncidentRAGEngine  # noqa: E402
 
 
 class LocalMemoryS3Client:
-    """Cliente S3 en memoria para persistencia determinista del motor AWS_Kiro sin requerir credenciales externas."""
+    """Cliente S3 en memoria para persistencia determinista del motor Getnet_ATM sin requerir credenciales externas."""
 
     def __init__(self) -> None:
         self.objects: Dict[str, bytes] = {}
 
     def put_object(self, Bucket: str, Key: str, Body: bytes, **kwargs: Any) -> Dict[str, Any]:
         self.objects[Key] = Body if isinstance(Body, bytes) else str(Body).encode("utf-8")
-        return {"ETag": '"simulated-etag-getnet-kiro"'}
+        return {"ETag": '"simulated-etag-getnet-atm"'}
 
     def get_object(self, Bucket: str, Key: str, **kwargs: Any) -> Dict[str, Any]:
         import io
@@ -68,7 +68,7 @@ class LocalMemoryS3Client:
 
 
 class SimulatedBedrockTriageClient:
-    """Cliente Bedrock determinista para triaje de incidencias ATM de tarjetas bancarias Getnet conforme a AWS_Kiro."""
+    """Cliente Bedrock determinista para triaje de incidencias ATM de tarjetas bancarias Getnet conforme a Getnet_ATM."""
 
     def __init__(self, response_payload: Dict[str, Any]) -> None:
         self.response_payload = response_payload
@@ -87,7 +87,7 @@ class SimulatedBedrockTriageClient:
 
 
 class ObservabilityMcpController:
-    """Controlador MCP de Observabilidad (Dynatrace + AWS CloudWatch + Prometheus + AWS Kiro ATM + Motor RAG)."""
+    """Controlador MCP de Observabilidad (Dynatrace + AWS CloudWatch + Prometheus + Getnet ATM + Motor RAG)."""
 
     def __init__(self, base_url: str = "http://127.0.0.1:8080") -> None:
         self.base_url = base_url.rstrip("/")
@@ -165,7 +165,7 @@ class ObservabilityMcpController:
     def rag_retrieve_incident_playbook(self, query: str, telemetry_source: Optional[str] = None) -> Dict[str, Any]:
         return self.rag_engine.retrieve(query=query, telemetry_source=telemetry_source, top_k=3)
 
-    def atm_kiro_inspect_incident(
+    def getnet_atm_inspect_incident(
         self,
         atm_id: str = "ATM-GTN-MAD-0042",
         ubicacion: str = "Sucursal Getnet Gran Vía 28, Madrid",
@@ -201,7 +201,7 @@ class ObservabilityMcpController:
             ),
         }
         bedrock_sim = SimulatedBedrockTriageClient(triage_payload)
-        kiro_res = kiro_process_incident(
+        atm_res = getnet_atm_process_incident(
             raw_incident,
             s3=s3_io,
             bedrock_client=bedrock_sim,
@@ -244,15 +244,15 @@ class ObservabilityMcpController:
         )
 
         return {
-            "kiroEngine": "AWS_Kiro-main (brand_verifier.incident + atm_sentinel)",
+            "atmEngine": "Getnet_ATM (brand_verifier.incident + atm_sentinel)",
             "validationErrors": validation_errors,
-            "triageSchemaValid": validate_triage(kiro_res.triaje) == [],
-            "incidentId": kiro_res.id,
-            "estadoTriaje": kiro_res.estado,
+            "triageSchemaValid": validate_triage(atm_res.triaje) == [],
+            "incidentId": atm_res.id,
+            "estadoTriaje": atm_res.estado,
             "panRedactedDescription": redacted_desc,
             "privacySafeScenePrompt": safe_scene_prompt,
             "s3ObjectsPersisted": list(s3_mem.objects.keys()),
-            "triageResult": kiro_res.triaje,
+            "triageResult": atm_res.triaje,
             "sentinelVideoReport": sentinel_report,
         }
 
@@ -332,8 +332,8 @@ MCP_TOOLS_SCHEMA = [
         },
     },
     {
-        "name": "atm_kiro_inspect_incident",
-        "description": "Analiza una incidencia funcional de bloqueo/retención de tarjeta bancaria en ATM usando AWS_Kiro-main (PAN masking PCI-DSS, vídeo y triaje).",
+        "name": "getnet_atm_inspect_incident",
+        "description": "Analiza una incidencia funcional de bloqueo/retención de tarjeta bancaria en ATM usando Getnet_ATM (PAN masking PCI-DSS, vídeo y triaje).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -367,7 +367,7 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
             "id": req_id,
             "result": {
                 "protocolVersion": "2024-11-05",
-                "serverInfo": {"name": "getnet-observability-dynatrace-cloudwatch-kiro-mcp", "version": "2.0.0"},
+                "serverInfo": {"name": "getnet-observability-dynatrace-cloudwatch-atm-mcp", "version": "2.0.0"},
                 "capabilities": {"tools": {}, "resources": {}, "prompts": {}},
             },
         }
@@ -396,8 +396,8 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
                     query=args.get("query", "bloqueo tarjeta atm mti 0420 redis deadlock"),
                     telemetry_source=args.get("telemetry_source"),
                 )
-            elif name == "atm_kiro_inspect_incident":
-                out = controller.atm_kiro_inspect_incident(
+            elif name in ("getnet_atm_inspect_incident", "atm_kiro_inspect_incident"):
+                out = controller.getnet_atm_inspect_incident(
                     atm_id=args.get("atm_id", "ATM-GTN-MAD-0042"),
                     ubicacion=args.get("ubicacion", "Sucursal Getnet Gran Vía 28, Madrid"),
                     descripcion=args.get(
@@ -444,15 +444,15 @@ def run_stdio_server(base_url: str) -> None:
 
 
 def run_selftest(base_url: str) -> int:
-    print("=== [Getnet Autonomous ALM] Self-Test del Servidor MCP (Dynatrace + AWS CloudWatch + Prometheus + RAG + AWS_Kiro) ===")
+    print("=== [Getnet Autonomous ALM] Self-Test del Servidor MCP (Dynatrace + AWS CloudWatch + Prometheus + RAG + Getnet ATM) ===")
     controller = ObservabilityMcpController(base_url=base_url)
     t0 = time.perf_counter()
 
-    kiro_out = controller.atm_kiro_inspect_incident()
+    atm_out = controller.getnet_atm_inspect_incident()
     print(
-        f"1. Motor Funcional ATM (AWS_Kiro-main): Incidencia {kiro_out['incidentId']} -> "
-        f"Estado: {kiro_out['estadoTriaje']} | Categoría: {kiro_out['triageResult']['categoria']} | "
-        f"PAN Redacted: {'**** 9012' in kiro_out['panRedactedDescription']}"
+        f"1. Motor Funcional ATM (Getnet_ATM): Incidencia {atm_out['incidentId']} -> "
+        f"Estado: {atm_out['estadoTriaje']} | Categoría: {atm_out['triageResult']['categoria']} | "
+        f"PAN Redacted: {'**** 9012' in atm_out['panRedactedDescription']}"
     )
 
     dt_out = controller.dynatrace_get_davis_problems()
@@ -487,7 +487,7 @@ def run_selftest(base_url: str) -> int:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Servidor MCP de Observabilidad Dynatrace + CloudWatch + Prometheus + RAG + AWS_Kiro (Getnet)")
+    parser = argparse.ArgumentParser(description="Servidor MCP de Observabilidad Dynatrace + CloudWatch + Prometheus + RAG + Getnet ATM")
     parser.add_argument("--base-url", default=os.environ.get("GETNET_BASE_URL", "http://127.0.0.1:8080"))
     parser.add_argument("--selftest", action="store_true", help="Ejecuta autodiagnóstico MCP y ciclo autónomo ALM")
     args = parser.parse_args()

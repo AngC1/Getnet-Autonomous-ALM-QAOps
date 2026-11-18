@@ -1,7 +1,7 @@
 """
 Orquestador Maestro QAOps & Autonomous Production ALM — Getnet (Grupo Santander).
 Levanta el portal de Tarjetas Bancarias Getnet y el Cuadro de Mando Jira Xray (si no está ya activo) y ejecuta sin Human-in-the-Loop:
-  1. Diagnóstico del Servidor MCP de Observabilidad (Dynatrace Davis AI + AWS CloudWatch + Prometheus + Motor RAG + AWS_Kiro ATM)
+  1. Diagnóstico del Servidor MCP de Observabilidad (Dynatrace Davis AI + AWS CloudWatch + Prometheus + Motor RAG + Getnet_ATM ATM)
      y ejecución completa del ciclo de Auto-Remediación de las 2 incidencias de Producción (GTN-INC-ATM-001 y GTN-INC-SYS-002).
   2. Diagnóstico del Servidor MCP de Selenium (Self-Healing DOM + Flujos E2E de Tarjetas + Evidencia PNG).
   3. Suite completa Pytest + Selenium E2E de Tarjetas Bancarias (GTN-TC-001..010 y GTN-TC-013..014).
@@ -51,7 +51,7 @@ def main() -> int:
         else:
             print("[1/5] Portal Tarjetas Getnet detectado activo en http://127.0.0.1:8080")
 
-        print("\n[2/5] Ejecutando Servidor MCP de Observabilidad (Dynatrace + CloudWatch + Prometheus + RAG + AWS_Kiro ATM) y Ciclo ALM Zero-Touch...")
+        print("\n[2/5] Ejecutando Servidor MCP de Observabilidad (Dynatrace + CloudWatch + Prometheus + RAG + Getnet_ATM ATM) y Ciclo ALM Zero-Touch...")
         rc_obs = subprocess.call(
             [sys.executable, str(ROOT / "mcp-observability-server" / "server.py"), "--selftest"],
             cwd=str(ROOT),

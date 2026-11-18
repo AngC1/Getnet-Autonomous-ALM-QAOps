@@ -143,9 +143,9 @@ def test_tc010_soporte_criptografico_emv_hsm_24h(driver, base_url):
 
 
 @pytest.mark.xray("GTN-TC-013")
-def test_tc013_incidencia_funcional_tarjeta_atm_kiro_autofix(driver, base_url):
+def test_tc013_incidencia_funcional_tarjeta_getnet_atm_autofix(driver, base_url):
     """
-    GTN-TC-013 / TL-GTN-113: Ciclo completo de Incidencia Funcional de Bloqueo de Tarjeta desde ATM (AWS_Kiro-main)
+    GTN-TC-013 / TL-GTN-113: Ciclo completo de Incidencia Funcional de Bloqueo de Tarjeta desde ATM (Getnet_ATM)
     -> Detección (HTTP 409) -> Consulta Playbook RAG-PB-ATM-001 -> Auto-Fix EMV 0420 -> Verificación UI/API (HTTP 201).
     """
     inj = requests.post(f"{base_url}/api/v1/alm/inject-incidents", timeout=5)

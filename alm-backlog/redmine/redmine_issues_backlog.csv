@@ -1,5 +1,5 @@
 ID,Tracker,Project,Subject,Priority,Status,XrayKey,RAGPlaybook
-5001,Incident,Getnet-Tarjetas-ALM,GTN-INC-ATM-001: Retencion de tarjeta bancaria en cajero ATM-GTN-MAD-0042 sin reverso ISO-8583 MTI 0420 (AWS_Kiro),Immediate,Resolved (Auto-Redeployed),GTN-TC-013,RAG-PB-ATM-001
+5001,Incident,Getnet-Tarjetas-ALM,GTN-INC-ATM-001: Retencion de tarjeta bancaria en cajero ATM-GTN-MAD-0042 sin reverso ISO-8583 MTI 0420 (Getnet_ATM),Immediate,Resolved (Auto-Redeployed),GTN-TC-013,RAG-PB-ATM-001
 5002,Incident,Getnet-Tarjetas-ALM,GTN-INC-SYS-002: Deadlock Redis TTL=0 y saturacion HikariCP detectado via MCP en Dynatrace Davis AI y AWS CloudWatch,Immediate,Resolved (Auto-Redeployed),GTN-TC-014,RAG-PB-SYS-002
 5003,Feature,Getnet-Tarjetas-ALM,GTN-US-101: Buscador de Parque de Tarjetas Bancarias EMV y Red de Cajeros ATM,High,Closed,GTN-TC-002,N/A
 5004,Feature,Getnet-Tarjetas-ALM,GTN-US-102: Pasarela de Autorizacion Online de Tarjetas Bancarias ISO-8583 y 3D-Secure 2.2,Urgent,Closed,GTN-TC-004,RAG-PB-ISO-003

@@ -16,5 +16,5 @@ Toda la aplicación (`/servicios-para-clientes` en `portal-getnet/app.py`) y la 
    - Autenticación del titular (`12345678Z` / `Getnet2026!`), contrato `CTR-GTN-908122` y visualización de tarjeta digital tokenizada (`4548123456789012`).
 5. **Soporte Criptográfico EMV, PIN Block HSM y 3DS2 24h (`POST /api/v1/tarjetas/soporte`)**:
    - Reserva de sesión remota con ingeniería de criptografía EMV/HSM (`SOP-2026-XXXXX`).
-6. **Bloqueo Preventivo de Tarjetas en Cajero ATM (`POST /api/v1/tarjetas/bloqueo` · Motor `AWS_Kiro-main`)**:
+6. **Bloqueo Preventivo de Tarjetas en Cajero ATM (`POST /api/v1/tarjetas/bloqueo` · Motor `Getnet_ATM`)**:
    - Validación con `brand_verifier.incident.validate_incident`, enmascarado PCI-DSS con `redact_pan` (`4548 **** **** 9012`), emisión de reverso `ISO-8583 MTI 0420` (`REV-EMV-2026-XXXXX`) y provisión de token digital en Wallet (`TOK-GTN-WALLET-9012`).

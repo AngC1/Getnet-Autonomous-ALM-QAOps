@@ -16,7 +16,7 @@
       "severity": "CRITICAL",
       "linkedIncidentId": "GTN-INC-ATM-001",
       "linkedDefectId": "GTN-BUG-201",
-      "telemetrySources": ["AWS_Kiro-main Vision Sentinel", "Switch ISO-8583 Getnet", "Dynatrace Custom Device ATM"],
+      "telemetrySources": ["Getnet_ATM Vision Sentinel", "Switch ISO-8583 Getnet", "Dynatrace Custom Device ATM"],
       "keywords": [
         "tarjeta", "retenida", "bloqueo", "atm", "cajero", "ranura", "slot", "card_stuck",
         "iso-8583", "mti 0420", "0420", "reverso", "emv", "kiro", "race_condition",
@@ -30,7 +30,7 @@
       },
       "behaviorModel": {
         "triggerCondition": "El cliente inserta su tarjeta bancaria EMV en el cajero ATM y se produce un micro-corte o timeout (>3000ms) entre el lector motorizado y el switch autorizador antes de confirmar el cierre de sesión EMV.",
-        "propagationPath": "Lectora Motorizada ATM (Estado CARD_STUCK) -> Edge Agent AWS_Kiro-main detecta anomalía visual en slot -> API /api/v1/tarjetas/bloqueo recibe evento sin flag de reverso -> Core bancario mantiene la tarjeta en estado INCONSISTENT_LOCK (riesgo de cargo duplicado o fraude físico).",
+        "propagationPath": "Lectora Motorizada ATM (Estado CARD_STUCK) -> Edge Agent Getnet_ATM detecta anomalía visual en slot -> API /api/v1/tarjetas/bloqueo recibe evento sin flag de reverso -> Core bancario mantiene la tarjeta en estado INCONSISTENT_LOCK (riesgo de cargo duplicado o fraude físico).",
         "businessImpact": "Riesgo operativo y reputacional alto: el titular pierde físicamente su tarjeta bancaria en el cajero sin bloqueo preventivo confirmado en el core ni anulación del cargo en curso."
       },
       "rootCauseAnalysis": {
@@ -40,9 +40,9 @@
       },
       "autonomousRemediation": {
         "zeroTouchSupported": true,
-        "agentOwner": "Self-Healing-Patch-Agent + Kiro-ATM-Vision-Agent",
+        "agentOwner": "Self-Healing-Patch-Agent + Getnet-ATM-Vision-Agent",
         "steps": [
-          "1. Validar payload de telemetría ATM con brand_verifier.incident.validate_incident (AWS_Kiro-main).",
+          "1. Validar payload de telemetría ATM con brand_verifier.incident.validate_incident (Getnet_ATM).",
           "2. Aplicar enmascaramiento PCI-DSS inmediato sobre el PAN (redact_pan -> 4548 **** **** 9012) antes de indexar logs.",
           "3. Activar flag de contingencia en caliente: atm_emv_fallback_reversal = True en el microservicio de bloqueo de tarjetas.",
           "4. Emitir trama automática de reverso EMV ISO-8583 MTI 0420 (REV-EMV-2026-XXXXX) hacia el switch adquirente Getnet.",
@@ -169,7 +169,7 @@
       "severity": "CRITICAL",
       "linkedIncidentId": "GTN-INC-PCI-004",
       "linkedDefectId": "GTN-BUG-204",
-      "telemetrySources": ["AWS_Kiro-main brand_verifier.incident", "AWS CloudWatch Log Anomaly Detector"],
+      "telemetrySources": ["Getnet_ATM brand_verifier.incident", "AWS CloudWatch Log Anomaly Detector"],
       "keywords": [
         "pci-dss", "pan", "enmascarado", "redact_pan", "privacidad", "seguridad",
         "16 digitos", "log", "traza", "cvv", "cumplimiento", "tokenizacion", "truncado"
@@ -184,13 +184,13 @@
         "businessImpact": "Riesgo regulatorio crítico en auditoría PCI-DSS si un PAN completo se almacena sin truncar en sistemas de observabilidad."
       },
       "rootCauseAnalysis": {
-        "component": "AWS_Kiro-main/brand_verifier/incident.py & portal-getnet/app.py",
+        "component": "Getnet_ATM/brand_verifier/incident.py & portal-getnet/app.py",
         "defectType": "PRE_LOG_PAN_REDACTION_BYPASS",
         "explanation": "El middleware de logging capturaba el cuerpo de la petición antes de invocar la función determinista redact_pan()."
       },
       "autonomousRemediation": {
         "zeroTouchSupported": true,
-        "agentOwner": "Kiro-ATM-Vision-Agent + Self-Healing-Patch-Agent",
+        "agentOwner": "Getnet-ATM-Vision-Agent + Self-Healing-Patch-Agent",
         "steps": [
           "1. Interceptar todo payload entrante con brand_verifier.incident.redact_pan() antes de cualquier escritura en disco, S3 o CloudWatch.",
           "2. Sustituir secuencias de 13 a 19 dígitos por el formato seguro 4548 **** **** 9012 o [PAN-REDACTED].",

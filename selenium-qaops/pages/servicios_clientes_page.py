@@ -189,7 +189,7 @@ class ServiciosClientesPage:
         )
         return alert.text
 
-    # --- 6. Flujo Bloqueo Preventivo de Tarjeta en Cajero ATM (AWS_Kiro) ---
+    # --- 6. Flujo Bloqueo Preventivo de Tarjeta en Cajero ATM (Getnet_ATM) ---
     def procesar_bloqueo_tarjeta_atm(
         self,
         num_tarjeta: str = "4548 1234 5678 9012",

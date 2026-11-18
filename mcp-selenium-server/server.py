@@ -375,7 +375,7 @@ def run_selftest(base_url: str) -> int:
         print(f"4. Flujo MCP Autorizaciones Tarjeta ISO-8583: {flow_aut['status']} ({flow_aut['durationMs']} ms)")
 
         flow_blk = controller.execute_tarjetas_flow("bloqueo_atm")
-        print(f"5. Flujo MCP Bloqueo Tarjeta ATM (AWS_Kiro): {flow_blk['status']} ({flow_blk['durationMs']} ms)")
+        print(f"5. Flujo MCP Bloqueo Tarjeta ATM (Getnet_ATM): {flow_blk['status']} ({flow_blk['durationMs']} ms)")
 
         shot = controller.take_screenshot("mcp_selftest_servicios_clientes.png")
         print(f"6. Evidencia PNG generada: {shot['path']}")

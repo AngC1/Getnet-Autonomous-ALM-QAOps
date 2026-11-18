@@ -1,6 +1,6 @@
 # Plan Maestro de Pruebas QAOps & Autonomous ALM — Tarjetas Bancarias Getnet (Grupo Santander)
 
-Este documento certifica la cobertura **100% enfocada en Tarjetas Bancarias** (`GTN-TC-001` a `GTN-TC-014`), la orquestación de los **5 Agentes Autónomos**, los conectores **MCP Server (`Dynatrace Davis AI`, `AWS CloudWatch`, `Prometheus`, `AWS Kiro ATM`)** y el **Motor RAG de Comportamiento de Incidencias (`rag-knowledge-base/`)**.
+Este documento certifica la cobertura **100% enfocada en Tarjetas Bancarias** (`GTN-TC-001` a `GTN-TC-014`), la orquestación de los **5 Agentes Autónomos**, los conectores **MCP Server (`Dynatrace Davis AI`, `AWS CloudWatch`, `Prometheus`, `Getnet ATM ATM`)** y el **Motor RAG de Comportamiento de Incidencias (`rag-knowledge-base/`)**.
 
 ## Matriz de 14 Casos de Prueba de Tarjetas Bancarias (`Jira Xray` / `TestLink` / `Redmine`)
 
@@ -18,5 +18,5 @@ Este documento certifica la cobertura **100% enfocada en Tarjetas Bancarias** (`
 | **`GTN-TC-010`** | `TL-GTN-110` | Solicitud de sesión de Soporte Criptográfico EMV, PIN Block HSM y 3DS2 24h | E2E Selenium | `PASSED` |
 | **`GTN-TC-011`** | `TL-GTN-111` | Rendimiento JMeter IA en Parque de Tarjetas y Bloqueo ATM (`P95 < 450 ms`) | JMeter AI | `PASSED` |
 | **`GTN-TC-012`** | `TL-GTN-112` | Stress Test JMeter IA en Autorización `ISO-8583` y Chargebacks (`0% HTTP 500`) | JMeter AI | `PASSED` |
-| **`GTN-TC-013`** | `TL-GTN-113` | Ciclo ALM Zero-Touch: Incidencia funcional de tarjeta en ATM (`AWS_Kiro`) + `RAG-PB-ATM-001` | Autonomous ALM | `PASSED` |
+| **`GTN-TC-013`** | `TL-GTN-113` | Ciclo ALM Zero-Touch: Incidencia funcional de tarjeta en ATM (`Getnet_ATM`) + `RAG-PB-ATM-001` | Autonomous ALM | `PASSED` |
 | **`GTN-TC-014`** | `TL-GTN-114` | Ciclo ALM Zero-Touch: Incidencia de sistemas en Dynatrace (`DT-PROB-2026-8841`) y CloudWatch + `RAG-PB-SYS-002` | Autonomous ALM | `PASSED` |

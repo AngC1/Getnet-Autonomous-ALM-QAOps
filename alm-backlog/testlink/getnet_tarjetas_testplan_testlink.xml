@@ -13,7 +13,7 @@
     <testcase internalid="TL-GTN-110" name="GTN-TC-010: Solicitud de Soporte Criptografico EMV y HSM 24h" status="PASSED"/>
     <testcase internalid="TL-GTN-111" name="GTN-TC-011: Performance Gate JMeter IA en Parque de Tarjetas y Bloqueo ATM" status="PASSED"/>
     <testcase internalid="TL-GTN-112" name="GTN-TC-012: Stress Test JMeter IA en Autorizacion ISO-8583 y Disputas de Tarjetas" status="PASSED"/>
-    <testcase internalid="TL-GTN-113" name="GTN-TC-013: Ciclo Autonomo ALM Incidencia Funcional Tarjeta ATM (AWS_Kiro + RAG)" status="PASSED"/>
+    <testcase internalid="TL-GTN-113" name="GTN-TC-013: Ciclo Autonomo ALM Incidencia Funcional Tarjeta ATM (Getnet_ATM + RAG)" status="PASSED"/>
     <testcase internalid="TL-GTN-114" name="GTN-TC-014: Ciclo Autonomo ALM Incidencia Sistemas Dynatrace y CloudWatch MCP + RAG" status="PASSED"/>
   </testsuite>
 </testsuites>

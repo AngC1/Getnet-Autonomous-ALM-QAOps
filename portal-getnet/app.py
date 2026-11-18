@@ -1,6 +1,6 @@
 """
 Simulador del Portal Getnet (Grupo Santander) — Operativa de Tarjetas Bancarias y Red ATM (/servicios-para-clientes)
-+ Aplicativo de Sistema de Bloqueo Preventivo de Tarjetas Bancarias en ATM (AWS_Kiro-main)
++ Aplicativo de Sistema de Bloqueo Preventivo de Tarjetas Bancarias en ATM (Getnet_ATM)
 + Conectores MCP Server en Vivo con Dynatrace (Davis AI / PurePath) y AWS CloudWatch (Alarms / Logs Insights)
 + Motor RAG y Base de Conocimiento de Comportamiento de Incidencias Bancarias en Producción (rag-knowledge-base/)
 + Flujo Visual de Máquina de Estados y Orquestación Multi-Agente ALM Sin Human-in-the-Loop (Jira Xray).
@@ -28,9 +28,9 @@ ALM_JSON_PATH = PROJECT_ROOT / "alm-backlog" / "jira-xray" / "backlog_xray_expor
 TESTLINK_XML_PATH = PROJECT_ROOT / "alm-backlog" / "testlink" / "getnet_tarjetas_testplan_testlink.xml"
 REDMINE_CSV_PATH = PROJECT_ROOT / "alm-backlog" / "redmine" / "redmine_issues_backlog.csv"
 
-KIRO_DIR = PROJECT_ROOT / "AWS_Kiro-main" / "AWS_Kiro-main"
+GETNET_ATM_DIR = PROJECT_ROOT / "Getnet_ATM"
 RAG_DIR = PROJECT_ROOT / "rag-knowledge-base"
-for p in (KIRO_DIR, RAG_DIR):
+for p in (GETNET_ATM_DIR, RAG_DIR):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -101,9 +101,9 @@ MCP_CONNECTIONS_STATE: Dict[str, Dict[str, Any]] = {
         "latencyMs": 9,
         "lastSync": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     },
-    "kiro_atm": {
-        "provider": "AWS Kiro ATM Sentinel Vision & PCI-DSS Edge MCP",
-        "serverName": "getnet-kiro-atm-edge-mcp",
+    "getnet_atm": {
+        "provider": "Getnet ATM Sentinel Vision & PCI-DSS Edge MCP",
+        "serverName": "getnet-atm-edge-mcp",
         "transport": "JSON-RPC 2.0 over stdio",
         "atmNode": "ATM-GTN-MAD-0042 (Gran Vía 28, Madrid)",
         "s3Bucket": "s3://getnet-atm-incidents-pro",
@@ -112,6 +112,7 @@ MCP_CONNECTIONS_STATE: Dict[str, Dict[str, Any]] = {
         "lastSync": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     },
 }
+MCP_CONNECTIONS_STATE["kiro_atm"] = MCP_CONNECTIONS_STATE["getnet_atm"]
 
 # ---------------------------------------------------------------------------
 # Máquina de Estados Visual (8 Estados) y Orquestación de 5 Agentes Autónomos
@@ -123,24 +124,26 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
         "order": 1,
         "name": "Ingesta de Telemetría",
         "badge": "TELEMETRÍA",
-        "agent": "Kiro-ATM-Vision-Agent + Observability-MCP-Agent",
-        "mcpTools": ["atm_kiro_inspect_incident", "dynatrace_get_davis_problems", "cloudwatch_get_alarms"],
+        "agent": "Getnet-ATM-Vision-Agent + Observability-MCP-Agent",
+        "mcpTools": ["getnet_atm_inspect_incident", "dynatrace_get_davis_problems", "cloudwatch_get_alarms"],
         "status": "COMPLETED",
         "durationMs": 320,
         "inputSignal": "Stream de vídeo ATM-GTN-MAD-0042 + Spans PurePath Dynatrace + Métricas CloudWatch",
         "outputTransition": "Detectada anomalía funcional en ranura de tarjeta o degradación P99 en microservicio",
+        "inspectorDetail": "{\n  \"state\": \"S1_TELEMETRY_STREAM\",\n  \"atmNode\": \"ATM-GTN-MAD-0042\",\n  \"dynatraceProblem\": \"DT-PROB-2026-8841\",\n  \"cloudwatchAlarm\": \"CW-ALARM-GTN-CARDLOCK-P99\",\n  \"prometheusMetric\": \"getnet_card_block_latency_p95_ms = 1840.0\"\n}",
     },
     {
         "stateId": "S2_ANOMALY_DETECTION",
         "order": 2,
         "name": "Detección & Redacción PCI-DSS",
         "badge": "DETECCIÓN",
-        "agent": "Kiro-ATM-Vision-Agent",
+        "agent": "Getnet-ATM-Vision-Agent",
         "mcpTools": ["brand_verifier.incident.validate_incident", "brand_verifier.incident.redact_pan"],
         "status": "COMPLETED",
         "durationMs": 410,
         "inputSignal": "PAN 4548 1234 5678 9012 retenido en obturador + Alarma CW-ALARM-GTN-CARDLOCK-P99",
         "outputTransition": "PAN enmascarado (4548 **** **** 9012) y apertura de GTN-INC-ATM-001 + GTN-INC-SYS-002",
+        "inspectorDetail": "{\n  \"state\": \"S2_ANOMALY_DETECTION\",\n  \"engine\": \"Getnet_ATM (brand_verifier.incident)\",\n  \"rawPan\": \"[REDACTED_BY_PCI_DSS_4_0]\",\n  \"maskedPan\": \"4548 **** **** 9012\",\n  \"incidentsCreated\": [\"GTN-INC-ATM-001\", \"GTN-INC-SYS-002\"]\n}",
     },
     {
         "stateId": "S3_MCP_CORRELATION",
@@ -153,6 +156,7 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
         "durationMs": 540,
         "inputSignal": "Problema Davis AI DT-PROB-2026-8841 + CloudWatch Logs Insights (/aws/ecs/getnet-card-blocker-svc)",
         "outputTransition": "Huella confirmada: EMV_LOCK_RACE_CONDITION (ATM) + REDIS_LOCK_TTL_MISSING (HikariCP 98.5%)",
+        "inspectorDetail": "{\n  \"state\": \"S3_MCP_CORRELATION\",\n  \"dqlQuery\": \"fetch spans | filter dt.entity.service == 'SERVICE-GETNET-CARD-BLOCKER'\",\n  \"davisRootCause\": \"PROCESS_GROUP-REDIS-CARD-MUTEX (redis_lock_ttl_ms=0)\",\n  \"cloudwatchException\": \"DeadlockDetectedException: HikariPool-1 timeout (98.5%)\"\n}",
     },
     {
         "stateId": "S4_RAG_KNOWLEDGE_LOOKUP",
@@ -165,18 +169,20 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
         "durationMs": 290,
         "inputSignal": "Query vectorial TF-IDF + BM25 sobre incident_knowledge_base.json (6 Playbooks Bancarios)",
         "outputTransition": "Recuperados Playbooks RAG-PB-ATM-001 (Score 0.99) y RAG-PB-SYS-002 (Score 0.99)",
+        "inspectorDetail": "{\n  \"state\": \"S4_RAG_KNOWLEDGE_LOOKUP\",\n  \"engine\": \"getnet-banking-incident-hybrid-v3 (TF-IDF + BM25)\",\n  \"matchedPlaybooks\": [\n    {\"id\": \"RAG-PB-ATM-001\", \"score\": 0.99, \"incident\": \"GTN-INC-ATM-001\"},\n    {\"id\": \"RAG-PB-SYS-002\", \"score\": 0.99, \"incident\": \"GTN-INC-SYS-002\"}\n  ]\n}",
     },
     {
         "stateId": "S5_RCA_TRIAGE_SYNTHESIS",
         "order": 5,
         "name": "Triaje Cognitivo & Síntesis RCA",
         "badge": "TRIAGE & RCA",
-        "agent": "RAG-Knowledge-Architect-Agent + Kiro-ATM-Vision-Agent",
+        "agent": "RAG-Knowledge-Architect-Agent + Getnet-ATM-Vision-Agent",
         "mcpTools": ["brand_verifier.incident.process_incident", "atm_sentinel.assemble_report"],
         "status": "COMPLETED",
         "durationMs": 680,
         "inputSignal": "Playbooks RAG + Telemetría de fotogramas S3 (frame_01, frame_03, frame_06)",
         "outputTransition": "Plan Zero-Touch sintetizado: habilitar reverso ISO-8583 MTI 0420 e inyectar TTL Redis = 3000ms",
+        "inspectorDetail": "{\n  \"state\": \"S5_RCA_TRIAGE_SYNTHESIS\",\n  \"categoria\": \"TARJETA_RETENIDA\",\n  \"severidad\": \"ALTA\",\n  \"synthesizedRemediation\": [\n    \"enable_emv_reversal_0420 = True (Emitir MTI 0420 + Token Wallet)\",\n    \"redis_lock_ttl_ms = 3000 + Circuit Breaker Resilience4j\"\n  ]\n}",
     },
     {
         "stateId": "S6_SELF_HEALING_HOTFIX",
@@ -189,6 +195,7 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
         "durationMs": 890,
         "inputSignal": "Parches PATCH-GTN-ATM-0420 (enable_emv_reversal_0420=True) y PATCH-GTN-SYS-REDIS (TTL=3000ms)",
         "outputTransition": "Reverso REV-EMV-2026 emitido, plástico liberado, token Wallet creado y pool HikariCP en 18.4%",
+        "inspectorDetail": "--- a/card_lock_engine.py\n+++ b/card_lock_engine.py\n@@ -42,3 +42,3 @@\n-enable_emv_reversal_0420 = False\n-redis_lock_ttl_ms = 0\n+enable_emv_reversal_0420 = True  # PATCH-GTN-ATM-0420\n+redis_lock_ttl_ms = 3000         # PATCH-GTN-SYS-REDIS",
     },
     {
         "stateId": "S7_CANARY_QAOPS_GATE",
@@ -201,6 +208,7 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
         "durationMs": 1450,
         "inputSignal": "Release v2026.11.2-AUTONOMOUS-PRO + 12 Tests Selenium E2E Tarjetas + 2 Tests JMeter IA",
         "outputTransition": "14/14 Casos de Prueba de Tarjetas Bancarias PASSED (Latencia P95 = 42.5ms, Apdex = 1.0)",
+        "inspectorDetail": "{\n  \"state\": \"S7_CANARY_QAOPS_GATE\",\n  \"deployedRelease\": \"v2026.11.2-AUTONOMOUS-PRO\",\n  \"seleniumE2E\": \"12/12 PASSED (DOM Pruning -93.1% tokens)\",\n  \"jmeterAiGate\": \"2/2 PASSED (P95 = 42.5ms, Apdex = 1.0)\"\n}",
     },
     {
         "stateId": "S8_ALM_XRAY_CLOSED",
@@ -213,18 +221,19 @@ STATE_MACHINE_FLOW: List[Dict[str, Any]] = [
         "durationMs": 240,
         "inputSignal": "Evidencias PNG, trazas PurePath Dynatrace, alarmas CloudWatch OK y matriz Xray",
         "outputTransition": "GTN-INC-ATM-001 y GTN-INC-SYS-002 cerradas en estado RESOLVED (Zero Human-in-the-Loop)",
+        "inspectorDetail": "{\n  \"state\": \"S8_ALM_XRAY_CLOSED\",\n  \"xrayTestPlan\": \"GTN-TP-2026-TARJETAS (14/14 PASSED)\",\n  \"incidentsClosed\": [\"GTN-INC-ATM-001\", \"GTN-INC-SYS-002\"],\n  \"humanInterventionRequired\": false\n}",
     },
 ]
 
 AUTONOMOUS_AGENTS_ROSTER: List[Dict[str, Any]] = [
     {
-        "agentId": "AGT-01-KIRO-VISION",
-        "name": "Kiro-ATM-Vision-Agent",
-        "role": "Especialista Funcional en Cajeros ATM & Privacidad PCI-DSS (AWS_Kiro-main)",
+        "agentId": "AGT-01-GETNET-ATM-VISION",
+        "name": "Getnet-ATM-Vision-Agent",
+        "role": "Especialista Funcional en Cajeros ATM & Privacidad PCI-DSS (Getnet_ATM)",
         "currentState": "S2_ANOMALY_DETECTION -> S5_RCA_TRIAGE_SYNTHESIS",
         "status": "ACTIVE_READY",
         "model": "Claude Sonnet 4.5 (Bedrock Converse API) + OpenCV Frame Extractor",
-        "mcpServer": "getnet-kiro-atm-edge-mcp",
+        "mcpServer": "getnet-atm-edge-mcp",
         "responsibilities": [
             "Extrae fotogramas clave del cajero ATM-GTN-MAD-0042 y detecta retención mecánica de tarjeta (CARD_TRAPPING).",
             "Aplica enmascaramiento determinista de PAN (redact_pan -> 4548 **** **** 9012) antes de persistir en S3.",
@@ -254,7 +263,7 @@ AUTONOMOUS_AGENTS_ROSTER: List[Dict[str, Any]] = [
         "currentState": "S4_RAG_KNOWLEDGE_LOOKUP -> S5_RCA_TRIAGE_SYNTHESIS",
         "status": "ACTIVE_READY",
         "model": "getnet-banking-incident-hybrid-v3 (TF-IDF Cosine + BM25 Telemetry Fingerprint)",
-        "mcpServer": "getnet-observability-dynatrace-cloudwatch-kiro-mcp (rag_retrieve_incident_playbook)",
+        "mcpServer": "getnet-observability-dynatrace-cloudwatch-atm-mcp (rag_retrieve_incident_playbook)",
         "responsibilities": [
             "Indexa y consulta los 6 Playbooks de producción de tarjetas bancarias (incident_knowledge_base.json).",
             "Explica el modelo de propagación del fallo desde el lector EMV o pool HikariCP hasta el impacto en negocio.",
@@ -269,7 +278,7 @@ AUTONOMOUS_AGENTS_ROSTER: List[Dict[str, Any]] = [
         "currentState": "S6_SELF_HEALING_HOTFIX -> S7_CANARY_QAOPS_GATE",
         "status": "ACTIVE_READY",
         "model": "Getnet Autonomous Patch Synthesizer (Zero-Touch)",
-        "mcpServer": "getnet-observability-dynatrace-cloudwatch-kiro-mcp (alm_autonomous_zero_touch_cycle)",
+        "mcpServer": "getnet-observability-dynatrace-cloudwatch-atm-mcp (alm_autonomous_zero_touch_cycle)",
         "responsibilities": [
             "Inyecta en caliente enable_emv_reversal_0420=True y emite el reverso financiero ISO-8583 MTI 0420.",
             "Aplica redis_lock_ttl_ms=3000 y activa Circuit Breaker Resilience4j para drenar el pool HikariCP al 18.4%.",
@@ -300,7 +309,7 @@ TARJETAS_BLOQUEADAS_LOG: List[Dict[str, Any]] = [
         "atmId": "ATM-GTN-MAD-0042",
         "ubicacion": "Sucursal Getnet Gran Vía 28, Madrid",
         "panEnmascarado": "4548 **** **** 9012",
-        "motivo": "SOSPECHA_SKIMMING_RANURA (Detectado por AWS_Kiro ATM Sentinel)",
+        "motivo": "SOSPECHA_SKIMMING_RANURA (Detectado por Getnet ATM Sentinel)",
         "estado": "BLOQUEO_PREVENTIVO_CON_REVERSO_EMV_0420",
         "codigoReverso": "REV-EMV-2026-88412",
         "tokenDigitalReemplazo": "TOK-GTN-WALLET-9012",
@@ -322,8 +331,8 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
     "agentsRoster": AUTONOMOUS_AGENTS_ROSTER,
     "pipelineStages": [
         {
-            "step": "1. DETECCIÓN EN PRO (ATM + DYNATRACE + CLOUDWATCH)",
-            "actor": "Kiro-ATM-Vision-Agent + Observability-MCP-Agent",
+            "step": "1. DETECCIÓN EN PRO (GETNET ATM + DYNATRACE + CLOUDWATCH)",
+            "actor": "Getnet-ATM-Vision-Agent + Observability-MCP-Agent",
             "status": "COMPLETED",
             "durationMs": 730,
             "detail": (
@@ -333,7 +342,7 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
         },
         {
             "step": "2. CONSULTA MOTOR RAG & PROTECCIÓN PCI-DSS",
-            "actor": "RAG-Knowledge-Architect-Agent + Kiro-ATM-Vision-Agent",
+            "actor": "RAG-Knowledge-Architect-Agent + Getnet-ATM-Vision-Agent",
             "status": "COMPLETED",
             "durationMs": 700,
             "detail": (
@@ -347,7 +356,7 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
             "status": "COMPLETED",
             "durationMs": 1220,
             "detail": (
-                "RCA #1 (ATM): Flag enable_emv_reversal_0420=False en card_lock_engine omite reverso MTI 0420. "
+                "RCA #1 (Getnet ATM): Flag enable_emv_reversal_0420=False en card_lock_engine omite reverso MTI 0420. "
                 "RCA #2 (Sistemas): Mutex Redis en bloqueo de tarjetas con redis_lock_ttl_ms=0 agota HikariCP al 98.5%."
             ),
         },
@@ -382,11 +391,11 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
             ),
         },
     ],
-    "atmKiroDetail": {
+    "atmDetail": {
         "incidentKey": "GTN-INC-ATM-001",
         "atmId": "ATM-GTN-MAD-0042",
         "location": "Sucursal Getnet Gran Vía 28, Madrid",
-        "engine": "AWS_Kiro-main (atm_sentinel.py + brand_verifier/incident.py)",
+        "engine": "Getnet_ATM (atm_sentinel.py + brand_verifier/incident.py)",
         "ragPlaybookId": "RAG-PB-ATM-001",
         "rawEvent": "Tarjeta bancaria Getnet 4548 1234 5678 9012 retenida en ranura tras bloqueo preventivo sin reverso EMV.",
         "panRedacted": "Tarjeta bancaria Getnet **** **** **** 9012 retenida en ranura tras bloqueo preventivo sin reverso EMV.",
@@ -417,7 +426,7 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
         "alarmName": "CW-ALARM-GTN-CARDLOCK-P99",
         "dynatraceProblemId": "DT-PROB-2026-8841",
         "ragPlaybookId": "RAG-PB-SYS-002",
-        "mcpServer": "getnet-observability-dynatrace-cloudwatch-kiro-mcp v2.0.0",
+        "mcpServer": "getnet-observability-dynatrace-cloudwatch-atm-mcp v2.0.0",
         "logGroup": "/aws/ecs/getnet-card-blocker-svc",
         "errorSignature": "DeadlockDetectedException: Redis mutex lock on CARD_BLOCK_STATE acquired with lock_ttl_ms=0; HikariPool-1 connection timeout (3000ms)",
         "metricsBeforeFix": {
@@ -440,6 +449,7 @@ AUTONOMOUS_ALM_STATE: Dict[str, Any] = {
         "status": "RESOLVED (AUTO-REDEPLOYED)",
     },
 }
+AUTONOMOUS_ALM_STATE["atmKiroDetail"] = AUTONOMOUS_ALM_STATE["atmDetail"]
 
 # ---------------------------------------------------------------------------
 # Catálogo de Servicios Exclusivos de Tarjetas Bancarias Getnet
@@ -450,7 +460,7 @@ SERVICIOS_TARJETAS_CATALOGO: List[Dict[str, Any]] = [
         "id": "srv-parque-tarjetas",
         "codigo": "PARQUE_TARJETAS_EMV",
         "titulo": "Parque de Tarjetas Bancarias EMV y Red de Cajeros ATM",
-        "descripcion": "Consulta e inventario en tiempo real de tarjetas Visa/Mastercard Débito, Crédito y Corporativas y nodos ATM monitorizados con AWS Kiro.",
+        "descripcion": "Consulta e inventario en tiempo real de tarjetas Visa/Mastercard Débito, Crédito y Corporativas y nodos ATM monitorizados con Getnet ATM.",
         "icono": "💳",
         "sla_respuesta_ms": 150,
         "destacado": True,
@@ -499,7 +509,7 @@ SERVICIOS_TARJETAS_CATALOGO: List[Dict[str, Any]] = [
     {
         "id": "srv-bloqueo-atm",
         "codigo": "BLOQUEO_TARJETA_ATM",
-        "titulo": "Bloqueo Preventivo de Tarjetas en ATM (AWS Kiro + CloudWatch + Dynatrace)",
+        "titulo": "Bloqueo Preventivo de Tarjetas en ATM (Getnet ATM + CloudWatch + Dynatrace)",
         "descripcion": "Simulador en vivo de retención de tarjeta bancaria en ranura ATM, reverso ISO-8583 MTI 0420 y auto-remediación ALM sin Human-in-the-Loop.",
         "icono": "🚨",
         "sla_respuesta_ms": 120,
@@ -694,7 +704,7 @@ JMETER_LATEST_REPORT: Dict[str, Any] = {
     ],
     "endpoints": [
         {"label": "GET /api/v1/tarjetas/parque", "samples": 20, "avgMs": 12.4, "p95Ms": 22.0, "errorPct": 0.0},
-        {"label": "POST /api/v1/tarjetas/bloqueo (ATM Kiro)", "samples": 16, "avgMs": 19.8, "p95Ms": 34.5, "errorPct": 0.0},
+        {"label": "POST /api/v1/tarjetas/bloqueo (Getnet ATM)", "samples": 16, "avgMs": 19.8, "p95Ms": 34.5, "errorPct": 0.0},
         {"label": "POST /api/v1/tarjetas/autorizaciones (ISO-8583)", "samples": 12, "avgMs": 48.2, "p95Ms": 61.0, "errorPct": 0.0},
         {"label": "POST /api/v1/tarjetas/disputas (Chargebacks)", "samples": 12, "avgMs": 15.1, "p95Ms": 25.8, "errorPct": 0.0},
     ],
@@ -704,7 +714,7 @@ SELENIUM_LATEST_REPORT: Dict[str, Any] = {
     "runId": "XRAY-EXEC-GTN-2026-105",
     "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     "browser": "Google Chrome Headless 1440x950 (Selenium WebDriver 4.52)",
-    "mcpServer": "getnet-selenium-qaops v2.0.0 + getnet-observability-dynatrace-cloudwatch-kiro-mcp v2.0.0",
+    "mcpServer": "getnet-selenium-qaops v2.0.0 + getnet-observability-dynatrace-cloudwatch-atm-mcp v2.0.0",
     "domLocatorsExtracted": 46,
     "domPruningSavingPct": 93.1,
     "selfHealingEventsCount": 0,
@@ -716,7 +726,7 @@ SELENIUM_LATEST_REPORT: Dict[str, Any] = {
     "screenshotUrl": "/api/v1/qaops/screenshot/mcp_selftest_servicios_clientes.png",
     "mcpToolRuns": [
         {
-            "tool": "atm_kiro_inspect_incident (AWS_Kiro-main)",
+            "tool": "getnet_atm_inspect_incident (Getnet_ATM)",
             "target": "ATM-GTN-MAD-0042 · PAN 4548 **** **** 9012",
             "durationMs": 115,
             "status": "PASSED",
@@ -862,8 +872,8 @@ SELENIUM_LATEST_REPORT: Dict[str, Any] = {
         {
             "key": "GTN-TC-013",
             "testLinkId": "TL-GTN-113",
-            "name": "test_tc013_incidencia_funcional_tarjeta_atm_kiro_autofix",
-            "locatorPrimary": "POST /api/v1/tarjetas/bloqueo + AWS_Kiro (ATM-GTN-MAD-0042)",
+            "name": "test_tc013_incidencia_funcional_tarjeta_getnet_atm_autofix",
+            "locatorPrimary": "POST /api/v1/tarjetas/bloqueo + Getnet_ATM (ATM-GTN-MAD-0042)",
             "locatorFallback": "#btn-ejecutar-bloqueo-atm / [data-testid='atm-bloqueo-alert']",
             "assertion": "Detección + PAN Masking + Auto-Fix EMV 0420 + GTN-INC-ATM-001 RESOLVED",
             "durationMs": 140,
@@ -874,7 +884,7 @@ SELENIUM_LATEST_REPORT: Dict[str, Any] = {
             "testLinkId": "TL-GTN-114",
             "name": "test_tc014_incidencia_sistemas_dynatrace_cloudwatch_mcp_autofix",
             "locatorPrimary": "GET /api/v1/observability/status + POST /api/v1/alm/autonomous-cycle",
-            "locatorFallback": "MCP Server getnet-observability-dynatrace-cloudwatch-kiro-mcp",
+            "locatorFallback": "MCP Server getnet-observability-dynatrace-cloudwatch-atm-mcp",
             "assertion": "Dynatrace CLOSED + CloudWatch OK + Redis TTL=3000ms + GTN-INC-SYS-002 RESOLVED",
             "durationMs": 155,
             "status": "PASSED",
@@ -885,7 +895,7 @@ SELENIUM_LATEST_REPORT: Dict[str, Any] = {
 EXECUTION_HISTORY: List[Dict[str, Any]] = [
     {
         "execKey": "GTN-EXEC-2026-105",
-        "buildName": "Build #105 · Ciclo Autónomo ALM Zero-Touch (ATM Kiro + Dynatrace + CloudWatch MCP + Motor RAG)",
+        "buildName": "Build #105 · Ciclo Autónomo ALM Zero-Touch (Getnet ATM + Dynatrace + CloudWatch MCP + Motor RAG)",
         "runner": "5 Agentes Autónomos ALM + Motor RAG + Dynatrace/CloudWatch MCP",
         "environment": "Production Simulation (Zero Human-in-the-Loop)",
         "testsScope": "GTN-INC-ATM-001 + GTN-INC-SYS-002 -> RAG Playbooks -> Auto-Fix & Re-Deploy (GTN-TC-001..014)",
@@ -912,7 +922,7 @@ EXECUTION_HISTORY: List[Dict[str, Any]] = [
         "buildName": "Build #103 · Diagnóstico Servidores MCP (Dynatrace + CloudWatch + Selenium + RAG)",
         "runner": "Observability-MCP-Agent + RAG-Knowledge-Architect-Agent",
         "environment": "Local Simulation (127.0.0.1:8080)",
-        "testsScope": "DOM Pruning (46 locators) + Dynatrace Davis AI + CloudWatch Alarms + AWS_Kiro ATM",
+        "testsScope": "DOM Pruning (46 locators) + Dynatrace Davis AI + CloudWatch Alarms + Getnet ATM",
         "passed": 6,
         "failed": 0,
         "durationMs": 1720,
@@ -1293,7 +1303,7 @@ def api_crear_sesion_soporte():
 
 
 # ---------------------------------------------------------------------------
-# Aplicativo de Sistema de Bloqueo de Tarjetas ATM (AWS_Kiro-main)
+# Aplicativo de Sistema de Bloqueo de Tarjetas ATM (Getnet_ATM)
 # ---------------------------------------------------------------------------
 
 
@@ -1337,7 +1347,7 @@ def api_bloqueo_tarjeta_atm():
         "descripcion": raw_desc,
         "fecha_hora": now_iso,
     }
-    kiro_errors = validate_incident(inc_obj)
+    atm_errors = validate_incident(inc_obj)
     masked_desc = redact_pan(raw_desc)
     masked_pan = atm_sentinel.mask_card_numbers(raw_pan)
     safe_prompt = scene_prompt(inc_obj)
@@ -1353,8 +1363,8 @@ def api_bloqueo_tarjeta_atm():
             "codigoReverso": None,
             "tokenDigitalReemplazo": None,
             "cardEjected": False,
-            "kiroValidationErrors": kiro_errors,
-            "kiroMaskedDescription": masked_desc,
+            "atmValidationErrors": atm_errors,
+            "atmMaskedDescription": masked_desc,
             "resolvedBy": "PENDIENTE_AUTO_REMEDIACION_ALM",
             "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         }
@@ -1388,9 +1398,9 @@ def api_bloqueo_tarjeta_atm():
         "codigoReverso": cod_reverso,
         "tokenDigitalReemplazo": token_digital,
         "cardEjected": True,
-        "kiroValidationErrors": kiro_errors,
-        "kiroMaskedDescription": masked_desc,
-        "kiroScenePrompt": safe_prompt,
+        "atmValidationErrors": atm_errors,
+        "atmMaskedDescription": masked_desc,
+        "atmScenePrompt": safe_prompt,
         "resolvedBy": "Self-Healing-Patch-Agent (Hotfix PATCH-GTN-ATM-0420 Activo)",
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     }
@@ -1511,7 +1521,7 @@ def api_observability_status():
             {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "level": "ERROR",
-                "service": "atm-kiro-sentinel-edge",
+                "service": "getnet-atm-sentinel-edge",
                 "message": "ATM-GTN-MAD-0042: Card 4548 **** **** 9012 trapped in reader slot; enable_emv_reversal_0420=False prevented MTI 0420 dispatch",
             },
         ]
@@ -1526,7 +1536,7 @@ def api_observability_status():
             {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "level": "INFO",
-                "service": "atm-kiro-sentinel-edge",
+                "service": "getnet-atm-sentinel-edge",
                 "message": "Hotfix PATCH-GTN-ATM-0420 active: ATM-GTN-MAD-0042 EMV reversal 0420 enabled, PAN redaction PCI-DSS compliant, 0 trapped cards",
             },
         ]
@@ -1565,7 +1575,7 @@ def api_observability_status():
             },
             "cloudwatch": {
                 "region": "eu-west-1",
-                "logGroups": ["/aws/ecs/getnet-card-blocker-svc", "/aws/lambda/atm-kiro-sentinel-edge"],
+                "logGroups": ["/aws/ecs/getnet-card-blocker-svc", "/aws/lambda/getnet-atm-sentinel-edge"],
                 "alarms": cw_alarms,
                 "recentLogs": cw_logs,
             },
@@ -1612,11 +1622,13 @@ def api_prometheus_text():
 @app.route("/api/v1/mcp/connect", methods=["POST"])
 def api_mcp_connect_and_test():
     """
-    Endpoint para las ventanas modales de conexión MCP Server (Dynatrace, AWS CloudWatch, Prometheus y AWS Kiro).
+    Endpoint para las ventanas modales de conexión MCP Server (Dynatrace, AWS CloudWatch, Prometheus y Getnet ATM).
     Actualiza parámetros de conexión, simula el handshake JSON-RPC 2.0 y devuelve telemetría en vivo.
     """
     payload = request.get_json(silent=True) or {}
     provider = str(payload.get("provider", "dynatrace")).strip().lower()
+    if provider == "kiro_atm":
+        provider = "getnet_atm"
     custom_url = str(payload.get("endpointUrl", "")).strip()
     custom_query = str(payload.get("query", "")).strip()
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -1649,9 +1661,9 @@ def api_mcp_connect_and_test():
         tool_args = {"query": custom_query or "getnet_card_block_latency_p95_ms"}
         result_payload = obs_resp.get("prometheus", {})
     else:
-        tool_name = "atm_kiro_inspect_incident"
+        tool_name = "getnet_atm_inspect_incident"
         tool_args = {"atm_id": "ATM-GTN-MAD-0042"}
-        result_payload = AUTONOMOUS_ALM_STATE.get("atmKiroDetail", {})
+        result_payload = AUTONOMOUS_ALM_STATE.get("atmDetail", {})
 
     jsonrpc_trace = {
         "request": {
@@ -1742,7 +1754,7 @@ def api_inject_incidents():
 
     AUTONOMOUS_ALM_STATE["overallStatus"] = "ALERTA CRÍTICA EN PRO · 2 INCIDENCIAS DE TARJETAS ACTIVAS (PENDIENTE AUTO-REMEDIACIÓN)"
     AUTONOMOUS_ALM_STATE["deployedRelease"] = "v2026.11.1-BROKEN-PRO"
-    AUTONOMOUS_ALM_STATE["atmKiroDetail"]["status"] = "OPEN · DETECTED IN ATM-GTN-MAD-0042"
+    AUTONOMOUS_ALM_STATE["atmDetail"]["status"] = "OPEN · DETECTED IN ATM-GTN-MAD-0042"
     AUTONOMOUS_ALM_STATE["cloudwatchSysDetail"]["status"] = "ALARM · FIRING IN DYNATRACE DAVIS AI & AWS CLOUDWATCH"
 
     alm_data = load_alm_backlog()
@@ -1765,8 +1777,8 @@ def api_inject_incidents():
         0,
         {
             "execKey": f"GTN-ALERT-2026-{100 + len(EXECUTION_HISTORY) + 1}",
-            "buildName": "🔥 INCIDENCIAS DE TARJETAS DETECTADAS (ATM Kiro + Dynatrace Davis AI + CloudWatch)",
-            "runner": "Kiro-ATM-Vision-Agent + Observability-MCP-Agent",
+            "buildName": "🔥 INCIDENCIAS DE TARJETAS DETECTADAS (Getnet ATM + Dynatrace Davis AI + CloudWatch)",
+            "runner": "Getnet-ATM-Vision-Agent + Observability-MCP-Agent",
             "environment": "PRODUCTION (eu-west-1)",
             "testsScope": "GTN-INC-ATM-001 (Card Trapped) + GTN-INC-SYS-002 (Redis Deadlock P95=1840ms)",
             "passed": 10,
@@ -1780,7 +1792,7 @@ def api_inject_incidents():
     return jsonify(
         {
             "ok": True,
-            "message": "Incidencias funcional (ATM Kiro) y de sistemas (Dynatrace/CloudWatch) inyectadas en Producción.",
+            "message": "Incidencias funcional (Getnet ATM) y de sistemas (Dynatrace/CloudWatch) inyectadas en Producción.",
             "systemState": SYSTEM_INCIDENT_STATE,
             "autonomousAlm": AUTONOMOUS_ALM_STATE,
         }
@@ -1802,7 +1814,7 @@ def api_autonomous_alm_cycle():
         ),
         "fecha_hora": now_iso,
     }
-    kiro_val_errors = validate_incident(raw_incident)
+    atm_val_errors = validate_incident(raw_incident)
     pan_masked = redact_pan(raw_incident["descripcion"])
     safe_scene = scene_prompt(raw_incident)
     triage_obj = {
@@ -1876,7 +1888,7 @@ def api_autonomous_alm_cycle():
             "lastCycleTimestamp": now_str,
         }
     )
-    AUTONOMOUS_ALM_STATE["atmKiroDetail"].update(
+    AUTONOMOUS_ALM_STATE["atmDetail"].update(
         {
             "panRedacted": pan_masked,
             "scenePrompt": safe_scene,
@@ -1892,7 +1904,7 @@ def api_autonomous_alm_cycle():
         {
             "execKey": f"GTN-EXEC-2026-{100 + len(EXECUTION_HISTORY) + 1}",
             "buildName": f"Build #{100 + len(EXECUTION_HISTORY) + 1} · Ciclo Completo ALM Zero-Touch (RAG + Auto-Fix & Re-Deploy PRO)",
-            "runner": "5 Agentes Autónomos (AWS_Kiro + Dynatrace + CloudWatch MCP + Motor RAG + Jira Xray)",
+            "runner": "5 Agentes Autónomos (Getnet ATM + Dynatrace + CloudWatch MCP + Motor RAG + Jira Xray)",
             "environment": "PRODUCTION (v2026.11.2-AUTONOMOUS-PRO)",
             "testsScope": "GTN-INC-ATM-001 & GTN-INC-SYS-002 RESOLVED · 14/14 Xray Card Tests PASSED",
             "passed": 14,
@@ -1915,7 +1927,7 @@ def api_autonomous_alm_cycle():
                 rag_atm["agenticSynthesis"]["selectedPlaybookId"],
                 rag_sys["agenticSynthesis"]["selectedPlaybookId"],
             ],
-            "kiroValidationOk": len(kiro_val_errors) == 0 and len(triage_errors) == 0,
+            "atmValidationOk": len(atm_val_errors) == 0 and len(triage_errors) == 0,
             "panRedacted": pan_masked,
             "emvReversalCode": cod_rev,
             "deployedRelease": "v2026.11.2-AUTONOMOUS-PRO",

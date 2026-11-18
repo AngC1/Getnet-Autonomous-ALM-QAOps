@@ -3,7 +3,7 @@ Asistente JMeter con Inteligencia Artificial (QAOps Performance Suite) — Getne
 Funciones principales:
   1. Generación/parametrización de planes Apache JMeter (.jmx) a partir de objetivos de negocio de tarjetas bancarias.
   2. Ejecución de pruebas de carga concurrentes contra los servicios de Parque de Tarjetas EMV, Autorizaciones ISO-8583,
-     Bloqueo Preventivo de Tarjetas en ATM (AWS_Kiro) y Disputas/Chargebacks de Getnet.
+     Bloqueo Preventivo de Tarjetas en ATM (Getnet_ATM) y Disputas/Chargebacks de Getnet.
   3. Análisis cognitivo de resultados .jtl: cálculo de P50/P90/P95/P99, índice Apdex, certificación del Hotfix
      de lock Redis (GTN-INC-SYS-002) y publicación automática en el Hub ALM (GTN-TC-011 y GTN-TC-012).
 """

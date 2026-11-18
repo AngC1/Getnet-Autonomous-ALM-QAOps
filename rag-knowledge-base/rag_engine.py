@@ -3,7 +3,7 @@ Getnet (Grupo Santander) · Motor RAG de Comportamiento de Incidencias Bancarias
 ========================================================================================================
 Implementa un motor híbrido de Recuperación Aumentada por Generación (RAG) sin dependencias externas pesadas:
   1. Indexación TF-IDF Vectorial + Similitud Coseno sobre Playbooks de Producción de Tarjetas Bancarias.
-  2. Boost BM25 por Huellas de Telemetría (AWS_Kiro-main, Dynatrace Davis AI, AWS CloudWatch, ISO-8583).
+  2. Boost BM25 por Huellas de Telemetría (Getnet_ATM, Dynatrace Davis AI, AWS CloudWatch, ISO-8583).
   3. Síntesis de Plan de Acción Autónomo (Zero Human-in-the-Loop) con trazabilidad hacia Jira Xray.
 """
 from __future__ import annotations
