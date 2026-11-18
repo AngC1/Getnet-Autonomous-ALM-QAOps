@@ -44,6 +44,9 @@ import atm_sentinel  # noqa: E402
 from rag_engine import IncidentRAGEngine  # noqa: E402
 from getnet_products_engineering import (  # noqa: E402
     get_all_products_engineering,
+    get_tpv_live_state,
+    inject_tpv_incident,
+    process_tpv_payment,
     simulate_and_heal_product_incident,
 )
 
@@ -994,6 +997,7 @@ def servicios_para_clientes_view():
         tarjetas_log=TARJETAS_BLOQUEADAS_LOG,
         mcp_connections=MCP_CONNECTIONS_STATE,
         getnet_products=get_all_products_engineering(),
+        tpv_state=get_tpv_live_state(),
     )
 
 
@@ -1014,6 +1018,7 @@ def alm_dashboard_view():
         rag_playbooks=RAG_ENGINE.playbooks,
         rag_meta=RAG_ENGINE.kb_data.get("metadata", {}),
         getnet_products=get_all_products_engineering(),
+        tpv_state=get_tpv_live_state(),
     )
 
 
@@ -2187,6 +2192,53 @@ def api_simulate_and_heal_product():
         },
     )
     return jsonify(report)
+
+
+@app.route("/api/v1/tpv/status", methods=["GET"])
+def api_tpv_status():
+    """Devuelve el estado en vivo de los 4 modelos de TPV de Getnet (Get Smart, Tap on Phone, Automatic, Central)."""
+    return jsonify({"ok": True, "tpvState": get_tpv_live_state()})
+
+
+@app.route("/api/v1/tpv/inject-incident", methods=["POST"])
+def api_tpv_inject_incident():
+    """Inyecta en tiempo real una incidencia de producción en una TPV específica o en todas las TPV de Getnet."""
+    data = request.get_json(silent=True) or {}
+    product_id = str(data.get("productId", "ALL_TPV")).strip()
+    report = inject_tpv_incident(product_id)
+
+    alm_data = load_alm_backlog()
+    injected_pids = {item["productId"] for item in report["injectedTerminals"]}
+    pid_to_tc = {
+        "PROD-TPV-SMART": "GTN-TC-015",
+        "PROD-TPV-TAP": "GTN-TC-016",
+        "PROD-TPV-AUTO": "GTN-TC-017",
+        "PROD-TPV-CENTRAL": "GTN-TC-018",
+    }
+    failed_tcs = {pid_to_tc[p] for p in injected_pids if p in pid_to_tc}
+    for tc in alm_data.get("testCases", []):
+        if tc.get("key") in failed_tcs:
+            tc["status"] = "FAILED"
+    total_tc = len(alm_data.get("testCases", []))
+    passed_tc = sum(1 for tc in alm_data.get("testCases", []) if tc.get("status") == "PASSED")
+    if "testPlan" in alm_data:
+        alm_data["testPlan"]["totalTests"] = total_tc
+        alm_data["testPlan"]["passed"] = passed_tc
+        alm_data["testPlan"]["failed"] = total_tc - passed_tc
+    save_alm_backlog(alm_data)
+    return jsonify(report)
+
+
+@app.route("/api/v1/tpv/charge", methods=["POST"])
+def api_tpv_charge():
+    """Simula un cobro con tarjeta en una TPV de Getnet (HTTP 409 si tiene incidencia activa, HTTP 200 si está operativa/reparada)."""
+    data = request.get_json(silent=True) or {}
+    product_id = str(data.get("productId", "PROD-TPV-SMART")).strip()
+    pan = str(data.get("pan", "4548 1234 5678 9012")).strip()
+    amount_eur = float(data.get("amountEur", 48.50))
+    terminal_id = str(data.get("terminalId", "")).strip()
+    resp, code = process_tpv_payment(product_id, pan, amount_eur, terminal_id)
+    return jsonify(resp), code
 
 
 @app.route("/api/v1/alm/export/<fmt>", methods=["GET"])

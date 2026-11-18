@@ -283,3 +283,85 @@ def test_tc015_productos_tpv_pagos_online_fx_harness_context_loop_prompt(driver,
     banner = driver.find_element("id", "product-engineering-live-banner")
     assert banner.is_displayed()
 
+
+def test_tc016_panel_inyeccion_incidencias_tpv_y_autofix(driver, base_url):
+    """
+    Verifica el Panel de Inyección de Incidencias TPV (Get Smart, Get Tap on Phone,
+    Get Automatic y Get Central):
+    1. Inyecta incidencia en PROD-TPV-SMART (POST /api/v1/tpv/inject-incident).
+    2. Verifica que el intento de cobro en TPV devuelve HTTP 409 REJECTED_BY_TPV_INCIDENT.
+    3. Ejecuta Auto-Fix Zero-Touch sobre ALL_TPV (POST /api/v1/products/simulate-and-heal).
+    4. Verifica que el cobro en TPV devuelve HTTP 200 APPROVED_EMV_TPV_SYNCED con PAN redactado.
+    5. Verifica la presencia y legibilidad del panel TPV tanto en /servicios-para-clientes
+       como en /alm-dashboard (Modo Ejecutivo Claro por defecto).
+    """
+    # 1. Inyectar incidencia en Get Smart TPV
+    inj_res = requests.post(
+        f"{base_url}/api/v1/tpv/inject-incident",
+        json={"productId": "PROD-TPV-SMART"},
+        timeout=5,
+    )
+    assert inj_res.status_code == 200
+    inj_data = inj_res.json()
+    assert inj_data["ok"] is True
+    assert inj_data["tpvState"]["activeIncidentsCount"] >= 1
+
+    # 2. Intentar cobro en Get Smart con incidencia activa -> HTTP 409
+    fail_charge = requests.post(
+        f"{base_url}/api/v1/tpv/charge",
+        json={
+            "productId": "PROD-TPV-SMART",
+            "pan": "4548812049109012",
+            "amountEur": 48.50,
+            "terminalId": "TPV-SMART-MAD-101",
+        },
+        timeout=5,
+    )
+    assert fail_charge.status_code == 409
+    fail_data = fail_charge.json()
+    assert fail_data["ok"] is False
+    assert fail_data["status"] == "REJECTED_BY_TPV_INCIDENT"
+    assert "4548 **** **** 9012" == fail_data["panMasked"]
+
+    # 3. Auto-remediar todas las TPV
+    heal_tpv = requests.post(
+        f"{base_url}/api/v1/products/simulate-and-heal",
+        json={"productId": "ALL_TPV"},
+        timeout=5,
+    )
+    assert heal_tpv.status_code == 200
+    heal_tpv_data = heal_tpv.json()
+    assert heal_tpv_data["ok"] is True
+    assert heal_tpv_data["tpvState"]["activeIncidentsCount"] == 0
+
+    # 4. Reintentar cobro en Get Smart tras Auto-Fix -> HTTP 200
+    ok_charge = requests.post(
+        f"{base_url}/api/v1/tpv/charge",
+        json={
+            "productId": "PROD-TPV-SMART",
+            "pan": "4548812049109012",
+            "amountEur": 48.50,
+            "terminalId": "TPV-SMART-MAD-101",
+        },
+        timeout=5,
+    )
+    assert ok_charge.status_code == 200
+    ok_data = ok_charge.json()
+    assert ok_data["ok"] is True
+    assert ok_data["status"] == "APPROVED_EMV_TPV_SYNCED"
+    assert ok_data["authCode"].startswith("AUT-TPV-2026-")
+
+    # 5. Verificar paneles UI en /servicios-para-clientes y /alm-dashboard
+    driver.get(f"{base_url}/servicios-para-clientes")
+    tpv_tab_btn = driver.find_element("id", "btn-tab-tpv-incidentes")
+    driver.execute_script("arguments[0].click();", tpv_tab_btn)
+    tpv_grid = driver.find_element("id", "tpv-terminals-status-grid")
+    assert tpv_grid.is_displayed()
+
+    driver.get(f"{base_url}/alm-dashboard")
+    body_el = driver.find_element("tag name", "body")
+    assert "executive-light" in (body_el.get_attribute("class") or "")
+    alm_tpv_panel = driver.find_element("id", "section-tpv-incident-injector")
+    assert alm_tpv_panel.is_displayed()
+
+

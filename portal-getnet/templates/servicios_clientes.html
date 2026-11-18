@@ -809,7 +809,7 @@
 
       <nav class="getnet-nav" aria-label="Navegación Principal Getnet">
         <a onclick="activateTab('tab-cuadro', true)" class="active-nav">Tu negocio · Parque Tarjetas</a>
-        <a onclick="activateTab('tab-autorizaciones', true)">Get Smart · ISO-8583</a>
+        <a onclick="activateTab('tab-tpv-incidentes', true)">TPV · Get Smart / Tap / Auto / Central</a>
         <a onclick="activateTab('tab-disputas', true)">Get Checkout · Chargebacks</a>
         <a onclick="activateTab('tab-bloqueo-atm', true)">Red ATM · Getnet ATM</a>
         <a href="/alm-dashboard">Cuadro de Mando CIO</a>
@@ -817,6 +817,7 @@
 
       <div class="header-actions">
         <span class="phone-pill">Soporte 24/7 · {{ system_state.currentRelease }}</span>
+        <button class="btn-outline" onclick="activateTab('tab-tpv-incidentes', true)" data-testid="header-btn-tpv">🏪 Inyectar Incidencia TPV</button>
         <button class="btn-outline" onclick="activateTab('tab-bloqueo-atm', true)" data-testid="header-btn-bloqueo">🚨 Bloqueo Preventivo ATM</button>
         <button class="btn-outline" onclick="activateTab('tab-cuadro', true)" data-testid="header-btn-cuadro">💳 Parque de Tarjetas</button>
         <button class="btn-primary" onclick="activateTab('tab-area-cliente', true)" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">Acceso Clientes · Área Titular</button>
@@ -953,6 +954,7 @@
       <button class="tab-btn" id="btn-tab-area-cliente" data-testid="btn-tab-area-cliente" onclick="activateTab('tab-area-cliente')">📲 4. Área Titular &amp; Wallet Digital</button>
       <button class="tab-btn" id="btn-tab-videoconsulta" data-testid="btn-tab-videoconsulta" onclick="activateTab('tab-videoconsulta')">🛠️ 5. Soporte Criptográfico EMV / HSM 24/7</button>
       <button class="tab-btn" id="btn-tab-bloqueo-atm" data-testid="btn-tab-bloqueo-atm" onclick="activateTab('tab-bloqueo-atm')">🚨 6. Bloqueo ATM (Getnet ATM + Dynatrace + CloudWatch)</button>
+      <button class="tab-btn" id="btn-tab-tpv-incidentes" data-testid="btn-tab-tpv-incidentes" onclick="activateTab('tab-tpv-incidentes')">🏪 7. Inyección de Incidencias TPV (Smart · Tap · Automatic · Central)</button>
     </div>
 
     <!-- PANEL 1: PARQUE DE TARJETAS BANCARIAS EMV & RED DE CAJEROS ATM -->
@@ -1230,6 +1232,92 @@
       </div>
     </section>
 
+    <!-- PANEL 7: LABORATORIO DE INYECCIÓN DE INCIDENCIAS RELATIVAS A LA TPV GETNET & SIMULADOR DE COBRO -->
+    <section class="tab-panel" id="tab-tpv-incidentes" data-testid="panel-tpv-incidentes">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
+        <div>
+          <span class="c-tag-info">PAGOS EN PERSONA GETNET · LABORATORIO DE RESILIENCIA TPV</span>
+          <h3 style="color:var(--getnet-charcoal);margin-bottom:6px;font-size:1.35rem;">Panel de Inyección de Incidencias en TPVs Getnet, Simulador de Cobro y Auto-Remediación Zero-Touch</h3>
+          <p style="font-size:0.94rem;color:var(--getnet-body);max-width:880px;">
+            Inyecta fallos reales de producción sobre cualquiera de las 4 familias de datáfonos y TPVs de Getnet (<strong>Get Smart</strong>, <strong>Get Tap on Phone</strong>, <strong>Get Automatic</strong> y <strong>Get Central</strong>), intenta pasar una tarjeta para reproducir el error <code>HTTP 409</code> y ejecuta la auto-remediación con el <strong>Motor RAG</strong>.
+          </p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="btn-danger-sim" id="btn-inject-all-tpv" data-testid="btn-inject-all-tpv" onclick="injectTpvIncident('ALL_TPV')">
+            🔥 1. Inyectar Incidencias en las 4 TPVs
+          </button>
+          <button type="button" class="btn-autofix-sim" id="btn-heal-all-tpv" data-testid="btn-heal-all-tpv" onclick="healTpvIncidents('ALL_TPV')">
+            🤖 3. Auto-Remediar TPVs con Motor RAG (Zero-Touch)
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Estado e Inyección Individual por Modelo de TPV -->
+      <div class="results-grid" style="margin-top:10px;margin-bottom:22px;" id="tpv-terminals-status-grid" data-testid="tpv-terminals-status-grid">
+        {% for term in tpv_state.terminals %}
+        <div class="result-card" id="tpv-status-card-{{ term.productId }}" data-testid="tpv-status-card-{{ term.productId }}" style="border-left:5px solid {{ '#EC0000' if term.incidentActive else '#10B981' }};">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span class="badge {{ 'badge-amber' if term.incidentActive else 'badge-green' }}" id="tpv-pill-{{ term.productId }}">
+              {{ '🚨 INCIDENCIA ACTIVA (P1)' if term.incidentActive else '✅ TPV OPERATIVA (OK)' }}
+            </span>
+            <code style="font-size:0.78rem;color:var(--getnet-charcoal);font-weight:700;">{{ term.terminalId }}</code>
+          </div>
+          <h4 style="font-size:1.02rem;margin-bottom:4px;">{{ term.name }}</h4>
+          <p style="font-size:0.84rem;">Incidente: <code>{{ term.incidentKey }}</code> · Playbook: <code>{{ term.ragPlaybookId }}</code> · Test: <code>{{ term.testKey }}</code></p>
+          <p style="font-size:0.8rem;color:#64748B;">Código Fallo Simulado: <code>{{ term.errorCode }}</code></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+            <button type="button" class="chip-btn" style="border-color:#EC0000;color:#B30000;" data-testid="btn-inject-tpv-{{ term.productId }}" onclick="injectTpvIncident('{{ term.productId }}')">
+              🔥 Inyectar Fallo TPV
+            </button>
+            <button type="button" class="chip-btn" data-testid="btn-select-tpv-{{ term.productId }}" onclick="selectTpvForCharge('{{ term.productId }}', '{{ term.terminalId }}')">
+              💳 Probar Cobro Aquí
+            </button>
+            <button type="button" class="chip-btn" style="border-color:#059669;color:#065F46;" data-testid="btn-heal-tpv-{{ term.productId }}" onclick="healTpvIncidents('{{ term.productId }}')">
+              🤖 Auto-Fix RAG
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Simulador de Cobro con Tarjeta en Terminal TPV -->
+      <div style="background:var(--getnet-sky);border:1.5px solid var(--getnet-sky-border);border-radius:14px;padding:20px;">
+        <h4 style="color:var(--getnet-charcoal);margin-bottom:10px;font-size:1.08rem;">💳 Paso 2 · Simulador de Cobro Presencial con Tarjeta EMV / Contactless en Terminal TPV</h4>
+        <form id="form-cobro-tpv" onsubmit="ejecutarCobroTpv(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="tpv-select-product">Modelo de TPV Getnet *</label>
+              <select id="tpv-select-product" data-testid="tpv-select-product">
+                <option value="PROD-TPV-SMART">📱 Get Smart: TPV táctil sin cables (TPV-SMART-MAD-101)</option>
+                <option value="PROD-TPV-TAP">📲 Get Tap on Phone: TPV en el móvil (TPV-TAP-NFC-204)</option>
+                <option value="PROD-TPV-AUTO">🏧 Get Automatic: TPV cobro automático / Vending (TPV-AUTO-VEND-309)</option>
+                <option value="PROD-TPV-CENTRAL">🖥️ Get Central: TPV conectado software gestión ERP (TPV-CENT-ECR-412)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tpv-input-pan">PAN de Tarjeta Bancaria (Chip EMV / NFC) *</label>
+              <input type="text" id="tpv-input-pan" value="4548 1234 5678 9012" data-testid="tpv-input-pan" required />
+            </div>
+            <div class="form-group">
+              <label for="tpv-input-amount">Importe del Cobro (EUR) *</label>
+              <input type="number" step="0.01" id="tpv-input-amount" value="48.50" data-testid="tpv-input-amount" required />
+            </div>
+            <div class="form-group">
+              <label for="tpv-input-terminal">ID Terminal TPV *</label>
+              <input type="text" id="tpv-input-terminal" value="TPV-SMART-MAD-101" data-testid="tpv-input-terminal" required />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="btn-ejecutar-cobro-tpv" data-testid="btn-ejecutar-cobro-tpv">
+            💳 Pasar Tarjeta y Ejecutar Cobro en TPV Seleccionada
+          </button>
+        </form>
+
+        <div id="tpv-cobro-alert" class="alert-box show alert-success" role="alert" data-testid="tpv-cobro-alert" style="margin-top:16px;">
+          <strong>Estado de la Red TPV Getnet:</strong> Las 4 familias de TPVs (<code>Get Smart</code>, <code>Get Tap on Phone</code>, <code>Get Automatic</code> y <code>Get Central</code>) se encuentran operativas. Pulsa <strong>"🔥 Inyectar Fallo TPV"</strong> arriba y luego <strong>"💳 Pasar Tarjeta"</strong> para reproducir la incidencia en vivo.
+        </div>
+      </div>
+    </section>
+
     <!-- NUEVA SECCIÓN: ECOSISTEMA COMPLETO DE 11 PRODUCTOS OFICIALES GETNET ESPAÑA (HARNESS · CONTEXT · LOOP · PROMPT ENGINEERING) -->
     <section style="margin-top:44px;background:#FFFFFF;border:1.5px solid var(--getnet-sky-border);border-radius:16px;padding:30px;box-shadow:0 8px 28px rgba(15,23,42,0.06);" id="getnet-official-products-section" data-testid="getnet-official-products-section">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:22px;border-bottom:2px solid var(--getnet-sky);padding-bottom:18px;">
@@ -1342,7 +1430,8 @@
         'tab-disputas': 'btn-tab-disputas',
         'tab-area-cliente': 'btn-tab-area-cliente',
         'tab-videoconsulta': 'btn-tab-videoconsulta',
-        'tab-bloqueo-atm': 'btn-tab-bloqueo-atm'
+        'tab-bloqueo-atm': 'btn-tab-bloqueo-atm',
+        'tab-tpv-incidentes': 'btn-tab-tpv-incidentes'
       };
       const btn = document.getElementById(mapBtn[tabId]);
       if (btn) btn.classList.add('active');
@@ -1358,6 +1447,110 @@
       document.getElementById('trj-programa').value = prog;
       buscarParqueTarjetas({ preventDefault: () => {} });
       showToast('💳 Filtro rápido aplicado en Parque de Tarjetas');
+    }
+
+    function selectTpvForCharge(productId, terminalId) {
+      document.getElementById('tpv-select-product').value = productId;
+      document.getElementById('tpv-input-terminal').value = terminalId;
+      showToast(`💳 Seleccionada TPV ${terminalId} para prueba de cobro`);
+    }
+
+    async function injectTpvIncident(productId) {
+      const alertBox = document.getElementById('tpv-cobro-alert');
+      const res = await fetch('/api/v1/tpv/inject-incident', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      (data.injectedTerminals || []).forEach(t => {
+        const pill = document.getElementById('tpv-pill-' + t.productId);
+        const card = document.getElementById('tpv-status-card-' + t.productId);
+        if (pill) {
+          pill.className = 'badge badge-amber';
+          pill.textContent = '🚨 INCIDENCIA ACTIVA (P1)';
+        }
+        if (card) card.style.borderLeftColor = '#EC0000';
+      });
+      if (data.injectedTerminals && data.injectedTerminals.length > 0) {
+        const first = data.injectedTerminals[0];
+        document.getElementById('tpv-select-product').value = first.productId;
+        document.getElementById('tpv-input-terminal').value = first.terminalId;
+        alertBox.className = 'alert-box show alert-error';
+        alertBox.innerHTML = `
+          <strong>🔥 INCIDENCIA TPV INYECTADA (${data.injectedCount} terminal(es) afectada(s)):</strong><br/>
+          • <strong>TPV:</strong> ${first.productName} (<code>${first.terminalId}</code>) · Ticket: <code>${first.incidentKey}</code> · Error: <code>${first.errorCode}</code><br/>
+          • <strong>Síntoma:</strong> ${first.symptom}<br/>
+          <em>Pulsa ahora en "💳 Pasar Tarjeta y Ejecutar Cobro en TPV Seleccionada" para reproducir el fallo HTTP 409 o en "🤖 Auto-Fix RAG" para repararlo sin intervención humana.</em>
+        `;
+      }
+      showToast(`🔥 Incidencia inyectada en TPV (${productId})`);
+    }
+
+    async function ejecutarCobroTpv(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const payload = {
+        productId: document.getElementById('tpv-select-product').value,
+        pan: document.getElementById('tpv-input-pan').value,
+        amountEur: parseFloat(document.getElementById('tpv-input-amount').value || '48.50'),
+        terminalId: document.getElementById('tpv-input-terminal').value
+      };
+      const alertBox = document.getElementById('tpv-cobro-alert');
+      const res = await fetch('/api/v1/tpv/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alertBox.className = 'alert-box show alert-error';
+        alertBox.innerHTML = `
+          <strong>🚨 COBRO RECHAZADO POR INCIDENCIA EN TPV (${data.errorCode} · ${data.incidentKey}):</strong><br/>
+          ${data.mensaje}<br/>
+          • <strong>PAN Enmascarado (PCI-DSS redact_pan):</strong> <code>${data.panMasked}</code> · <strong>Importe:</strong> ${data.amountEur.toFixed(2)} EUR<br/>
+          • <strong>Recomendación Agéntica:</strong> ${data.recommendedAction}
+        `;
+        showToast(`🚨 Error HTTP 409 en TPV: ${data.errorCode}`);
+        return;
+      }
+      alertBox.className = 'alert-box show alert-success';
+      alertBox.innerHTML = `
+        <strong>✅ ${data.status} (${data.authCode}):</strong><br/>
+        ${data.mensaje}<br/>
+        • <strong>Terminal:</strong> <code>${data.terminalId}</code> · <strong>PAN Enmascarado:</strong> <code>${data.panMasked}</code> · <strong>Importe:</strong> ${data.amountEur.toFixed(2)} EUR<br/>
+        • <strong>Criptograma EMV:</strong> <code>${data.emvCryptogram}</code> · <strong>Configuración Activa:</strong> <code>${JSON.stringify(data.activeConfig)}</code>
+      `;
+      showToast(`✅ Cobro TPV Aprobado: ${data.authCode}`);
+    }
+
+    async function healTpvIncidents(productId) {
+      const alertBox = document.getElementById('tpv-cobro-alert');
+      alertBox.className = 'alert-box show alert-warning';
+      alertBox.innerHTML = `⏳ Ejecutando Auto-Remediación ALM Zero-Touch (Context + Prompt + Loop + Harness Engineering) sobre TPV <code>${productId}</code>...`;
+      const res = await fetch('/api/v1/products/simulate-and-heal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      (data.results || []).forEach(r => {
+        const pill = document.getElementById('tpv-pill-' + r.productId);
+        const card = document.getElementById('tpv-status-card-' + r.productId);
+        if (pill) {
+          pill.className = 'badge badge-green';
+          pill.textContent = '✅ TPV OPERATIVA (OK)';
+        }
+        if (card) card.style.borderLeftColor = '#10B981';
+      });
+      const first = (data.results || [])[0] || {};
+      alertBox.className = 'alert-box show alert-success';
+      alertBox.innerHTML = `
+        <strong>🤖 AUTO-REMEDIACIÓN TPV COMPLETADA (${data.totalProductsProcessed} TPV(s) reparada(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
+        • <strong>TPV Reparada:</strong> ${first.productName} · Incidente <code>${first.incidentKey}</code> -> <strong>${first.incidentStatus}</strong><br/>
+        • <strong>Playbook RAG Aplicado:</strong> <code>${first.contextLoaded.ragPlaybookId}</code> · <strong>Patch OTA:</strong> <code>${JSON.stringify(first.remediation.configPatch)}</code><br/>
+        • <strong>Certificación Jira Xray:</strong> Caso <code>${first.verification.testKey}</code> -> <strong>PASSED</strong> (MTTR: ${first.remediation.mttrAutonomous})
+      `;
+      showToast(`🤖 TPV Auto-Reparada (${first.verification.testKey} PASSED)`);
     }
 
     async function simulateAndHealGetnetProduct(productId) {

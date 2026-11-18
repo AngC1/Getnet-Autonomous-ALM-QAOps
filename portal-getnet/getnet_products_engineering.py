@@ -1048,6 +1048,161 @@ def get_product_by_id(product_id: str) -> Dict[str, Any] | None:
     return None
 
 
+TPV_PRODUCT_IDS: List[str] = [
+    "PROD-TPV-SMART",
+    "PROD-TPV-TAP",
+    "PROD-TPV-AUTO",
+    "PROD-TPV-CENTRAL",
+]
+
+TPV_LIVE_STATE: Dict[str, Dict[str, Any]] = {
+    "PROD-TPV-SMART": {
+        "productId": "PROD-TPV-SMART",
+        "name": "Get Smart: TPV táctil sin cables",
+        "terminalId": "TPV-SMART-MAD-101",
+        "incidentKey": "GTN-INC-TPV-007",
+        "ragPlaybookId": "RAG-PB-TPV-007",
+        "testKey": "GTN-TC-015",
+        "incidentActive": False,
+        "errorCode": "SMARTPOS_ROAMING_ACK_LOSS",
+        "activeConfig": {"smartpos_fast_roaming_4g": True, "handoff_timeout_ms": 1200, "store_and_forward_idempotent_rrn": True},
+    },
+    "PROD-TPV-TAP": {
+        "productId": "PROD-TPV-TAP",
+        "name": "Get Tap on Phone: TPV en el móvil",
+        "terminalId": "TPV-TAP-NFC-204",
+        "incidentKey": "GTN-INC-TAP-008",
+        "ragPlaybookId": "RAG-PB-TAP-008",
+        "testKey": "GTN-TC-016",
+        "incidentActive": False,
+        "errorCode": "MPOC_ATTESTATION_EXPIRED",
+        "activeConfig": {"mpoc_attestation_refresh_sec": 900, "dukpt_pin_on_glass_warm_pool": True},
+    },
+    "PROD-TPV-AUTO": {
+        "productId": "PROD-TPV-AUTO",
+        "name": "Get Automatic: TPV de cobro automático (Vending/Quiosco)",
+        "terminalId": "TPV-AUTO-VEND-309",
+        "incidentKey": "GTN-INC-AUTO-009",
+        "ragPlaybookId": "RAG-PB-AUTO-009",
+        "testKey": "GTN-TC-017",
+        "incidentActive": False,
+        "errorCode": "MDB_VEND_FAILURE_NO_0420_REVERSAL",
+        "activeConfig": {"mdb_vend_fail_auto_reversal_0420": True, "preauth_orphan_ttl_sec": 30},
+    },
+    "PROD-TPV-CENTRAL": {
+        "productId": "PROD-TPV-CENTRAL",
+        "name": "Get Central: TPV conectado software de gestión (ERP/ECR)",
+        "terminalId": "TPV-CENT-ECR-412",
+        "incidentKey": "GTN-INC-CENT-010",
+        "ragPlaybookId": "RAG-PB-CENT-010",
+        "testKey": "GTN-TC-018",
+        "incidentActive": False,
+        "errorCode": "ECR_BATCH_MTI0500_ACK_TIMEOUT",
+        "activeConfig": {"ecr_outbox_replay_enabled": True, "auto_query_tx_status_on_timeout": True},
+    },
+}
+
+
+def get_tpv_live_state() -> Dict[str, Any]:
+    any_active = any(v["incidentActive"] for v in TPV_LIVE_STATE.values())
+    return {
+        "overallTpvStatus": "DEGRADED_TPV_INCIDENT_OPEN" if any_active else "ALL_TPV_OPERATIONAL",
+        "activeIncidentsCount": sum(1 for v in TPV_LIVE_STATE.values() if v["incidentActive"]),
+        "terminals": list(TPV_LIVE_STATE.values()),
+    }
+
+
+def inject_tpv_incident(product_id: str = "ALL_TPV") -> Dict[str, Any]:
+    """Inyecta en tiempo real una incidencia de producción en una TPV específica o en las 4 TPVs de Getnet."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    target_ids = TPV_PRODUCT_IDS if product_id in ("ALL", "ALL_TPV", "") else [product_id]
+    injected = []
+    for pid in target_ids:
+        if pid in TPV_LIVE_STATE:
+            TPV_LIVE_STATE[pid]["incidentActive"] = True
+            if pid == "PROD-TPV-SMART":
+                TPV_LIVE_STATE[pid]["activeConfig"] = {"smartpos_fast_roaming_4g": False, "handoff_timeout_ms": 8000}
+            elif pid == "PROD-TPV-TAP":
+                TPV_LIVE_STATE[pid]["activeConfig"] = {"mpoc_attestation_refresh_sec": 3600, "dukpt_pin_on_glass_warm_pool": False}
+            elif pid == "PROD-TPV-AUTO":
+                TPV_LIVE_STATE[pid]["activeConfig"] = {"mdb_vend_fail_auto_reversal_0420": False, "preauth_orphan_ttl_sec": 0}
+            elif pid == "PROD-TPV-CENTRAL":
+                TPV_LIVE_STATE[pid]["activeConfig"] = {"ecr_outbox_replay_enabled": False, "auto_query_tx_status_on_timeout": False}
+
+            prod = get_product_by_id(pid)
+            if prod:
+                prod["incident"]["status"] = "INCIDENT_ACTIVE (OPEN P1)"
+                prod["testCase"]["status"] = "FAILED"
+                injected.append({
+                    "productId": pid,
+                    "productName": prod["name"],
+                    "terminalId": TPV_LIVE_STATE[pid]["terminalId"],
+                    "incidentKey": prod["incident"]["incidentKey"],
+                    "errorCode": TPV_LIVE_STATE[pid]["errorCode"],
+                    "symptom": prod["incident"]["symptom"],
+                    "ragPlaybookId": prod["contextEngineering"]["ragPlaybookId"],
+                })
+
+    return {
+        "ok": True,
+        "action": "TPV_INCIDENT_INJECTED",
+        "injectedCount": len(injected),
+        "injectedTerminals": injected,
+        "tpvState": get_tpv_live_state(),
+        "timestamp": now_iso,
+    }
+
+
+def process_tpv_payment(product_id: str, pan: str, amount_eur: float, terminal_id: str = "") -> tuple[Dict[str, Any], int]:
+    """Simula un cobro con tarjeta EMV/Contactless en una TPV de Getnet, fallando con HTTP 409 si hay incidencia inyectada."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    digits = "".join(ch for ch in str(pan) if ch.isdigit())
+    pan_masked = f"{digits[:4]} **** **** {digits[-4:]}" if len(digits) >= 8 else "4548 **** **** 9012"
+    pid = product_id if product_id in TPV_LIVE_STATE else "PROD-TPV-SMART"
+    st = TPV_LIVE_STATE[pid]
+    prod = get_product_by_id(pid) or GETNET_OFFICIAL_PRODUCTS_ENGINEERING[0]
+    term = terminal_id or st["terminalId"]
+
+    if st["incidentActive"]:
+        return (
+            {
+                "ok": False,
+                "status": "REJECTED_BY_TPV_INCIDENT",
+                "productId": pid,
+                "productName": prod["name"],
+                "terminalId": term,
+                "incidentKey": st["incidentKey"],
+                "errorCode": st["errorCode"],
+                "ragPlaybookId": st["ragPlaybookId"],
+                "panMasked": pan_masked,
+                "amountEur": round(float(amount_eur), 2),
+                "mensaje": f"Fallo en {prod['name']} ({term}): {prod['incident']['symptom']}",
+                "recommendedAction": f"Ejecutar Auto-Remediación ALM Zero-Touch con Playbook {st['ragPlaybookId']} ({prod['loopEngineering']['loopId']})",
+                "timestamp": now_iso,
+            },
+            409,
+        )
+
+    return (
+        {
+            "ok": True,
+            "status": "APPROVED_EMV_TPV_SYNCED",
+            "productId": pid,
+            "productName": prod["name"],
+            "terminalId": term,
+            "authCode": f"AUT-TPV-2026-{abs(hash(now_iso)) % 89999 + 10000}",
+            "emvCryptogram": "ARQC-9F26-GETNET-OK",
+            "reversalOrSettlement": "MTI_0110_APPROVED_AND_MTI_0500_SYNCED",
+            "panMasked": pan_masked,
+            "amountEur": round(float(amount_eur), 2),
+            "activeConfig": st["activeConfig"],
+            "mensaje": f"Cobro en {prod['name']} ({term}) APROBADO y conciliado sin fricción (PCI-DSS redact_pan activo).",
+            "timestamp": now_iso,
+        },
+        200,
+    )
+
+
 def simulate_and_heal_product_incident(product_id: str = "ALL") -> Dict[str, Any]:
     """
     Ejecuta en tiempo real el ciclo completo de:
@@ -1058,7 +1213,9 @@ def simulate_and_heal_product_incident(product_id: str = "ALL") -> Dict[str, Any
       5. Harness Engineering (Ejecución de Quality Gates y Certificación en Jira Xray)
     """
     now_iso = datetime.now(timezone.utc).isoformat()
-    if product_id and product_id != "ALL":
+    if product_id == "ALL_TPV":
+        targets = [p for p in GETNET_OFFICIAL_PRODUCTS_ENGINEERING if p["productId"] in TPV_PRODUCT_IDS]
+    elif product_id and product_id != "ALL":
         target = get_product_by_id(product_id)
         targets = [target] if target else GETNET_OFFICIAL_PRODUCTS_ENGINEERING
     else:
@@ -1066,6 +1223,7 @@ def simulate_and_heal_product_incident(product_id: str = "ALL") -> Dict[str, Any
 
     results = []
     for prod in targets:
+        pid = prod["productId"]
         inc = prod["incident"]
         tc = prod["testCase"]
         harness = prod["harnessEngineering"]
@@ -1075,6 +1233,9 @@ def simulate_and_heal_product_incident(product_id: str = "ALL") -> Dict[str, Any
 
         inc["status"] = "RESOLVED (AUTO-REDEPLOYED)"
         tc["status"] = "PASSED"
+        if pid in TPV_LIVE_STATE:
+            TPV_LIVE_STATE[pid]["incidentActive"] = False
+            TPV_LIVE_STATE[pid]["activeConfig"] = dict(loop["configPatch"])
 
         results.append({
             "productId": prod["productId"],
@@ -1118,6 +1279,7 @@ def simulate_and_heal_product_incident(product_id: str = "ALL") -> Dict[str, Any
         "totalProductsProcessed": len(results),
         "allQualityGatesPassed": True,
         "deployedRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM",
+        "tpvState": get_tpv_live_state(),
         "results": results,
         "timestamp": now_iso
     }

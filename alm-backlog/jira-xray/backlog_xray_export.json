@@ -142,7 +142,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 330
+      "lastExecutionTimeMs": 302
     },
     {
       "key": "GTN-TC-002",
@@ -152,7 +152,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 296
+      "lastExecutionTimeMs": 252
     },
     {
       "key": "GTN-TC-003",
@@ -162,7 +162,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 272
+      "lastExecutionTimeMs": 201
     },
     {
       "key": "GTN-TC-004",
@@ -172,7 +172,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 337
+      "lastExecutionTimeMs": 277
     },
     {
       "key": "GTN-TC-005",
@@ -182,7 +182,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 825
+      "lastExecutionTimeMs": 275
     },
     {
       "key": "GTN-TC-006",
@@ -192,7 +192,7 @@
       "priority": "High",
       "type": "API & Business Rule",
       "status": "PASSED",
-      "lastExecutionTimeMs": 45
+      "lastExecutionTimeMs": 44
     },
     {
       "key": "GTN-TC-007",
@@ -202,7 +202,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 310
+      "lastExecutionTimeMs": 287
     },
     {
       "key": "GTN-TC-008",
@@ -212,7 +212,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 292
+      "lastExecutionTimeMs": 826
     },
     {
       "key": "GTN-TC-009",
@@ -222,7 +222,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 258
+      "lastExecutionTimeMs": 222
     },
     {
       "key": "GTN-TC-010",
@@ -232,7 +232,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 283
+      "lastExecutionTimeMs": 238
     },
     {
       "key": "GTN-TC-011",
@@ -242,7 +242,7 @@
       "priority": "High",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 52
+      "lastExecutionTimeMs": 48
     },
     {
       "key": "GTN-TC-012",
@@ -252,7 +252,7 @@
       "priority": "Critical",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 60
+      "lastExecutionTimeMs": 56
     },
     {
       "key": "GTN-TC-013",
@@ -262,7 +262,7 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (Getnet ATM + RAG)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 903
+      "lastExecutionTimeMs": 316
     },
     {
       "key": "GTN-TC-014",
@@ -272,7 +272,7 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (Dynatrace + CloudWatch MCP)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 31
+      "lastExecutionTimeMs": 24
     },
     {
       "key": "GTN-TC-015",
@@ -282,7 +282,7 @@
       "priority": "Critical",
       "type": "Product E2E + Harness Loop",
       "status": "PASSED",
-      "lastExecutionTimeMs": 125
+      "lastExecutionTimeMs": 100
     },
     {
       "key": "GTN-TC-016",
@@ -396,7 +396,7 @@
       "rootCause": "Flag enable_emv_reversal_0420=False en card_lock_engine omite el envío del reverso MTI 0420 al bloquear preventivamente la tarjeta.",
       "autoFixApplied": "Activado enable_emv_reversal_0420=True, emitido reverso REV-EMV-2026 y aprovisionado token digital TOK-GTN-WALLET-9012.",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-18T14:34:09+00:00"
+      "resolvedAt": "2026-11-18T20:49:09+00:00"
     },
     {
       "key": "GTN-INC-SYS-002",
@@ -408,7 +408,7 @@
       "rootCause": "Ausencia de TTL en lock Redis de bloqueo de tarjetas provoca bloqueo indefinido de conexiones bajo ráfagas concurrentes.",
       "autoFixApplied": "Inyectado redis_lock_ttl_ms=3000, activado Circuit Breaker Resilience4j y redesplegada versión v2026.11.2-AUTONOMOUS-PRO (P95 = 42.5 ms).",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-18T14:34:09+00:00"
+      "resolvedAt": "2026-11-18T20:49:09+00:00"
     }
   ],
   "defects": [

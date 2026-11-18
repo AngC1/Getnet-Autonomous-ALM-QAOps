@@ -116,12 +116,24 @@
       <span class="highlight-red">ARQUITECTURA MULTI-AGENTE ZERO-TOUCH</span>
       <h2>1. Máquina de 8 Estados y Orquestación de los 5 Agentes Autónomos</h2>
       <ul>
-        <li><strong>S1 · Ingesta de Telemetría</strong> → <strong>S2 · Detección &amp; Redacción PCI-DSS (<code>redact_pan</code>)</strong> por <code>Kiro-ATM-Vision-Agent</code>.</li>
+        <li><strong>S1 · Ingesta de Telemetría</strong> → <strong>S2 · Detección &amp; Redacción PCI-DSS (<code>redact_pan</code>)</strong> por <code>Getnet-ATM-Vision-Agent</code>.</li>
         <li><strong>S3 · Correlación MCP</strong> por <code>Observability-MCP-Agent</code> conectando con <strong>Dynatrace Davis AI (<code>DT-PROB-2026-8841</code>)</strong> y <strong>AWS CloudWatch (<code>CW-ALARM-GTN-CARDLOCK-P99</code>)</strong>.</li>
-        <li><strong>S4 · Consulta Motor RAG</strong> → <strong>S5 · Síntesis RCA</strong> por <code>RAG-Knowledge-Architect-Agent</code> sobre <code>rag-knowledge-base/incident_knowledge_base.json</code>.</li>
+        <li><strong>S4 · Consulta Motor RAG</strong> → <strong>S5 · Síntesis RCA</strong> por <code>RAG-Knowledge-Architect-Agent</code> sobre <code>rag-knowledge-base/incident_knowledge_base.json</code> (17 Playbooks indexados).</li>
         <li><strong>S6 · Re-Fixing en Caliente</strong> por <code>Self-Healing-Patch-Agent</code> (Reverso <code>ISO-8583 MTI 0420</code> + <code>redis_lock_ttl_ms=3000</code>).</li>
-        <li><strong>S7 · Canary Re-Deploy &amp; Quality Gate</strong> → <strong>S8 · Cierre en Jira Xray</strong> por <code>QAOps-Xray-Certifier-Agent</code> (14/14 Tests de Tarjetas PASSED).</li>
+        <li><strong>S7 · Canary Re-Deploy &amp; Quality Gate</strong> → <strong>S8 · Cierre en Jira Xray</strong> por <code>QAOps-Xray-Certifier-Agent</code> (25/25 Tests de Tarjetas y Productos Getnet PASSED).</li>
       </ul>
+    </div>
+    <div class="slide">
+      <span class="highlight-red">LABORATORIO INTERACTIVO DE TPV &amp; 11 PRODUCTOS OFICIALES GETNET.NET/ES</span>
+      <h2>2. Panel de Inyección de Incidencias TPV y 4 Pilares de Ingeniería Agéntica</h2>
+      <ul>
+        <li><strong>🏪 Panel de Inyección de Incidencias TPV en Tiempo Real</strong>: Permite inyectar fallos reales en <strong>Get Smart</strong> (<code>GTN-INC-TPV-007</code>), <strong>Get Tap on Phone</strong> (<code>GTN-INC-TPV-008</code>), <strong>Get Automatic</strong> (<code>GTN-INC-TPV-009</code>) y <strong>Get Central</strong> (<code>GTN-INC-TPV-010</code>), reproducir el rechazo <code>HTTP 409</code> al cobrar con tarjeta y ejecutar <strong>Auto-Fix Zero-Touch</strong>.</li>
+        <li><strong>4 Pilares Agénticos en los 11 Productos Getnet</strong>: <strong>Harness Engineering</strong> (Quality Gates y sondas deterministas), <strong>Context Engineering</strong> (ventanas RAG y telemetría MCP con <code>redact_pan</code>), <strong>Loop Engineering</strong> (ciclo cerrado de 8 estados sin intervención humana) y <strong>Prompt Engineering</strong> (plantillas estructuradas con guardarraíles PCI-DSS).</li>
+      </ul>
+      <div class="nav-btns">
+        <a class="btn" href="/alm-dashboard#section-tpv-incident-injector">🏪 Abrir Panel TPV en Cuadro de Mando CIO →</a>
+        <a class="btn btn-alt" href="/servicios-para-clientes#section-tpv-incidentes">🧪 Probar Inyección y Cobro TPV en Portal Operativo</a>
+      </div>
     </div>
   </div>
 </body>
