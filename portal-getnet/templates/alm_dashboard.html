@@ -6,33 +6,69 @@
   <title>Cuadro de Mando CIO Getnet · Jira Xray | Flujo de Estados, Agentes, Ventanas MCP (Dynatrace/CloudWatch) y Motor RAG</title>
   <style>
     :root {
+      --getnet-red: #EC0000;
+      --getnet-red-dark: #CC0000;
+      --getnet-red-soft: #FFF0F0;
+      --getnet-sky: #F5F9FB;
+      --getnet-sky-border: #D9E8F0;
+      --getnet-tag-bg: #E6F2F8;
+      --getnet-tag-text: #005C8A;
+      --bg-dark: #F5F9FB;
+      --bg-card: #FFFFFF;
+      --bg-card-alt: #F5F9FB;
+      --border: #D9E8F0;
+      --text: #191919;
+      --muted: #595959;
+      --green: #008A5E;
+      --amber: #D97706;
+      --blue: #005C8A;
+      --purple: #6D28D9;
+      --cyan: #0369A1;
+    }
+    body.soc-dark {
       --bg-dark: #0B101B;
       --bg-card: #121A2B;
       --bg-card-alt: #1A253B;
       --border: #2E3C56;
       --text: #F8FAFC;
       --muted: #94A3B8;
-      --getnet-red: #EC0000;
-      --getnet-red-dark: #B30000;
-      --getnet-sky: #F5F9FB;
-      --green: #10B981;
-      --amber: #F59E0B;
-      --blue: #3B82F6;
-      --purple: #8B5CF6;
-      --cyan: #06B6D4;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Santander Micro Text', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg-dark);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
     }
+    .qaops-top-strip {
+      background: #191919;
+      color: #F5F9FB;
+      font-size: 0.78rem;
+      padding: 8px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--getnet-red);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .qaops-top-strip a {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 3px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.75rem;
+    }
+    .qaops-top-strip a:hover { background: var(--getnet-red); border-color: var(--getnet-red); }
     header.topbar {
       background: #FFFFFF;
       color: #191919;
-      border-bottom: 3px solid var(--getnet-red);
-      padding: 14px 26px;
+      border-bottom: 1px solid #E5E9EC;
+      padding: 15px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -40,235 +76,278 @@
       top: 0;
       z-index: 100;
       flex-wrap: wrap;
-      gap: 12px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+      gap: 14px;
+      box-shadow: 0 2px 16px rgba(25, 25, 25, 0.06);
     }
     .topbar-left { display: flex; align-items: center; gap: 16px; }
     .jira-badge {
       background: #FFF0F0;
       border: 1.5px solid #EC0000;
       padding: 8px 14px;
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .topbar-title h1 { font-size: 1.12rem; font-weight: 800; color: #191919; }
-    .topbar-title span { font-size: 0.78rem; color: #595959; font-weight: 600; }
-    .topbar-title code { color: #EC0000; font-weight: 700; }
+    .topbar-title h1 { font-size: 1.14rem; font-weight: 800; color: #191919; letter-spacing: -0.2px; }
+    .topbar-title span { font-size: 0.79rem; color: #595959; font-weight: 600; }
+    .topbar-title code { color: #EC0000; font-weight: 700; background: #FFF0F0; padding: 1px 5px; border-radius: 4px; }
     .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
     .btn {
-      padding: 8px 15px;
+      padding: 9px 18px;
       border-radius: 999px;
-      font-size: 0.81rem;
+      font-size: 0.83rem;
       font-weight: 700;
       text-decoration: none;
       cursor: pointer;
-      border: 1.5px solid #CBD5E1;
-      background: #F5F9FB;
-      color: #191919;
-      transition: all 0.15s;
+      border: 1.5px solid var(--getnet-red);
+      background: #FFFFFF;
+      color: var(--getnet-red);
+      transition: all 0.18s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
-    .btn:hover { border-color: var(--getnet-red); color: var(--getnet-red); background: #FFF0F0; }
-    .btn-red { background: var(--getnet-red); border-color: var(--getnet-red); color: #fff; }
-    .btn-red:hover { background: #CC0000; color: #fff; }
-    .btn-green { background: #059669; border-color: #10b981; color: #fff; }
-    .btn-green:hover { background: #047857; color: #fff; }
-    .btn-purple { background: #6d28d9; border-color: #8b5cf6; color: #fff; }
-    .btn-purple:hover { background: #5b21b6; color: #fff; }
-    .btn-blue { background: #1d4ed8; border-color: #3b82f6; color: #fff; }
-    .btn-blue:hover { background: #1e40af; color: #fff; }
+    .btn:hover { background: var(--getnet-red-soft); color: var(--getnet-red-dark); }
+    .btn-red { background: var(--getnet-red); border-color: var(--getnet-red); color: #fff; box-shadow: 0 4px 12px rgba(236, 0, 0, 0.2); }
+    .btn-red:hover { background: #CC0000; border-color: #CC0000; color: #fff; }
+    .btn-green { background: #008A5E; border-color: #008A5E; color: #fff; }
+    .btn-green:hover { background: #006E4B; color: #fff; }
+    .btn-purple { background: #005C8A; border-color: #005C8A; color: #fff; }
+    .btn-purple:hover { background: #004466; color: #fff; }
+    .btn-blue { background: #191919; border-color: #191919; color: #fff; }
+    .btn-blue:hover { background: #333333; color: #fff; }
 
-    .container { max-width: 1460px; margin: 22px auto 60px; padding: 0 22px; }
+    .container { max-width: 1440px; margin: 24px auto 60px; padding: 0 24px; }
+
+    .highlight-red {
+      display: inline-block;
+      color: var(--getnet-red);
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .c-tag-info {
+      display: inline-block;
+      background: var(--getnet-tag-bg);
+      color: var(--getnet-tag-text);
+      font-size: 0.73rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
 
     .zero-touch-banner {
-      background: linear-gradient(135deg, rgba(153, 27, 27, 0.35) 0%, rgba(15, 23, 42, 0.96) 55%, rgba(6, 95, 70, 0.35) 100%);
-      border: 1px solid #ef4444;
-      border-radius: 12px;
-      padding: 20px 24px;
-      margin-bottom: 22px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--getnet-sky-border);
+      border-left: 8px solid var(--getnet-red);
+      border-radius: 18px;
+      padding: 28px 30px;
+      margin-bottom: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      gap: 20px;
+      box-shadow: 0 10px 28px rgba(25, 25, 25, 0.05);
     }
-    .zero-touch-banner h2 { font-size: 1.22rem; color: #fff; margin-bottom: 5px; }
-    .zero-touch-banner p { font-size: 0.87rem; color: #cbd5e1; max-width: 850px; }
+    .zero-touch-banner h2 { font-size: 1.45rem; color: #191919; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.3px; }
+    .zero-touch-banner p { font-size: 0.95rem; color: #595959; max-width: 880px; }
     .zero-touch-controls { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
-      gap: 14px;
-      margin-bottom: 22px;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
     }
     .kpi-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 15px 17px;
-      border-top: 3px solid var(--getnet-red);
+      border-radius: 16px;
+      padding: 18px 20px;
+      border-bottom: 4px solid var(--getnet-red);
+      box-shadow: 0 4px 16px rgba(25, 25, 25, 0.04);
     }
-    .kpi-card .label { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
-    .kpi-card .value { font-size: 1.55rem; font-weight: 900; margin: 5px 0 3px; }
-    .kpi-card .sub { font-size: 0.77rem; color: var(--green); }
+    .kpi-card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 700; }
+    .kpi-card .value { font-size: 1.6rem; font-weight: 900; margin: 6px 0 4px; color: var(--text); }
+    .kpi-card .sub { font-size: 0.8rem; color: var(--green); font-weight: 600; }
 
     .card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 22px;
+      border: 1px solid #E5E9EC;
+      border-radius: 18px;
+      padding: 26px 28px;
+      margin-bottom: 26px;
+      box-shadow: 0 8px 24px rgba(25, 25, 25, 0.05);
+      position: relative;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 28px;
+      width: 48px;
+      height: 4px;
+      background: var(--getnet-red);
+      border-radius: 0 0 4px 4px;
     }
     .card h2 {
-      font-size: 1.06rem;
-      margin-bottom: 12px;
+      font-size: 1.2rem;
+      color: var(--text);
+      font-weight: 800;
+      margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+      border-bottom: 1px solid #E5E9EC;
+      padding-bottom: 12px;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
     }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 24px; }
     @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
 
     /* Flujo Visual de Máquina de Estados (8 Estados) */
     .state-flow-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+      gap: 16px;
       margin-top: 14px;
     }
     @media (max-width: 1150px) { .state-flow-grid { grid-template-columns: repeat(2, 1fr); } }
     .state-node {
-      background: var(--bg-card-alt);
-      border: 1.5px solid var(--border);
-      border-top: 4px solid var(--green);
-      border-radius: 10px;
-      padding: 14px;
+      background: var(--getnet-sky);
+      border: 1.5px solid var(--getnet-sky-border);
+      border-top: 4px solid var(--getnet-red);
+      border-radius: 14px;
+      padding: 16px;
       position: relative;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
       cursor: pointer;
     }
     .state-node:hover {
       transform: translateY(-3px);
-      border-color: var(--cyan);
-      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.2);
+      border-color: var(--getnet-red);
+      box-shadow: 0 10px 24px rgba(25, 25, 25, 0.08);
     }
     .state-node.active-step {
-      border-color: #f59e0b;
-      border-top-color: #f59e0b;
-      box-shadow: 0 0 22px rgba(245, 158, 11, 0.45);
-      background: rgba(245, 158, 11, 0.12);
+      border-color: var(--getnet-red);
+      border-top-color: var(--getnet-red);
+      box-shadow: 0 0 0 3px rgba(236, 0, 0, 0.18);
+      background: #FFF0F0;
     }
     .state-node .st-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .state-node .st-num {
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      font-weight: 900;
-      font-size: 0.72rem;
-      padding: 2px 8px;
-      border-radius: 99px;
+      background: var(--getnet-tag-bg);
+      color: var(--getnet-tag-text);
+      font-weight: 800;
+      font-size: 0.73rem;
+      padding: 3px 10px;
+      border-radius: 6px;
     }
-    .state-node h4 { font-size: 0.9rem; color: #fff; margin-bottom: 4px; }
-    .state-node .st-agent { font-size: 0.75rem; color: #38bdf8; font-weight: 700; margin-bottom: 6px; }
-    .state-node .st-desc { font-size: 0.76rem; color: #cbd5e1; line-height: 1.38; }
+    .state-node h4 { font-size: 0.96rem; color: var(--text); margin-bottom: 5px; font-weight: 800; }
+    .state-node .st-agent { font-size: 0.82rem; color: var(--getnet-red); font-weight: 700; margin-bottom: 6px; }
+    .state-node .st-desc { font-size: 0.83rem; color: #334155; line-height: 1.45; }
     .state-node .st-tools {
-      margin-top: 8px;
-      padding-top: 6px;
-      border-top: 1px dashed rgba(148, 163, 184, 0.25);
-      font-size: 0.71rem;
-      color: #a78bfa;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed #CBD5E1;
+      font-size: 0.76rem;
+      color: #005C8A;
       font-family: 'Consolas', monospace;
+      font-weight: 600;
     }
 
     /* Orquestación de los 5 Agentes Autónomos */
     .agents-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+      gap: 16px;
       margin-top: 14px;
     }
     .agent-card {
-      background: linear-gradient(180deg, #162036 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-left: 4px solid var(--purple);
-      border-radius: 10px;
-      padding: 15px;
-    }
-    .agent-card h4 { font-size: 0.94rem; color: #f8fafc; margin-bottom: 3px; }
-    .agent-card .ag-role { font-size: 0.76rem; color: #fbbf24; font-weight: 700; margin-bottom: 8px; }
-    .agent-card ul { padding-left: 16px; font-size: 0.77rem; color: #cbd5e1; margin-bottom: 10px; }
-    .agent-card li { margin-bottom: 4px; }
-    .agent-card .ag-footer {
-      font-size: 0.73rem;
-      background: rgba(15, 23, 42, 0.8);
-      padding: 7px 9px;
-      border-radius: 6px;
-      border: 1px solid #1e293b;
-      color: #34d399;
-    }
-
-    /* Tarjetas de Conexión MCP Server (Dynatrace, CloudWatch, Prometheus, Kiro) */
-    .mcp-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 14px;
-      margin-top: 12px;
-    }
-    .mcp-conn-card {
-      background: var(--bg-card-alt);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
+      background: var(--getnet-sky);
+      border: 1px solid var(--getnet-sky-border);
+      border-left: 5px solid var(--getnet-red);
+      border-radius: 14px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
     }
-    .mcp-conn-card.dynatrace { border-top: 4px solid #a855f7; }
-    .mcp-conn-card.cloudwatch { border-top: 4px solid #f59e0b; }
-    .mcp-conn-card.prometheus { border-top: 4px solid #06b6d4; }
-    .mcp-conn-card.kiro { border-top: 4px solid #ef4444; }
+    .agent-card h4 { font-size: 1rem; color: var(--text); margin-bottom: 4px; font-weight: 800; }
+    .agent-card .ag-role { font-size: 0.82rem; color: #005C8A; font-weight: 700; margin-bottom: 8px; }
+    .agent-card ul { padding-left: 18px; font-size: 0.84rem; color: #334155; margin-bottom: 12px; }
+    .agent-card li { margin-bottom: 5px; }
+    .agent-card .ag-footer {
+      font-size: 0.8rem;
+      background: #ECFDF5;
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+      font-weight: 600;
+    }
+
+    /* Tarjetas de Conexión MCP Server (Dynatrace, CloudWatch, Prometheus, Getnet ATM) */
+    .mcp-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .mcp-conn-card {
+      background: var(--getnet-sky);
+      border: 1px solid var(--getnet-sky-border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .mcp-conn-card.dynatrace { border-top: 4px solid #6D28D9; }
+    .mcp-conn-card.cloudwatch { border-top: 4px solid #D97706; }
+    .mcp-conn-card.prometheus { border-top: 4px solid #005C8A; }
+    .mcp-conn-card.kiro { border-top: 4px solid #EC0000; }
 
     /* Tablas y Píldoras */
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
-    th { color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; background: rgba(255,255,255,0.02); }
-    tr:hover td { background: rgba(255,255,255,0.02); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th, td { text-align: left; padding: 12px 12px; border-bottom: 1px solid #E5E9EC; vertical-align: top; color: #1E293B; }
+    th { color: #191919; font-weight: 800; text-transform: uppercase; font-size: 0.76rem; background: var(--getnet-sky); border-bottom: 2px solid var(--getnet-sky-border); }
+    tr:hover td { background: #F8FAFC; }
 
     .status-pill {
       display: inline-block;
-      padding: 3px 9px;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.71rem;
+      font-size: 0.74rem;
       font-weight: 800;
     }
-    .status-passed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-    .status-failed { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border: 1px solid #ef4444; }
-    .status-info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; }
-    .status-purple { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid #8b5cf6; }
-    code { font-family: 'Consolas', monospace; font-size: 0.78rem; color: #38bdf8; }
+    .status-passed { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; }
+    .status-failed { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }
+    .status-info { background: var(--getnet-tag-bg); color: var(--getnet-tag-text); border: 1px solid #BAE6FD; }
+    .status-purple { background: #EDE9FE; color: #5B21B6; border: 1px solid #C4B5FD; }
+    code { font-family: 'Consolas', monospace; font-size: 0.82rem; color: #B30000; background: #FFF0F0; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
 
-    /* Ventanas Modales de Conexión MCP Server (Dynatrace & CloudWatch) */
+    /* Ventanas Modales de Conexión MCP Server (Estilo Limpio Getnet.net/es) */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(7, 11, 20, 0.84);
+      background: rgba(25, 25, 25, 0.65);
       z-index: 300;
       align-items: center;
       justify-content: center;
@@ -276,184 +355,94 @@
     }
     .modal-backdrop.open { display: flex; }
     .modal-window {
-      background: #0f172a;
-      border: 2px solid #3b82f6;
-      border-radius: 14px;
+      background: #FFFFFF;
+      border: 2px solid var(--getnet-red);
+      border-radius: 18px;
       max-width: 880px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
-      padding: 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+      padding: 28px;
+      box-shadow: 0 24px 54px rgba(25, 25, 25, 0.3);
+      color: #191919;
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-      margin-bottom: 16px;
+      border-bottom: 1px solid #E5E9EC;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
     }
     .modal-form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 14px;
     }
-    .modal-form-grid label { display: block; font-size: 0.77rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+    .modal-form-grid label { display: block; font-size: 0.82rem; color: #191919; margin-bottom: 5px; font-weight: 700; }
     .modal-form-grid input, .modal-form-grid select, .modal-form-grid textarea {
       width: 100%;
-      background: #1e293b;
-      border: 1px solid #475569;
-      color: #fff;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 0.83rem;
+      background: #FFFFFF;
+      border: 1.5px solid #CED6DE;
+      color: #191919;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.86rem;
       font-family: 'Consolas', monospace;
     }
     .jsonrpc-console {
-      background: #050811;
+      background: #191919;
       border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 16px;
       font-family: 'Consolas', monospace;
-      font-size: 0.77rem;
-      color: #34d399;
+      font-size: 0.8rem;
+      color: #34D399;
       max-height: 310px;
       overflow-y: auto;
       white-space: pre-wrap;
-      margin-top: 12px;
-    }
-
-    /* MEJORA USABILIDAD & LEGIBILIDAD: Modo Ejecutivo Claro Getnet por defecto + Alto Contraste */
-    body.executive-light {
-      --bg-dark: #F4F7FA;
-      --bg-card: #FFFFFF;
-      --bg-card-alt: #F8FAFC;
-      --border: #CBD5E1;
-      --text: #1E293B;
-      --muted: #475569;
-    }
-    body.executive-light .card,
-    body.executive-light .kpi-card {
-      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
-      border-color: #CBD5E1;
-    }
-    body.executive-light .zero-touch-banner {
-      background: linear-gradient(135deg, #FFF0F0 0%, #FFFFFF 55%, #ECFDF5 100%);
-      border: 2px solid #EC0000;
-      box-shadow: 0 8px 24px rgba(236, 0, 0, 0.08);
-    }
-    body.executive-light .zero-touch-banner h2 { color: #191919; }
-    body.executive-light .zero-touch-banner p { color: #334155; font-size: 0.94rem; }
-    body.executive-light #live-Banner-status { color: #065F46 !important; }
-    body.executive-light .state-node {
-      background: #F8FAFC;
-      border-color: #CBD5E1;
-    }
-    body.executive-light .state-node h4,
-    body.executive-light .agent-card h4,
-    body.executive-light h3 {
-      color: #191919 !important;
-    }
-    body.executive-light .state-node .st-agent { color: #0369A1 !important; font-size: 0.82rem; }
-    body.executive-light .state-node .st-desc,
-    body.executive-light .agent-card ul,
-    body.executive-light td,
-    body.executive-light .mcp-conn-card div {
-      color: #1E293B !important;
-      font-size: 0.86rem;
-      line-height: 1.5;
-    }
-    body.executive-light .state-node .st-tools { color: #6D28D9 !important; font-size: 0.78rem; }
-    body.executive-light .agent-card {
-      background: #F8FAFC;
-      border-color: #CBD5E1;
-    }
-    body.executive-light .agent-card .ag-role { color: #B45309 !important; }
-    body.executive-light .agent-card .ag-footer {
-      background: #ECFDF5;
-      border-color: #A7F3D0;
-      color: #065F46 !important;
-    }
-    body.executive-light .mcp-conn-card strong { color: #191919 !important; }
-    body.executive-light #state-inspector-banner,
-    body.executive-light #alm-product-cycle-output,
-    body.executive-light #rag-live-result,
-    body.executive-light #tpv-alm-live-output {
-      background: #F8FAFC !important;
-      color: #1E293B !important;
-      border-color: #94A3B8 !important;
-      font-size: 0.88rem !important;
-    }
-    body.executive-light #section-rag-knowledge-base > div {
-      background: #F5F9FB !important;
-      border-color: #CBD5E1 !important;
-    }
-    body.executive-light #rag-search-input {
-      background: #FFFFFF !important;
-      color: #191919 !important;
-      border-color: #94A3B8 !important;
-    }
-    body.executive-light .status-passed { background: #D1FAE5; color: #065F46 !important; border-color: #10B981; }
-    body.executive-light .status-failed { background: #FEE2E2; color: #991B1B !important; border-color: #EF4444; }
-    body.executive-light .status-info { background: #DBEAFE; color: #1E40AF !important; border-color: #3B82F6; }
-    body.executive-light .status-purple { background: #EDE9FE; color: #5B21B6 !important; border-color: #8B5CF6; }
-    body.executive-light code {
-      color: #B30000 !important;
-      background: #FFF0F0;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 0.82rem;
-    }
-    body.executive-light th {
-      background: #F1F5F9;
-      color: #1E293B;
-      font-size: 0.78rem;
-      padding: 12px;
-    }
-    body.executive-light td {
-      padding: 12px;
-      border-bottom: 1px solid #E2E8F0;
+      margin-top: 14px;
     }
 
     /* Barra de Navegación Rápida por Secciones (Quick-Jump Sub-Nav) */
     .quick-jump-bar {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 18px;
-      margin-bottom: 20px;
+      background: #FFFFFF;
+      border: 1px solid var(--getnet-sky-border);
+      border-radius: 16px;
+      padding: 12px 20px;
+      margin-bottom: 22px;
       display: flex;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
       position: sticky;
-      top: 68px;
+      top: 72px;
       z-index: 90;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 6px 20px rgba(25, 25, 25, 0.06);
     }
     .tpv-grid-4 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 14px;
-      margin-top: 12px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(295px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+      margin-bottom: 18px;
     }
     .tpv-unit-card {
-      background: var(--bg-card-alt);
-      border: 1.5px solid var(--border);
+      background: var(--getnet-sky);
+      border: 1.5px solid var(--getnet-sky-border);
       border-left: 5px solid var(--green);
-      border-radius: 10px;
-      padding: 15px;
+      border-radius: 14px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
     }
     .tpv-unit-card.incident-open {
       border-left-color: var(--getnet-red);
-      background: rgba(236, 0, 0, 0.04);
+      background: #FFF0F0;
+      border-color: #FCA5A5;
     }
 
     .alm-progress-track {
@@ -491,8 +480,19 @@
 <body class="executive-light">
   <div class="alm-toast" id="alm-toast" data-testid="alm-toast"></div>
 
+  <div class="qaops-top-strip">
+    <div>
+      <strong>GETNET ESPAÑA (GRUPO SANTANDER) · SOLUCIONES DE PAGO PARA EMPRESAS</strong> · Cuadro de Mando Ejecutivo CIO &amp; Jira Xray ALM Zero-Touch
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="/servicios-para-clientes">💳 Portal Operativo getnet.net/es</a>
+      <a href="/presentacion">📽️ Presentación Ejecutiva CIO</a>
+      <a href="/api/v1/observability/status" target="_blank">🔭 Telemetría MCP JSON</a>
+    </div>
+  </div>
+
   <!-- Barra Superior Oficial Getnet España + Jira Xray & Conectores MCP -->
-  <header class="topbar">
+  <header class="topbar" id="santandercloud-header">
     <div class="topbar-left">
       <div class="jira-badge">
         <svg width="108" height="22" viewBox="0 0 113 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Getnet Logo Oficial">
@@ -501,7 +501,7 @@
         <span style="font-size:0.74rem;font-weight:900;color:#EC0000;border-left:1.5px solid #EC0000;padding-left:8px;">JIRA XRAY ALM</span>
       </div>
       <div class="topbar-title">
-        <h1 id="alm-dashboard-title">Cuadro de Mando CIO Getnet · ALM Autónomo de Tarjetas, TPV, Pagos Online y FX</h1>
+        <h1 id="alm-dashboard-title">Cuadro de Mando CIO Getnet · Soluciones de Pago para Empresas &amp; ALM Autónomo</h1>
         <span>Flujo Visual de 8 Estados · 5 Agentes IA · Ventanas MCP (<code>Getnet ATM</code> + <code>Dynatrace</code> + <code>CloudWatch</code>) · Motor <code>RAG</code> (17 Playbooks)</span>
       </div>
     </div>
@@ -532,9 +532,10 @@
     <!-- BANNER DE SIMULACIÓN EN VIVO PARA EL CIO DE GETNET -->
     <div class="zero-touch-banner" data-testid="zero-touch-banner">
       <div>
+        <span class="highlight-red">PAGOS INTUITIVOS · TECNOLOGÍA COMPLEJA HECHA SENCILLA PARA TI</span>
         <h2>🤖 Centro de Mando Autónomo (Zero Human-in-the-Loop) · Tarjetas Bancarias, TPV, Pagos Online y FX Getnet</h2>
         <p>Simula en tiempo real una <strong>Incidencia Funcional en Cajero ATM (<code>Getnet_ATM</code>)</strong>, una <strong>Incidencia en la Red de Terminales TPV (<code>Get Smart / Tap on Phone / Automatic / Central</code>)</strong> y una <strong>Incidencia de Sistemas en Producción (<code>Dynatrace Davis AI + AWS CloudWatch MCP</code>)</strong>. Observa cómo los <strong>5 Agentes Autónomos</strong> consultan el <strong>Motor RAG</strong> y certifican los 25 casos en Jira Xray.</p>
-        <div id="live-Banner-status" style="margin-top:8px;font-size:0.88rem;color:#6ee7b7;font-weight:700;">
+        <div id="live-Banner-status" style="margin-top:10px;font-size:0.9rem;color:#008A5E;font-weight:800;">
           Estado Global: <span id="overall-alm-status">{{ autonomous.overallStatus }}</span> · Release Activa: <code id="active-release-code">{{ autonomous.deployedRelease }}</code>
         </div>
       </div>
@@ -647,33 +648,33 @@
         <div class="state-node" id="node-{{ st.stateId }}" data-detail="{{ st.inspectorDetail|default('') }}" onclick="inspectStateNode('{{ st.stateId }}', '{{ st.name }}', '{{ st.agent }}', '{{ st.inputSignal }}', '{{ st.outputTransition }}', this.getAttribute('data-detail'))">
           <div class="st-header">
             <span class="st-num">ESTADO {{ st.order }} · {{ st.badge }}</span>
-            <span style="font-size:0.72rem;color:#94a3b8;">{{ st.durationMs }} ms</span>
+            <span style="font-size:0.75rem;color:#595959;font-weight:700;">{{ st.durationMs }} ms</span>
           </div>
           <h4>{{ st.name }}</h4>
           <div class="st-agent">🤖 {{ st.agent }}</div>
           <div class="st-desc"><strong>Entrada:</strong> {{ st.inputSignal }}</div>
-          <div class="st-desc" style="margin-top:4px;color:#6ee7b7;"><strong>Transición:</strong> {{ st.outputTransition }}</div>
+          <div class="st-desc" style="margin-top:4px;color:#008A5E;font-weight:600;"><strong>Transición:</strong> {{ st.outputTransition }}</div>
           <div class="st-tools">MCP Tools: {{ st.mcpTools|join(', ') }}</div>
         </div>
         {% endfor %}
       </div>
 
-      <div id="state-inspector-banner" style="margin-top:14px;padding:14px 18px;background:#090d16;border:1.5px solid #38bdf8;border-radius:10px;font-size:0.83rem;color:#e2e8f0;">
+      <div id="state-inspector-banner" style="margin-top:16px;padding:15px 18px;background:var(--getnet-sky);border:1.5px solid var(--getnet-sky-border);border-left:5px solid var(--getnet-red);border-radius:12px;font-size:0.88rem;color:#191919;">
         <strong>🔍 Inspector de Transición de Estado en Vivo (Click-to-Inspect):</strong> Selecciona cualquier nodo superior (<code>S1</code> a <code>S8</code>) o ejecuta la animación paso a paso para visualizar el payload técnico, los comandos MCP y el intercambio en el bus Multi-Agente (Protocolo A2A).
       </div>
 
       <!-- Cómo Trabajan los 5 Agentes Especializados -->
-      <h3 style="font-size:0.96rem;margin-top:20px;margin-bottom:8px;color:#f8fafc;">🤖 Cómo Trabajan y Colaboran los 5 Agentes Autónomos de Ingeniería &amp; QAOps</h3>
+      <h3 style="font-size:1.05rem;margin-top:22px;margin-bottom:10px;color:#191919;font-weight:800;">🤖 Cómo Trabajan y Colaboran los 5 Agentes Autónomos de Ingeniería &amp; QAOps</h3>
       <div class="agents-grid">
         {% for ag in agents_roster %}
         <div class="agent-card" id="card-{{ ag.agentId }}">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
             <span class="status-pill status-purple">{{ ag.agentId }}</span>
             <span class="status-pill status-passed">{{ ag.status }}</span>
           </div>
           <h4>{{ ag.name }}</h4>
           <div class="ag-role">{{ ag.role }}</div>
-          <div style="font-size:0.73rem;color:#94a3b8;margin-bottom:8px;">
+          <div style="font-size:0.8rem;color:#595959;margin-bottom:8px;">
             <strong>Estados:</strong> <code>{{ ag.currentState }}</code><br/>
             <strong>Servidor MCP:</strong> <code>{{ ag.mcpServer }}</code>
           </div>
@@ -696,7 +697,7 @@
         <span>🔌 Conectores MCP Server en Producción (Dynatrace Davis AI · AWS CloudWatch · Prometheus · Getnet ATM)</span>
         <span class="status-pill status-info">PROTOCOLO JSON-RPC 2.0 ACTIVO</span>
       </h2>
-      <p style="font-size:0.84rem;color:var(--muted);">
+      <p style="font-size:0.88rem;color:var(--muted);">
         Configura, prueba y lanza consultas en vivo hacia las herramientas de observabilidad empresarial mediante el protocolo <strong>Model Context Protocol (MCP)</strong>.
       </p>
 
@@ -704,11 +705,11 @@
         <!-- Conector 1: Dynatrace MCP -->
         <div class="mcp-conn-card dynatrace">
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <strong style="color:#e9d5ff;font-size:0.95rem;">🟣 Dynatrace Davis AI &amp; PurePath MCP</strong>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="color:#191919;font-size:0.98rem;">🟣 Dynatrace Davis AI &amp; PurePath MCP</strong>
               <span class="status-pill status-passed">{{ mcp_connections.dynatrace.status }} ({{ mcp_connections.dynatrace.latencyMs }}ms)</span>
             </div>
-            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+            <div style="font-size:0.84rem;color:#334155;margin-bottom:10px;display:grid;gap:4px;">
               <div><strong>Endpoint:</strong> <code>{{ mcp_connections.dynatrace.endpointUrl }}</code></div>
               <div><strong>Servidor MCP:</strong> <code>{{ mcp_connections.dynatrace.serverName }}</code></div>
               <div><strong>Problema Detectado:</strong> <code>DT-PROB-2026-8841</code> (Deadlock Redis en Bloqueo de Tarjetas)</div>
@@ -720,11 +721,11 @@
         <!-- Conector 2: AWS CloudWatch MCP -->
         <div class="mcp-conn-card cloudwatch">
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <strong style="color:#fde68a;font-size:0.95rem;">🟠 AWS CloudWatch Alarms &amp; Logs Insights MCP</strong>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="color:#191919;font-size:0.98rem;">🟠 AWS CloudWatch Alarms &amp; Logs Insights MCP</strong>
               <span class="status-pill status-passed">{{ mcp_connections.cloudwatch.status }} ({{ mcp_connections.cloudwatch.latencyMs }}ms)</span>
             </div>
-            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+            <div style="font-size:0.84rem;color:#334155;margin-bottom:10px;display:grid;gap:4px;">
               <div><strong>Región:</strong> <code>{{ mcp_connections.cloudwatch.region }}</code></div>
               <div><strong>Log Group:</strong> <code>{{ mcp_connections.cloudwatch.logGroup }}</code></div>
               <div><strong>Alarma P99:</strong> <code>CW-ALARM-GTN-CARDLOCK-P99</code></div>
@@ -736,11 +737,11 @@
         <!-- Conector 3: Getnet ATM Sentinel MCP -->
         <div class="mcp-conn-card kiro">
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <strong style="color:#fecaca;font-size:0.95rem;">🔴 Getnet ATM Sentinel Vision MCP</strong>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="color:#191919;font-size:0.98rem;">🔴 Getnet ATM Sentinel Vision MCP</strong>
               <span class="status-pill status-passed">{{ mcp_connections.getnet_atm.status }} ({{ mcp_connections.getnet_atm.latencyMs }}ms)</span>
             </div>
-            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+            <div style="font-size:0.84rem;color:#334155;margin-bottom:10px;display:grid;gap:4px;">
               <div><strong>Nodo Cajero:</strong> <code>{{ mcp_connections.getnet_atm.atmNode }}</code></div>
               <div><strong>Bucket S3:</strong> <code>{{ mcp_connections.getnet_atm.s3Bucket }}</code></div>
               <div><strong>Privacidad PAN:</strong> <code>brand_verifier.incident.redact_pan</code></div>
@@ -752,11 +753,11 @@
         <!-- Conector 4: Prometheus OpenSource MCP -->
         <div class="mcp-conn-card prometheus">
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <strong style="color:#a5f3fc;font-size:0.95rem;">🔵 Prometheus &amp; OpenTelemetry MCP</strong>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="color:#191919;font-size:0.98rem;">🔵 Prometheus &amp; OpenTelemetry MCP</strong>
               <span class="status-pill status-passed">{{ mcp_connections.prometheus.status }} ({{ mcp_connections.prometheus.latencyMs }}ms)</span>
             </div>
-            <div style="font-size:0.78rem;color:#cbd5e1;margin-bottom:8px;">
+            <div style="font-size:0.84rem;color:#334155;margin-bottom:10px;display:grid;gap:4px;">
               <div><strong>Scrape URL:</strong> <code>{{ mcp_connections.prometheus.endpointUrl }}</code></div>
               <div><strong>Servidor MCP:</strong> <code>{{ mcp_connections.prometheus.serverName }}</code></div>
               <div><strong>Métricas Clave:</strong> <code>getnet_card_block_latency_p95_ms</code></div>
@@ -773,28 +774,28 @@
         <span>🧠 Base de Conocimiento &amp; Modelo RAG de Comportamiento de Incidencias Bancarias (<code>rag-knowledge-base/</code>)</span>
         <span class="status-pill status-purple">{{ rag_meta.embeddingModel }}</span>
       </h2>
-      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:14px;">
         El agente <code>RAG-Knowledge-Architect-Agent</code> indexa los patrones de comportamiento de las incidencias de tarjetas bancarias, sus huellas de telemetría (<code>Getnet_ATM</code>, <code>Dynatrace Davis AI</code>, <code>AWS CloudWatch</code>, <code>ISO-8583</code>) y prescribe la solución determinista que aplica <code>Self-Healing-Patch-Agent</code> sin Human-in-the-Loop.
       </p>
 
       <!-- Buscador Interactivo RAG -->
-      <div style="background:#090d16;border:1px solid #4c1d95;border-radius:10px;padding:16px;margin-bottom:16px;">
-        <div style="font-size:0.82rem;font-weight:700;color:#c4b5fd;margin-bottom:8px;">
+      <div style="background:var(--getnet-sky);border:1.5px solid var(--getnet-sky-border);border-radius:14px;padding:18px;margin-bottom:18px;">
+        <div style="font-size:0.86rem;font-weight:800;color:#005C8A;margin-bottom:8px;">
           🔎 Consulta en Vivo al Motor RAG (Similitud Coseno TF-IDF + Boost BM25 de Telemetría):
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
-          <input type="text" id="rag-search-input" value="Tarjeta bancaria retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 y deadlock Redis" style="flex:1;min-width:300px;padding:10px 12px;border-radius:6px;border:1px solid #6d28d9;background:#1e293b;color:#fff;font-size:0.86rem;" />
-          <button class="btn btn-purple" onclick="runRagQuery()">🧠 Recuperar Playbook RAG &amp; Sintetizar Solución</button>
+          <input type="text" id="rag-search-input" value="Tarjeta bancaria retenida en ranura cajero ATM sin reverso ISO-8583 MTI 0420 y deadlock Redis" style="flex:1;min-width:300px;padding:11px 14px;border-radius:10px;border:1.5px solid #CED6DE;background:#FFFFFF;color:#191919;font-size:0.9rem;" />
+          <button class="btn btn-red" onclick="runRagQuery()">🧠 Recuperar Playbook RAG &amp; Sintetizar Solución</button>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Tarjeta retenida en ranura cajero Getnet ATM sin reverso ISO-8583 MTI 0420')">🏧 Preset 1: Retención Tarjeta Getnet ATM (MTI 0420)</button>
-          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Dynatrace Davis AI DT-PROB-2026-8841 y CloudWatch deadlock Redis TTL 0 HikariCP')">🟣 Preset 2: Deadlock Redis &amp; HikariCP (Dynatrace/CW)</button>
-          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Fallo autorización 3D-Secure 2.2 ISO-8583 RC 91 Issuer Switch Inoperative')">🔐 Preset 3: Error ISO-8583 RC 91 (Stand-In STIP)</button>
-          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Fuga de PAN de 16 dígitos en logs PCI-DSS 4.0 redact_pan')">🛡️ Preset 4: Privacidad PCI-DSS (redact_pan)</button>
-          <button class="btn" style="font-size:0.74rem;" onclick="setRagPreset('Desincronización clave ZPK CVK en HSM Thales payShield criptograma ARQC')">🔑 Preset 5: Rotación Claves HSM Thales</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn" style="font-size:0.76rem;padding:6px 12px;" onclick="setRagPreset('Tarjeta retenida en ranura cajero Getnet ATM sin reverso ISO-8583 MTI 0420')">🏧 Preset 1: Retención Tarjeta Getnet ATM (MTI 0420)</button>
+          <button class="btn" style="font-size:0.76rem;padding:6px 12px;" onclick="setRagPreset('Dynatrace Davis AI DT-PROB-2026-8841 y CloudWatch deadlock Redis TTL 0 HikariCP')">🟣 Preset 2: Deadlock Redis &amp; HikariCP (Dynatrace/CW)</button>
+          <button class="btn" style="font-size:0.76rem;padding:6px 12px;" onclick="setRagPreset('Fallo autorización 3D-Secure 2.2 ISO-8583 RC 91 Issuer Switch Inoperative')">🔐 Preset 3: Error ISO-8583 RC 91 (Stand-In STIP)</button>
+          <button class="btn" style="font-size:0.76rem;padding:6px 12px;" onclick="setRagPreset('Fuga de PAN de 16 dígitos en logs PCI-DSS 4.0 redact_pan')">🛡️ Preset 4: Privacidad PCI-DSS (redact_pan)</button>
+          <button class="btn" style="font-size:0.76rem;padding:6px 12px;" onclick="setRagPreset('Desincronización clave ZPK CVK en HSM Thales payShield criptograma ARQC')">🔑 Preset 5: Rotación Claves HSM Thales</button>
         </div>
 
-        <div id="rag-live-result" style="margin-top:14px;padding:14px;background:#0f172a;border:1px solid #334155;border-radius:8px;font-size:0.81rem;">
+        <div id="rag-live-result" style="margin-top:14px;padding:15px;background:#FFFFFF;border:1.5px solid var(--getnet-sky-border);border-left:5px solid #005C8A;border-radius:10px;font-size:0.86rem;color:#191919;">
           <strong>Playbook Activo por Defecto:</strong> <code>RAG-PB-ATM-001</code> (Confianza: <strong>99.0%</strong>) + <code>RAG-PB-SYS-002</code> (Confianza: <strong>99.0%</strong>) · Pulsa <em>"Recuperar Playbook RAG"</em> o cualquiera de los presets para ejecutar el motor vectorial en tiempo real.
         </div>
       </div>
@@ -822,25 +823,25 @@
               <strong>{{ pb.title }}</strong><br/>
               <small style="color:var(--muted);">Incidente: <code>{{ pb.linkedIncidentId }}</code> · Bug: <code>{{ pb.linkedDefectId }}</code></small>
             </td>
-            <td style="font-size:0.77rem;color:#cbd5e1;">
+            <td style="font-size:0.83rem;color:#334155;">
               <strong>Disparador:</strong> {{ pb.behaviorModel.triggerCondition }}<br/>
-              <span style="color:#fcd34d;"><strong>Propagación:</strong> {{ pb.behaviorModel.propagationPath }}</span>
+              <span style="color:#B45309;font-weight:600;"><strong>Propagación:</strong> {{ pb.behaviorModel.propagationPath }}</span>
             </td>
-            <td style="font-size:0.77rem;">
+            <td style="font-size:0.83rem;">
               <code>{{ pb.rootCauseAnalysis.defectType }}</code><br/>
-              <small style="color:#94a3b8;">{{ pb.rootCauseAnalysis.explanation }}</small><br/>
-              <span style="color:#38bdf8;font-size:0.72rem;">Fuentes: {{ pb.telemetrySources|join(' · ') }}</span>
+              <small style="color:#595959;">{{ pb.rootCauseAnalysis.explanation }}</small><br/>
+              <span style="color:#005C8A;font-size:0.78rem;font-weight:600;">Fuentes: {{ pb.telemetrySources|join(' · ') }}</span>
             </td>
-            <td style="font-size:0.76rem;color:#a7f3d0;">
+            <td style="font-size:0.82rem;color:#065F46;">
               <strong>Agente:</strong> <code>{{ pb.autonomousRemediation.agentOwner }}</code><br/>
               {% for step in pb.autonomousRemediation.steps[:3] %}
               <div>{{ step }}</div>
               {% endfor %}
-              <div style="margin-top:4px;color:#38bdf8;"><strong>Patch JSON:</strong> <code>{{ pb.autonomousRemediation.configPatch|tojson }}</code></div>
+              <div style="margin-top:4px;color:#005C8A;"><strong>Patch JSON:</strong> <code>{{ pb.autonomousRemediation.configPatch|tojson }}</code></div>
             </td>
-            <td style="font-size:0.76rem;">
+            <td style="font-size:0.82rem;">
               <strong>Tests:</strong> <code>{{ pb.verificationGate.xrayTests|join(', ') }}</code><br/>
-              <span style="color:#34d399;font-weight:700;">Auto MTTR: {{ pb.verificationGate.mttrAutonomous }}</span><br/>
+              <span style="color:#008A5E;font-weight:800;">Auto MTTR: {{ pb.verificationGate.mttrAutonomous }}</span><br/>
               <small style="color:var(--muted);">Manual: {{ pb.verificationGate.mttrManual }}</small>
             </td>
           </tr>
@@ -856,7 +857,7 @@
           <span>🏧 Incidencia Funcional Tarjeta ATM (<code>Getnet_ATM</code>)</span>
           <span class="status-pill status-passed" id="badge-atm-status">{{ autonomous.atmDetail.status }}</span>
         </h2>
-        <div style="font-size:0.82rem;display:grid;gap:8px;">
+        <div style="font-size:0.86rem;display:grid;gap:8px;">
           <div><strong>Ticket Jira Xray:</strong> <code>{{ autonomous.atmDetail.incidentKey }}</code> · <strong>Playbook RAG:</strong> <code>{{ autonomous.atmDetail.ragPlaybookId }}</code></div>
           <div><strong>Cajero ATM:</strong> <code>{{ autonomous.atmDetail.atmId }}</code> ({{ autonomous.atmDetail.location }})</div>
           <div><strong>Privacidad PCI-DSS (<code>redact_pan</code>):</strong> <code>{{ autonomous.atmDetail.panRedacted }}</code></div>
@@ -871,12 +872,12 @@
           <span>🟣🟠 Incidencia Sistemas (<code>Dynatrace Davis AI</code> + <code>AWS CloudWatch MCP</code>)</span>
           <span class="status-pill status-passed" id="badge-sys-status">{{ autonomous.cloudwatchSysDetail.status }}</span>
         </h2>
-        <div style="font-size:0.82rem;display:grid;gap:8px;">
+        <div style="font-size:0.86rem;display:grid;gap:8px;">
           <div><strong>Ticket Jira Xray:</strong> <code>{{ autonomous.cloudwatchSysDetail.incidentKey }}</code> · <strong>Playbook RAG:</strong> <code>{{ autonomous.cloudwatchSysDetail.ragPlaybookId }}</code></div>
           <div><strong>Problema Dynatrace:</strong> <code>{{ autonomous.cloudwatchSysDetail.dynatraceProblemId }}</code> · <strong>Alarma CloudWatch:</strong> <code>{{ autonomous.cloudwatchSysDetail.alarmName }}</code></div>
           <div><strong>Excepción Detectada:</strong> <code>{{ autonomous.cloudwatchSysDetail.errorSignature }}</code></div>
           <div><strong>Antes del Auto-Fix:</strong> Latencia P95 = <code>{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.p95LatencyMs }} ms</code> · HikariCP = <code>{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.hikariPoolUsagePct }}%</code> · Deadlocks = <code>{{ autonomous.cloudwatchSysDetail.metricsBeforeFix.redisMutexDeadlocks }}</code></div>
-          <div><strong>Después del Auto-Fix:</strong> Latencia P95 = <strong style="color:#34d399;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.p95LatencyMs }} ms</strong> · HikariCP = <strong style="color:#34d399;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.hikariPoolUsagePct }}%</strong> · Deadlocks = <strong style="color:#34d399;">0</strong></div>
+          <div><strong>Después del Auto-Fix:</strong> Latencia P95 = <strong style="color:#008A5E;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.p95LatencyMs }} ms</strong> · HikariCP = <strong style="color:#008A5E;">{{ autonomous.cloudwatchSysDetail.metricsAfterFix.hikariPoolUsagePct }}%</strong> · Deadlocks = <strong style="color:#008A5E;">0</strong></div>
           <div><strong>Commit Autónomo:</strong> <code>{{ autonomous.cloudwatchSysDetail.hotfixCommit }}</code></div>
         </div>
       </div>
@@ -891,11 +892,11 @@
           <button class="btn btn-red" id="btn-alm-heal-all-products" onclick="runProductEngineeringCycle('ALL')">⚡ Ejecutar Ciclo Completo en los 11 Productos</button>
         </div>
       </h2>
-      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:14px;">
         Casos de incidencia en producción, pruebas automatizadas (<code>GTN-TC-015</code> a <code>GTN-TC-025</code>) y especificación de los <strong>4 Pilares de Ingeniería Agéntica</strong> sobre las soluciones oficiales de <strong>Getnet España</strong>: <em>Get Smart</em>, <em>Get Tap on Phone</em>, <em>Get Automatic</em>, <em>Get Central</em>, <em>Métodos de pago online</em>, <em>Get Checkout</em>, <em>Get Link &amp; Pay</em>, <em>Get Social Selling</em>, <em>Cuentas de Empresa</em>, <em>Pagos Locales/Globales</em> y <em>FX Cambio de Divisas</em>.
       </p>
 
-      <div id="alm-product-cycle-output" style="margin-bottom:14px;padding:12px 16px;background:#090d16;border:1px solid #10b981;border-radius:8px;font-size:0.81rem;color:#e2e8f0;">
+      <div id="alm-product-cycle-output" style="margin-bottom:16px;padding:14px 18px;background:#ECFDF5;border:1.5px solid #10B981;border-radius:10px;font-size:0.86rem;color:#065F46;">
         <strong>✅ Estado del Arnés de Productos Getnet:</strong> 11/11 incidencias auto-remediadas y 11/11 pruebas (<code>GTN-TC-015</code>..<code>GTN-TC-025</code>) en estado <code>PASSED</code>. Pulsa en <em>"⚡ Simular &amp; Auto-Fix"</em> en cualquier fila para ejecutar en vivo su Context, Prompt, Loop y Harness Engineering.
       </div>
 
@@ -916,32 +917,32 @@
             <td>
               <strong>{{ prod.icon }} {{ prod.name }}</strong><br/>
               <span class="status-pill status-info" style="margin-top:4px;">{{ prod.family }}</span><br/>
-              <a href="{{ prod.officialUrl }}" target="_blank" style="font-size:0.72rem;color:#38bdf8;">getnet.net/es ↗</a>
+              <a href="{{ prod.officialUrl }}" target="_blank" style="font-size:0.78rem;color:#EC0000;font-weight:700;text-decoration:none;">getnet.net/es ↗</a>
             </td>
-            <td style="font-size:0.76rem;">
+            <td style="font-size:0.83rem;">
               <code>{{ prod.incident.incidentKey }}</code> · <span class="status-pill status-passed">{{ prod.incident.status }}</span><br/>
               <strong>{{ prod.incident.title }}</strong><br/>
               <small style="color:var(--muted);">RCA: {{ prod.incident.rootCause }}</small>
             </td>
-            <td style="font-size:0.75rem;color:#cbd5e1;">
+            <td style="font-size:0.82rem;color:#334155;">
               <strong>RAG:</strong> <code>{{ prod.contextEngineering.ragPlaybookId }}</code><br/>
               <strong>SDD:</strong> <code>{{ prod.contextEngineering.sddSpecRef }}</code><br/>
-              <span style="color:#38bdf8;">MCP: {{ prod.contextEngineering.mcpSources|join(' · ') }}</span>
+              <span style="color:#005C8A;font-weight:600;">MCP: {{ prod.contextEngineering.mcpSources|join(' · ') }}</span>
             </td>
-            <td style="font-size:0.75rem;color:#e9d5ff;">
+            <td style="font-size:0.82rem;color:#5B21B6;">
               <strong>Patrón:</strong> <code>{{ prod.promptEngineering.promptPattern }}</code><br/>
-              <small style="color:#cbd5e1;">{{ prod.promptEngineering.systemPrompt }}</small><br/>
-              <span style="color:#fcd34d;">Guardrail: {{ prod.promptEngineering.guardrails[0] }}</span>
+              <small style="color:#334155;">{{ prod.promptEngineering.systemPrompt }}</small><br/>
+              <span style="color:#B45309;font-weight:600;">Guardrail: {{ prod.promptEngineering.guardrails[0] }}</span>
             </td>
-            <td style="font-size:0.75rem;color:#a7f3d0;">
+            <td style="font-size:0.82rem;color:#065F46;">
               <code>{{ prod.loopEngineering.loopId }}</code><br/>
               <strong>Patch:</strong> <code>{{ prod.loopEngineering.configPatch|tojson }}</code><br/>
-              <span style="color:#34d399;font-weight:700;">MTTR: {{ prod.loopEngineering.mttrAutonomous }}</span> <small style="color:var(--muted);">(vs {{ prod.loopEngineering.mttrManual }})</small>
+              <span style="color:#008A5E;font-weight:800;">MTTR: {{ prod.loopEngineering.mttrAutonomous }}</span> <small style="color:var(--muted);">(vs {{ prod.loopEngineering.mttrManual }})</small>
             </td>
-            <td style="font-size:0.75rem;">
-              <code>{{ prod.testCase.testKey }}</code> (<span style="color:#34d399;font-weight:800;">{{ prod.testCase.status }}</span>)<br/>
-              <small style="color:#cbd5e1;">{{ prod.harnessEngineering.qualityGates[0] }}</small><br/>
-              <button class="btn btn-green" style="margin-top:6px;padding:4px 10px;font-size:0.72rem;" onclick="runProductEngineeringCycle('{{ prod.productId }}')">⚡ Simular &amp; Auto-Fix</button>
+            <td style="font-size:0.82rem;">
+              <code>{{ prod.testCase.testKey }}</code> (<span style="color:#008A5E;font-weight:800;">{{ prod.testCase.status }}</span>)<br/>
+              <small style="color:#334155;">{{ prod.harnessEngineering.qualityGates[0] }}</small><br/>
+              <button class="btn btn-green" style="margin-top:6px;padding:5px 12px;font-size:0.76rem;" onclick="runProductEngineeringCycle('{{ prod.productId }}')">⚡ Simular &amp; Auto-Fix</button>
             </td>
           </tr>
           {% endfor %}
@@ -1024,13 +1025,33 @@
 
   </div>
 
+  <!-- Pie de Página Oficial Estilo https://www.getnet.net/es/ -->
+  <footer style="background:#191919;color:#D1D5DB;padding:38px 28px 28px;border-top:4px solid var(--getnet-red);">
+    <div style="max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <svg width="113" height="24" viewBox="0 0 113 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Getnet">
+          <path d="M59.3311 5.96402C57.5749 5.96402 55.0239 6.32762 52.7051 6.89321V23.4672H56.3486V9.34498C57.3428 9.17833 58.3697 9.07985 59.2301 9.07985C62.8737 9.07985 63.7341 10.3398 63.7341 12.9582V23.4672H67.3776V12.3295C67.3801 8.31731 65.4272 5.96402 59.3311 5.96402ZM15.1065 20.3514C14.1124 20.5509 13.0198 20.6822 12.0585 20.6822C7.02213 20.6822 3.84287 17.7658 3.84287 11.8321C3.84287 6.39579 6.79 3.31278 12.2225 3.31278C14.5413 3.31278 16.3631 3.71173 17.9855 4.24198C18.3161 3.21431 18.581 1.98716 18.6491 0.893846C16.9258 0.297949 14.7735 0 12.2225 0C4.47115 0 0 4.31015 0 11.9659C0 18.9929 4.075 24 11.7935 24C14.2789 24 16.9283 23.5354 18.8157 22.7729V10.9711H15.1065V20.3514ZM78.2805 5.96402C72.4846 5.96402 70.1986 9.87523 70.1986 14.8141C70.1986 20.4827 73.1457 23.8637 79.2418 23.8637C81.1973 23.8637 82.951 23.5657 84.6087 22.8032C84.8409 21.7098 85.0402 20.4499 85.1714 19.4878C35.2822 20.316 81.3285 20.7478 79.3402 20.7478C76.0954 20.7478 74.372 19.3212 73.9077 16.372H85.5347C85.6659 15.41 85.7341 14.5818 85.7341 13.5541C85.7341 9.3778 83.4808 5.96402 78.2805 5.96402ZM73.8421 13.3218C74.1399 10.5039 75.4973 9.01168 78.0811 9.01168C80.5993 9.01168 82.0552 10.6024 82.0552 13.3218H73.8421ZM97.7925 9.64293C97.9591 8.68091 98.0575 7.65323 98.1231 6.52709H92.3601V0.262599C91.2347 0.262599 89.8419 0.429248 88.7165 0.792846V18.1976C88.7165 22.2426 90.9698 23.8662 94.5124 23.8662C95.5393 23.8662 96.5991 23.7349 97.5932 23.3359C97.7925 22.3739 97.9238 21.2478 98.0247 20.2529C97.2299 20.5509 96.2357 20.7503 95.176 20.7503C93.4198 20.7503 92.3601 19.9221 92.3601 17.7658V9.64293H97.7925ZM49.7252 9.64293C49.8917 8.68091 49.9901 7.65323 50.0557 6.52709H44.2927V0.262599C43.1673 0.262599 41.7745 0.429248 40.6491 0.792846V18.1976C40.6491 22.2426 42.9024 23.8662 46.445 23.8662C47.4719 23.8662 48.5317 23.7349 49.5258 23.3359C49.7252 22.3739 49.8564 21.2478 49.9573 20.2529C49.1625 20.5509 48.1683 20.7503 47.1086 20.7503C45.3524 20.7503 44.2927 19.9221 44.2927 17.7658V9.64293H49.7252ZM30.2131 5.96402C24.4172 5.96402 22.1312 9.87523 22.1312 14.8141C22.1312 20.4827 25.0783 23.8637 31.1744 23.8637C33.1299 23.8637 34.8836 23.5657 36.5413 22.8032C36.7735 21.7098 36.9728 20.4499 37.104 19.4878C35.2822 20.316 33.2611 20.7478 31.2728 20.7478C28.028 20.7478 26.3046 19.3212 25.8403 16.372H37.4673C37.5985 15.41 37.6667 14.5818 37.6667 13.5541C37.6667 9.3778 35.4134 5.96402 30.2131 5.96402ZM25.7722 13.3218C26.0699 10.5039 27.4274 9.01168 30.0112 9.01168C32.5294 9.01168 33.9853 10.6024 33.9853 13.3218H25.7722ZM111.14 9.64293H113V7.78201H111.14V9.64293ZM111.14 5.92109H113V4.06018H111.14V5.92109ZM107.421 2.19926H109.281V0.338347H107.421V2.19926ZM103.702 9.64293H105.562V7.78201H103.702V9.64293ZM107.421 5.92109H109.281V4.06018H107.421V5.92109ZM111.14 0.338347V2.19926H113V0.338347H111.14ZM103.702 5.92109H105.562V4.06018H103.702V5.92109ZM103.702 2.19926H105.562V0.338347H103.702V2.19926ZM107.421 9.64293H109.281V7.78201H107.421V9.64293Z" fill="#EC0000"/>
+        </svg>
+        <div style="font-size:0.82rem;">
+          <strong style="color:#FFFFFF;">PagoNxt Merchant Solutions, S.L. (Getnet Europe · Grupo Santander)</strong><br/>
+          <span>Soluciones de pago para empresas · Cuadro de Mando CIO Jira Xray · Autonomous ALM Zero-Touch</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:0.82rem;">
+        <a href="/servicios-para-clientes" style="color:#D1D5DB;text-decoration:none;">Portal Operativo getnet.net/es</a>
+        <a href="/alm-dashboard" style="color:#D1D5DB;text-decoration:none;">Cuadro de Mando CIO Jira Xray</a>
+        <a href="/presentacion" style="color:#D1D5DB;text-decoration:none;">Presentación Ejecutiva CIO</a>
+      </div>
+    </div>
+  </footer>
+
   <!-- VENTANA MODAL INTERACTIVA DE CONEXIÓN MCP SERVER (DYNATRACE / AWS CLOUDWATCH / KIRO / PROMETHEUS) -->
   <div class="modal-backdrop" id="mcp-modal-backdrop" data-testid="mcp-modal-backdrop">
     <div class="modal-window">
       <div class="modal-header">
         <div>
-          <h3 id="mcp-modal-title" style="font-size:1.1rem;color:#fff;">🔌 Ventana de Conexión MCP Server</h3>
-          <span id="mcp-modal-subtitle" style="font-size:0.78rem;color:#93c5fd;">Protocolo Model Context Protocol (JSON-RPC 2.0)</span>
+          <h3 id="mcp-modal-title" style="font-size:1.15rem;color:#191919;font-weight:800;">🔌 Ventana de Conexión MCP Server</h3>
+          <span id="mcp-modal-subtitle" style="font-size:0.82rem;color:#005C8A;font-weight:700;">Protocolo Model Context Protocol (JSON-RPC 2.0)</span>
         </div>
         <button class="btn btn-red" onclick="closeMcpModal()">✖ Cerrar Ventana</button>
       </div>
@@ -1059,11 +1080,11 @@
         </div>
       </div>
 
-      <div style="margin-bottom:12px;">
-        <label for="mcp-query-input" style="display:block;font-size:0.77rem;color:var(--muted);margin-bottom:4px;font-weight:700;">
+      <div style="margin-bottom:14px;">
+        <label for="mcp-query-input" style="display:block;font-size:0.82rem;color:#191919;margin-bottom:5px;font-weight:700;">
           Consulta DQL (Dynatrace) / CloudWatch Logs Insights / PromQL a ejecutar vía Tool MCP:
         </label>
-        <input type="text" id="mcp-query-input" style="width:100%;background:#1e293b;border:1px solid #475569;color:#fff;padding:9px 11px;border-radius:6px;font-family:'Consolas',monospace;font-size:0.82rem;" value="fetch spans | filter dt.entity.service == 'SERVICE-GETNET-CARD-BLOCKER' | summarize p95=percentile(duration, 95), redisDeadlocks=countIf(redis.lock.ttl == 0)" />
+        <input type="text" id="mcp-query-input" style="width:100%;background:#FFFFFF;border:1.5px solid #CED6DE;color:#191919;padding:10px 12px;border-radius:10px;font-family:'Consolas',monospace;font-size:0.84rem;" value="fetch spans | filter dt.entity.service == 'SERVICE-GETNET-CARD-BLOCKER' | summarize p95=percentile(duration, 95), redisDeadlocks=countIf(redis.lock.ttl == 0)" />
       </div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -1130,12 +1151,12 @@
     }
 
     function toggleExecutiveTheme() {
-      const isLight = document.body.classList.toggle('executive-light');
+      const isDark = document.body.classList.toggle('soc-dark');
       const btn = document.getElementById('btn-toggle-theme');
       if (btn) {
-        btn.textContent = isLight ? '🌙 Modo SOC Oscuro' : '☀️ Modo Ejecutivo Claro Getnet';
+        btn.textContent = isDark ? '☀️ Modo Ejecutivo Claro Getnet' : '🌙 Modo SOC Oscuro';
       }
-      showAlmToast(isLight ? '☀️ Activado Modo Ejecutivo Claro Getnet (Alto Contraste Proyector)' : '🌙 Activado Modo SOC Oscuro');
+      showAlmToast(isDark ? '🌙 Activado Modo SOC Oscuro' : '☀️ Activado Diseño Oficial Claro Getnet (getnet.net/es)');
     }
 
     function openMcpModal(provider) {
@@ -1190,8 +1211,8 @@
         <strong>📍 Estado Seleccionado: <code>${stateId}</code> (${name})</strong><br/>
         • <strong>Agente Responsable:</strong> <code>${agent}</code><br/>
         • <strong>Señal de Entrada:</strong> ${inputSig}<br/>
-        • <strong>Resultado / Transición de Salida:</strong> <span style="color:#34d399;">${outputTrans}</span><br/>
-        ${inspectorDetail ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #334155;color:#fde68a;"><strong>🔬 Detalle Técnico de Inspección:</strong> <code>${inspectorDetail}</code></div>` : ''}
+        • <strong>Resultado / Transición de Salida:</strong> <strong style="color:#008A5E;">${outputTrans}</strong><br/>
+        ${inspectorDetail ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #CBD5E1;color:#005C8A;"><strong>🔬 Detalle Técnico de Inspección:</strong> <code>${inspectorDetail}</code></div>` : ''}
       `;
     }
 
@@ -1233,11 +1254,11 @@
       const topChunk = (rag.retrievedChunks || [])[0] || {};
       box.innerHTML = `
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-          <div><strong>🎯 Playbook Seleccionado por RAG:</strong> <code>${syn.selectedPlaybookId}</code> (Similitud: <strong style="color:#34d399;">${topChunk.confidencePct}%</strong>) · Incidente: <code>${syn.linkedIncidentId}</code></div>
-          <div><strong>Agente Ejecutor:</strong> <code>${syn.autonomousAgent}</code> · <strong>MTTR Autónomo:</strong> <strong style="color:#f59e0b;">${syn.estimatedAutonomousMTTR}</strong> (vs ${syn.manualBaselineMTTR} manual)</div>
+          <div><strong>🎯 Playbook Seleccionado por RAG:</strong> <code>${syn.selectedPlaybookId}</code> (Similitud: <strong style="color:#008A5E;">${topChunk.confidencePct}%</strong>) · Incidente: <code>${syn.linkedIncidentId}</code></div>
+          <div><strong>Agente Ejecutor:</strong> <code>${syn.autonomousAgent}</code> · <strong>MTTR Autónomo:</strong> <strong style="color:#B45309;">${syn.estimatedAutonomousMTTR}</strong> (vs ${syn.manualBaselineMTTR} manual)</div>
         </div>
-        <div style="margin-bottom:6px;color:#cbd5e1;"><strong>Propagación del Comportamiento:</strong> ${syn.behaviorSummary}</div>
-        <div style="margin-bottom:6px;color:#a7f3d0;"><strong>Parche Determinista Sintetizado:</strong> <code>${JSON.stringify(syn.recommendedConfigPatch)}</code></div>
+        <div style="margin-bottom:6px;color:#334155;"><strong>Propagación del Comportamiento:</strong> ${syn.behaviorSummary}</div>
+        <div style="margin-bottom:6px;color:#065F46;"><strong>Parche Determinista Sintetizado:</strong> <code>${JSON.stringify(syn.recommendedConfigPatch)}</code></div>
         <div><strong>Quality Gate en Jira Xray:</strong> Casos requeridos <code>${(syn.xrayVerificationTests || []).join(', ')}</code></div>
       `;
       showAlmToast("🧠 Playbook RAG recuperado: " + syn.selectedPlaybookId);

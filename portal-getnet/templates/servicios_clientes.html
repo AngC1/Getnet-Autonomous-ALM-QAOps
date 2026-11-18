@@ -593,6 +593,129 @@
     .badge-blue { background: var(--getnet-tag-bg); color: var(--getnet-tag-text); }
     .badge-green { background: #DCFCE7; color: #166534; }
     .badge-red { background: #FEE2E2; color: #B91C1C; }
+    .badge-amber { background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
+
+    /* Tarjetas y Botones del Laboratorio TPV estilo Getnet.net/es */
+    .result-card {
+      background: var(--getnet-white);
+      border: 1.5px solid var(--getnet-sky-border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 6px 20px rgba(25, 25, 25, 0.05);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .result-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(25, 25, 25, 0.09);
+    }
+    .btn-danger-sim {
+      background: var(--getnet-red);
+      color: #FFFFFF;
+      border: 1.5px solid var(--getnet-red);
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      box-shadow: 0 4px 12px rgba(236, 0, 0, 0.22);
+    }
+    .btn-danger-sim:hover { background: var(--getnet-red-hover); }
+    .btn-autofix-sim {
+      background: #008A5E;
+      color: #FFFFFF;
+      border: 1.5px solid #008A5E;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      box-shadow: 0 4px 12px rgba(0, 138, 94, 0.22);
+    }
+    .btn-autofix-sim:hover { background: #006E4B; }
+
+    /* Secciones Oficiales de https://www.getnet.net/es/ (Cobra como quieras & Sectores) */
+    .getnet-sky-section {
+      background: var(--getnet-sky);
+      border-top: 1px solid var(--getnet-sky-border);
+      border-bottom: 1px solid var(--getnet-sky-border);
+      padding: 44px 28px;
+      margin: 40px 0;
+      border-radius: 20px;
+    }
+    .getnet-2col-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+    }
+    @media (max-width: 900px) {
+      .getnet-2col-cards { grid-template-columns: 1fr; }
+    }
+    .getnet-feature-card {
+      background: var(--getnet-white);
+      border: 1px solid var(--getnet-border);
+      border-radius: 18px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(25, 25, 25, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .getnet-feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 32px rgba(25, 25, 25, 0.09);
+      border-color: var(--getnet-red);
+    }
+    .getnet-action-link {
+      color: var(--getnet-red);
+      font-weight: 800;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-top: 14px;
+    }
+    .getnet-action-link:hover { text-decoration: underline; }
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .sector-card {
+      background: var(--getnet-white);
+      border: 1px solid var(--getnet-border);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 16px rgba(25, 25, 25, 0.04);
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+    .sector-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--getnet-red);
+    }
+    .sector-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--getnet-charcoal);
+      margin: 8px 0 6px;
+    }
+    .sector-card p {
+      font-size: 0.86rem;
+      color: var(--getnet-body);
+      margin-bottom: 12px;
+    }
 
     .alert-box {
       margin-top: 20px;
@@ -747,12 +870,12 @@
       width: 440px;
       max-width: 92vw;
       height: 100vh;
-      background: #0F172A;
-      color: #F8FAFC;
+      background: #FFFFFF;
+      color: var(--getnet-charcoal);
       z-index: 300;
-      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.5);
-      border-left: 3px solid var(--getnet-red);
-      padding: 22px;
+      box-shadow: -10px 0 35px rgba(25, 25, 25, 0.18);
+      border-left: 4px solid var(--getnet-red);
+      padding: 24px;
       overflow-y: auto;
       transition: right 0.25s ease;
     }
@@ -808,10 +931,10 @@
       </div>
 
       <nav class="getnet-nav" aria-label="Navegación Principal Getnet">
-        <a onclick="activateTab('tab-cuadro', true)" class="active-nav">Tu negocio · Parque Tarjetas</a>
-        <a onclick="activateTab('tab-tpv-incidentes', true)">TPV · Get Smart / Tap / Auto / Central</a>
-        <a onclick="activateTab('tab-disputas', true)">Get Checkout · Chargebacks</a>
-        <a onclick="activateTab('tab-bloqueo-atm', true)">Red ATM · Getnet ATM</a>
+        <a onclick="activateTab('tab-cuadro', true)" class="active-nav">Tu negocio</a>
+        <a onclick="activateTab('tab-tpv-incidentes', true)">Nuestras soluciones · TPV</a>
+        <a onclick="activateTab('tab-disputas', true)">Pagos online · Get Checkout</a>
+        <a onclick="activateTab('tab-bloqueo-atm', true)">Por qué Getnet · Red ATM</a>
         <a href="/alm-dashboard">Cuadro de Mando CIO</a>
       </nav>
 
@@ -820,7 +943,7 @@
         <button class="btn-outline" onclick="activateTab('tab-tpv-incidentes', true)" data-testid="header-btn-tpv">🏪 Inyectar Incidencia TPV</button>
         <button class="btn-outline" onclick="activateTab('tab-bloqueo-atm', true)" data-testid="header-btn-bloqueo">🚨 Bloqueo Preventivo ATM</button>
         <button class="btn-outline" onclick="activateTab('tab-cuadro', true)" data-testid="header-btn-cuadro">💳 Parque de Tarjetas</button>
-        <button class="btn-primary" onclick="activateTab('tab-area-cliente', true)" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">Acceso Clientes · Área Titular</button>
+        <button class="btn-primary" onclick="activateTab('tab-area-cliente', true)" id="header-btn-area-cliente" data-testid="header-btn-area-cliente">Acceso Clientes · Contratar</button>
       </div>
     </div>
   </header>
@@ -829,12 +952,13 @@
   <section class="hero">
     <div class="hero-inner">
       <div>
-        <span class="highlight-red">SOLUCIONES DE PAGO PARA EMPRESAS · TARJETAS EMV &amp; CAJEROS ATM</span>
-        <h1 id="hero-title" data-testid="hero-title">Getnet · Soluciones de pago y gestión integral de tarjetas bancarias EMV, cajeros ATM, autorizaciones ISO-8583 y disputas online</h1>
-        <p>Getnet es la fintech líder en soluciones de pago en Iberia y América Latina, perteneciente al <strong>Grupo Santander</strong>. Tecnología compleja hecha sencilla para ti: gestiona el parque de tarjetas bancarias, pasarela de autorización EMV y auto-remediación en producción con <strong>Getnet ATM</strong>, <strong>Dynatrace MCP</strong>, <strong>AWS CloudWatch MCP</strong> y <strong>Motor RAG</strong> sin Human-in-the-Loop.</p>
+        <span class="highlight-red">PAGOS INTUITIVOS · SOLUCIONES DE PAGO PARA EMPRESAS</span>
+        <h1 id="hero-title" data-testid="hero-title">Getnet · Tecnología compleja hecha sencilla para ti: tarjetas bancarias EMV, TPV Get Smart, cajeros ATM y pagos online</h1>
+        <p>Ya tengas una pequeña tienda o una gran multinacional, cobra sin preocupaciones. Diseñamos soluciones intuitivas para pagos físicos y online respaldadas por el <strong>Grupo Santander</strong>, con auto-remediación en producción mediante <strong>Getnet ATM</strong>, <strong>Dynatrace MCP</strong>, <strong>AWS CloudWatch MCP</strong> y <strong>Motor RAG</strong> sin Human-in-the-Loop.</p>
         <div class="hero-cta-row">
-          <button class="btn-primary" onclick="activateTab('tab-bloqueo-atm', true)">Probar Bloqueo Preventivo ATM (Getnet ATM) →</button>
-          <a href="/alm-dashboard" class="btn-outline" style="text-decoration:none;">Abrir Conectores MCP (Dynatrace &amp; CloudWatch)</a>
+          <button class="btn-primary" onclick="activateTab('tab-tpv-incidentes', true)">🏪 Probar Inyección de Incidencias TPV →</button>
+          <button class="btn-outline" onclick="activateTab('tab-bloqueo-atm', true)">🏧 Probar Bloqueo Preventivo ATM</button>
+          <a href="/alm-dashboard" class="btn-outline" style="text-decoration:none;">📊 Cuadro de Mando CIO en Jira Xray</a>
         </div>
       </div>
 
@@ -856,19 +980,19 @@
 
         <div class="hero-kpis" data-testid="hero-kpis">
           <div class="kpi-box">
-            <strong>100% Tarjetas</strong>
-            <span>Visa &amp; Mastercard EMV</span>
+            <strong>11 Productos</strong>
+            <span>Catálogo getnet.net/es</span>
           </div>
           <div class="kpi-box">
             <strong>Zero-Touch</strong>
-            <span>5 Agentes + Motor RAG</span>
+            <span>5 Agentes + 17 RAG</span>
           </div>
           <div class="kpi-box">
             <strong>&lt; 6 seg</strong>
             <span>MTTR Auto-Fix PRO</span>
           </div>
           <div class="kpi-box">
-            <strong>14 / 14</strong>
+            <strong>25 / 25</strong>
             <span>Tests Jira Xray</span>
           </div>
         </div>
@@ -1373,16 +1497,133 @@
         {% endfor %}
       </div>
     </section>
+
+    <!-- SECCIÓN OFICIAL GETNET.NET/ES 1: "COBRA COMO QUIERAS" (MUÉVETE CON TU NEGOCIO & PAGOS ONLINE) -->
+    <section style="margin-top:44px;" data-testid="getnet-cobra-como-quieras">
+      <div class="section-heading">
+        <div>
+          <span class="highlight-red">EN TU COMERCIO FÍSICO Y ONLINE · GETNET.NET/ES</span>
+          <h2>Cobra como quieras</h2>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:0.86rem;color:var(--getnet-body);font-weight:700;align-self:center;">También te puede interesar:</span>
+          <button type="button" class="btn-outline" onclick="simulateAndHealGetnetProduct('PROD-ONL-LINKPAY')">🔗 Enlaces de pago (Get Link &amp; Pay)</button>
+          <button type="button" class="btn-primary" onclick="simulateAndHealGetnetProduct('PROD-ONL-SOCIAL')">📲 Vender en RRSS (Get Social Selling)</button>
+        </div>
+      </div>
+
+      <div class="getnet-2col-cards">
+        <div class="getnet-feature-card">
+          <div>
+            <span class="c-tag-info">MUÉVETE CON TU NEGOCIO</span>
+            <h3 style="font-size:1.35rem;font-weight:800;color:var(--getnet-charcoal);margin:8px 0;">📱 Cobra con tu móvil · Get Tap on Phone</h3>
+            <p style="font-size:0.95rem;color:var(--getnet-body);">
+              Convierte tu dispositivo Android en un TPV SoftPOS con certificación PCI MPoC y lleva tu negocio donde lo necesites. Acepta tarjetas contactless EMV, Apple Pay y Google Pay con PIN-on-Glass.
+            </p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px;">
+            <button type="button" class="getnet-action-link" onclick="activateTab('tab-tpv-incidentes', true); selectTpvForCharge('PROD-TPV-TAP', 'TPV-TAP-NFC-204');">
+              Saber más · Probar en Laboratorio TPV ›
+            </button>
+            <button type="button" class="chip-btn" onclick="simulateAndHealGetnetProduct('PROD-TPV-TAP')">⚡ Simular Auto-Fix (GTN-TC-016)</button>
+          </div>
+        </div>
+
+        <div class="getnet-feature-card">
+          <div>
+            <span class="c-tag-info">PAGOS ONLINE</span>
+            <h3 style="font-size:1.35rem;font-weight:800;color:var(--getnet-charcoal);margin:8px 0;">🛒 TPV virtual para tu ecommerce · Get Checkout</h3>
+            <p style="font-size:0.95rem;color:var(--getnet-body);">
+              Mejora tu tasa de conversión con una pasarela de pagos para tu tienda online totalmente configurable, 3D-Secure 2.2 Frictionless, tokenización COF y enrutamiento inteligente multi-adquirente.
+            </p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px;">
+            <button type="button" class="getnet-action-link" onclick="activateTab('tab-disputas', true);">
+              Saber más · Abrir Get Checkout ›
+            </button>
+            <button type="button" class="chip-btn" onclick="simulateAndHealGetnetProduct('PROD-ONL-CHECKOUT')">⚡ Simular Auto-Fix (GTN-TC-020)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN OFICIAL GETNET.NET/ES 2: "SECTORES · GETNET EN TU NEGOCIO" (.color-#F5F9FB) -->
+    <section class="getnet-sky-section" data-testid="getnet-sectores-negocio">
+      <div class="section-heading" style="margin-bottom:14px;">
+        <div>
+          <span class="highlight-red">SECTORES</span>
+          <h2>Getnet en tu negocio</h2>
+        </div>
+        <span style="font-size:0.88rem;color:var(--getnet-body);font-weight:600;">Soluciones de pago personalizadas por sector con resiliencia autónoma 24/7</span>
+      </div>
+
+      <div class="sectors-grid">
+        <div class="sector-card">
+          <div>
+            <span class="c-tag-info">HOSTELERÍA</span>
+            <h3>🍽️ Restaurantes, bares y cafeterías</h3>
+            <p>Cobra en mesa con <strong>Get Smart</strong>, divide la cuenta, añade propinas o convierte nuestro TPV táctil sin cables en tu comandero conectado por Wi-Fi y 4G Dual-SIM.</p>
+          </div>
+          <button type="button" class="getnet-action-link" onclick="activateTab('tab-tpv-incidentes', true); selectTpvForCharge('PROD-TPV-SMART', 'TPV-SMART-MAD-101');">
+            Saber más ›
+          </button>
+        </div>
+
+        <div class="sector-card">
+          <div>
+            <span class="c-tag-info">HOTELES</span>
+            <h3>🏨 Hoteles y alojamientos</h3>
+            <p>La mejor experiencia de pago desde la reserva online en <strong>Get Checkout</strong> hasta el check-out integrado con tu PMS mediante <strong>Get Central</strong> y cambio de divisas <strong>FX DCC</strong>.</p>
+          </div>
+          <button type="button" class="getnet-action-link" onclick="activateTab('tab-tpv-incidentes', true); selectTpvForCharge('PROD-TPV-CENTRAL', 'TPV-CENT-ECR-412');">
+            Saber más ›
+          </button>
+        </div>
+
+        <div class="sector-card">
+          <div>
+            <span class="c-tag-info">SALUD Y BELLEZA</span>
+            <h3>💆 Centros de belleza y salud</h3>
+            <p>Facilita los pagos de tus consultas y tratamientos, ya sea en clínica con <strong>Get Smart</strong> o a domicilio con <strong>Get Tap on Phone</strong> y enlaces <strong>Get Link &amp; Pay</strong>.</p>
+          </div>
+          <button type="button" class="getnet-action-link" onclick="activateTab('tab-tpv-incidentes', true); selectTpvForCharge('PROD-TPV-TAP', 'TPV-TAP-NFC-204');">
+            Saber más ›
+          </button>
+        </div>
+
+        <div class="sector-card">
+          <div>
+            <span class="c-tag-info">RETAIL &amp; COMERCIO</span>
+            <h3>🛍️ Retail y tiendas físicas</h3>
+            <p>Ya vendas en tienda física u online, te tenemos cubierto con pagos rápidos, conciliación en <strong>Cuentas de Empresa</strong> y liquidación automática <strong>Split Settlement</strong>.</p>
+          </div>
+          <button type="button" class="getnet-action-link" onclick="activateTab('tab-autorizaciones', true);">
+            Saber más ›
+          </button>
+        </div>
+
+        <div class="sector-card">
+          <div>
+            <span class="c-tag-info">MOVILIDAD, GASOLINERAS Y PARKINGS</span>
+            <h3>⛽ Autocobro 24/7, Vending y Parkings</h3>
+            <p>Terminales desatendidos <strong>Get Automatic</strong> con certificación IP65/IK10 y reverso EMV <code>MTI 0420</code> automático ante cualquier bloqueo mecánico.</p>
+          </div>
+          <button type="button" class="getnet-action-link" onclick="activateTab('tab-tpv-incidentes', true); selectTpvForCharge('PROD-TPV-AUTO', 'TPV-AUTO-VEND-309');">
+            Saber más ›
+          </button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- MEJORA USABILIDAD 4: Botón y Drawer Lateral de Telemetría MCP & Agentes en Vivo -->
   <button type="button" class="floating-drawer-btn" onclick="toggleTelemetryDrawer()">🔭 Telemetría MCP &amp; Agentes en Vivo</button>
   <aside class="telemetry-drawer" id="live-telemetry-drawer">
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;padding-bottom:12px;margin-bottom:14px;">
-      <strong style="color:#FFF;font-size:0.95rem;">🔭 Telemetría MCP &amp; Agentes Autónomos</strong>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--getnet-sky-border);padding-bottom:12px;margin-bottom:14px;">
+      <strong style="color:var(--getnet-charcoal);font-size:0.98rem;">🔭 Telemetría MCP &amp; Agentes Autónomos</strong>
       <button type="button" class="chip-btn" onclick="toggleTelemetryDrawer()">✕ Cerrar</button>
     </div>
-    <div id="drawer-telemetry-content" style="font-size:0.8rem;line-height:1.5;color:#CBD5E1;">
+    <div id="drawer-telemetry-content" style="font-size:0.85rem;line-height:1.55;color:var(--getnet-body);">
       Pulsa en actualizar o ejecuta un paso de la demo para ver el estado en vivo de <strong>Getnet ATM</strong>, <strong>Dynatrace Davis AI</strong>, <strong>AWS CloudWatch</strong> y los <strong>5 Agentes</strong>.
     </div>
   </aside>
@@ -1660,20 +1901,20 @@
       const dtProb = (data.dynatrace.problems || [])[0] || {};
       const cwAlarm = (data.cloudwatch.alarms || [])[0] || {};
       box.innerHTML = `
-        <div style="background:#1E293B;padding:12px;border-radius:10px;margin-bottom:10px;border-left:4px solid #EC0000;">
+        <div style="background:var(--getnet-sky);border:1px solid var(--getnet-sky-border);color:var(--getnet-charcoal);padding:13px;border-radius:12px;margin-bottom:10px;border-left:5px solid #EC0000;">
           <strong>🏧 Getnet ATM (ATM-GTN-MAD-0042)</strong><br/>
           Estado: <code>${data.autonomousAlm.atmDetail.status}</code><br/>
           Reverso MTI 0420: <strong>${data.systemState.enable_emv_reversal_0420 ? 'ACTIVO' : 'INACTIVO (FALLO)'}</strong>
         </div>
-        <div style="background:#1E293B;padding:12px;border-radius:10px;margin-bottom:10px;border-left:4px solid #A855F7;">
+        <div style="background:var(--getnet-sky);border:1px solid var(--getnet-sky-border);color:var(--getnet-charcoal);padding:13px;border-radius:12px;margin-bottom:10px;border-left:5px solid #7C3AED;">
           <strong>🟣 Dynatrace Davis AI (${dtProb.problemId || 'DT-PROB-2026-8841'})</strong><br/>
           Estado: <strong>${dtProb.status}</strong> · P95: <code>${dtProb.p95LatencyMs} ms</code>
         </div>
-        <div style="background:#1E293B;padding:12px;border-radius:10px;margin-bottom:10px;border-left:4px solid #F59E0B;">
+        <div style="background:var(--getnet-sky);border:1px solid var(--getnet-sky-border);color:var(--getnet-charcoal);padding:13px;border-radius:12px;margin-bottom:10px;border-left:5px solid #D97706;">
           <strong>☁️ AWS CloudWatch (${cwAlarm.alarmName || 'CW-ALARM'})</strong><br/>
           Estado: <strong>${cwAlarm.state}</strong> · Valor: <code>${cwAlarm.currentValue}</code>
         </div>
-        <div style="margin-top:12px;">
+        <div style="margin-top:14px;">
           <a href="/alm-dashboard" class="btn-primary" style="text-decoration:none;width:100%;justify-content:center;">📊 Ir al Cuadro de Mando CIO Completo →</a>
         </div>
       `;
