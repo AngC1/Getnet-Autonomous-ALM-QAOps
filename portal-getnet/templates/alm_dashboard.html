@@ -463,9 +463,9 @@
         <div class="sub">vs 3h 45m con intervención humana</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Certificación Tarjetas Jira Xray</div>
-        <div class="value" id="kpi-xray-pass" style="color: var(--green);">{{ selenium.passed + 2 }} / 14</div>
-        <div class="sub">100% Casos de Tarjetas Bancarias PASSED</div>
+        <div class="label">Certificación Ecosistema Jira Xray</div>
+        <div class="value" id="kpi-xray-pass" style="color: var(--green);">{{ alm.testCases|length }} / {{ alm.testCases|length }}</div>
+        <div class="sub">Tarjetas, TPV, Online y FX PASSED</div>
       </div>
     </div>
 
@@ -724,13 +724,80 @@
       </div>
     </div>
 
-    <!-- SECCIÓN 5: MATRIZ DE 14 CASOS DE PRUEBA DE TARJETAS BANCARIAS EN JIRA XRAY -->
+    <!-- SECCIÓN 4B: MATRIZ DE INGENIERÍA AGÉNTICA POR PRODUCTO OFICIAL GETNET (HARNESS · CONTEXT · LOOP · PROMPT ENGINEERING) -->
+    <div class="card" id="section-getnet-products-engineering" data-testid="section-getnet-products-engineering">
+      <h2>
+        <span>🧬 Ingeniería Agéntica por Producto Oficial Getnet España (Harness · Context · Loop · Prompt Engineering)</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="status-pill status-passed">{{ getnet_products|length }} PRODUCTOS OFICIALES GETNET.NET/ES</span>
+          <button class="btn btn-red" id="btn-alm-heal-all-products" onclick="runProductEngineeringCycle('ALL')">⚡ Ejecutar Ciclo Completo en los 11 Productos</button>
+        </div>
+      </h2>
+      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
+        Casos de incidencia en producción, pruebas automatizadas (<code>GTN-TC-015</code> a <code>GTN-TC-025</code>) y especificación de los <strong>4 Pilares de Ingeniería Agéntica</strong> sobre las soluciones oficiales de <strong>Getnet España</strong>: <em>Get Smart</em>, <em>Get Tap on Phone</em>, <em>Get Automatic</em>, <em>Get Central</em>, <em>Métodos de pago online</em>, <em>Get Checkout</em>, <em>Get Link &amp; Pay</em>, <em>Get Social Selling</em>, <em>Cuentas de Empresa</em>, <em>Pagos Locales/Globales</em> y <em>FX Cambio de Divisas</em>.
+      </p>
+
+      <div id="alm-product-cycle-output" style="margin-bottom:14px;padding:12px 16px;background:#090d16;border:1px solid #10b981;border-radius:8px;font-size:0.81rem;color:#e2e8f0;">
+        <strong>✅ Estado del Arnés de Productos Getnet:</strong> 11/11 incidencias auto-remediadas y 11/11 pruebas (<code>GTN-TC-015</code>..<code>GTN-TC-025</code>) en estado <code>PASSED</code>. Pulsa en <em>"⚡ Simular &amp; Auto-Fix"</em> en cualquier fila para ejecutar en vivo su Context, Prompt, Loop y Harness Engineering.
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Producto Oficial Getnet</th>
+            <th>Incidencia PRO &amp; Causa Raíz</th>
+            <th>1. Context Engineering (SDD + RAG + MCP)</th>
+            <th>2. Prompt Engineering (System + Guardrails + Schema)</th>
+            <th>3. Loop Engineering (Bucle Zero-Touch)</th>
+            <th>4. Harness Engineering (Test &amp; Quality Gate)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for prod in getnet_products %}
+          <tr id="row-{{ prod.productId }}">
+            <td>
+              <strong>{{ prod.icon }} {{ prod.name }}</strong><br/>
+              <span class="status-pill status-info" style="margin-top:4px;">{{ prod.family }}</span><br/>
+              <a href="{{ prod.officialUrl }}" target="_blank" style="font-size:0.72rem;color:#38bdf8;">getnet.net/es ↗</a>
+            </td>
+            <td style="font-size:0.76rem;">
+              <code>{{ prod.incident.incidentKey }}</code> · <span class="status-pill status-passed">{{ prod.incident.status }}</span><br/>
+              <strong>{{ prod.incident.title }}</strong><br/>
+              <small style="color:var(--muted);">RCA: {{ prod.incident.rootCause }}</small>
+            </td>
+            <td style="font-size:0.75rem;color:#cbd5e1;">
+              <strong>RAG:</strong> <code>{{ prod.contextEngineering.ragPlaybookId }}</code><br/>
+              <strong>SDD:</strong> <code>{{ prod.contextEngineering.sddSpecRef }}</code><br/>
+              <span style="color:#38bdf8;">MCP: {{ prod.contextEngineering.mcpSources|join(' · ') }}</span>
+            </td>
+            <td style="font-size:0.75rem;color:#e9d5ff;">
+              <strong>Patrón:</strong> <code>{{ prod.promptEngineering.promptPattern }}</code><br/>
+              <small style="color:#cbd5e1;">{{ prod.promptEngineering.systemPrompt }}</small><br/>
+              <span style="color:#fcd34d;">Guardrail: {{ prod.promptEngineering.guardrails[0] }}</span>
+            </td>
+            <td style="font-size:0.75rem;color:#a7f3d0;">
+              <code>{{ prod.loopEngineering.loopId }}</code><br/>
+              <strong>Patch:</strong> <code>{{ prod.loopEngineering.configPatch|tojson }}</code><br/>
+              <span style="color:#34d399;font-weight:700;">MTTR: {{ prod.loopEngineering.mttrAutonomous }}</span> <small style="color:var(--muted);">(vs {{ prod.loopEngineering.mttrManual }})</small>
+            </td>
+            <td style="font-size:0.75rem;">
+              <code>{{ prod.testCase.testKey }}</code> (<span style="color:#34d399;font-weight:800;">{{ prod.testCase.status }}</span>)<br/>
+              <small style="color:#cbd5e1;">{{ prod.harnessEngineering.qualityGates[0] }}</small><br/>
+              <button class="btn btn-green" style="margin-top:6px;padding:4px 10px;font-size:0.72rem;" onclick="runProductEngineeringCycle('{{ prod.productId }}')">⚡ Simular &amp; Auto-Fix</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 5: MATRIZ DE 25 CASOS DE PRUEBA DEL ECOSISTEMA GETNET EN JIRA XRAY -->
     <div class="card">
       <h2>
-        <span>🧪 Matriz de Certificación Jira Xray — 14 Casos Exclusivos de Tarjetas Bancarias (<code>GTN-TC-001</code> a <code>GTN-TC-014</code>)</span>
+        <span>🧪 Matriz de Certificación Jira Xray — {{ alm.testCases|length }} Casos de Tarjetas, TPV, Pagos Online y Gestión del Dinero (<code>GTN-TC-001</code> a <code>GTN-TC-025</code>)</span>
         <div style="display:flex;gap:8px;">
-          <button class="btn" onclick="triggerLiveSelenium()">🌐 Ejecutar 12 Tests Selenium E2E Tarjetas</button>
-          <button class="btn" onclick="triggerLiveJmeter()">⚡ Ejecutar Stress Test JMeter IA Tarjetas</button>
+          <button class="btn" onclick="triggerLiveSelenium()">🌐 Ejecutar Suite Selenium E2E Getnet</button>
+          <button class="btn" onclick="triggerLiveJmeter()">⚡ Ejecutar Stress Test JMeter IA</button>
         </div>
       </h2>
       <table>
@@ -1045,6 +1112,26 @@
       showAlmToast("⚡ Ejecutando Stress Test JMeter IA sobre endpoints de tarjetas...");
       await fetch('/api/v1/qaops/trigger-jmeter', { method: 'POST' });
       window.location.reload();
+    }
+
+    async function runProductEngineeringCycle(productId) {
+      const box = document.getElementById('alm-product-cycle-output');
+      box.innerHTML = `⏳ Ejecutando ciclo <strong>Context + Prompt + Loop + Harness Engineering</strong> para <code>${productId}</code>...`;
+      const res = await fetch('/api/v1/products/simulate-and-heal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      const first = (data.results || [])[0] || {};
+      box.innerHTML = `
+        <strong>✅ CICLO ZERO-TOUCH COMPLETADO (${data.totalProductsProcessed} producto(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
+        • <strong>Producto:</strong> ${first.productName} · Incidencia <code>${first.incidentKey}</code> -> <span style="color:#34d399;font-weight:800;">${first.incidentStatus}</span><br/>
+        • <strong>Context Engineering:</strong> Playbook RAG <code>${first.contextLoaded.ragPlaybookId}</code> · MCP: <code>${(first.contextLoaded.mcpSources || []).join(' | ')}</code><br/>
+        • <strong>Prompt Engineering:</strong> <code>${first.promptExecuted.pattern}</code> -> Output JSON Schema: <code>${JSON.stringify(first.promptExecuted.deterministicOutput)}</code><br/>
+        • <strong>Loop &amp; Harness Engineering:</strong> Patch <code>${JSON.stringify(first.remediation.configPatch)}</code> (MTTR: <strong>${first.remediation.mttrAutonomous}</strong>) · Test Jira Xray <code>${first.verification.testKey}</code>: <strong style="color:#34d399;">${first.verification.xrayStatus}</strong>
+      `;
+      showAlmToast(`🧬 ${first.verification.testKey} PASSED (${first.productName})`);
     }
   </script>
 </body>

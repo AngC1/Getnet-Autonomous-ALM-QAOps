@@ -1,6 +1,6 @@
 # Informe de Rendimiento JMeter Asistido por IA — Operativa de Tarjetas Bancarias Getnet
 
-- **Fecha de Ejecución**: `2026-11-18 06:43:45 UTC`
+- **Fecha de Ejecución**: `2026-11-18 14:34:11 UTC`
 - **Escenario**: Pico Transaccional de Tarjetas Bancarias Getnet & Card Blocker - Ejecución JMeter AI
 - **Estado del Quality Gate (SLA P95 < 450ms)**: **PASSED**
 
@@ -10,10 +10,10 @@
 | :--- | :--- | :--- |
 | Muestras Totales | `60` | >= 50 |
 | Throughput | `120.0 req/s` | >= 15 req/s |
-| Tiempo Medio (Avg) | `16.34 ms` | < 200 ms |
-| Percentil 90 (P90) | `46.39 ms` | < 350 ms |
-| Percentil 95 (P95) | `50.62 ms` | **< 450 ms** |
-| Percentil 99 (P99) | `60.26 ms` | < 800 ms |
+| Tiempo Medio (Avg) | `19.1 ms` | < 200 ms |
+| Percentil 90 (P90) | `48.23 ms` | < 350 ms |
+| Percentil 95 (P95) | `52.67 ms` | **< 450 ms** |
+| Percentil 99 (P99) | `60.11 ms` | < 800 ms |
 | Tasa de Error | `0.0%` | <= 1.0% |
 | Índice Apdex | `1.0` | >= 0.90 |
 
@@ -21,14 +21,14 @@
 
 | Endpoint / Transacción | Muestras | Media (ms) | P95 (ms) | Error % |
 | :--- | :--- | :--- | :--- | :--- |
-| `POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro)` | 12 | 8.4 ms | **16.9 ms** | 0.0% |
-| `POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard)` | 12 | 8.06 ms | **14.9 ms** | 0.0% |
-| `POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100)` | 12 | 8.43 ms | **17.12 ms** | 0.0% |
-| `POST /api/v1/tarjetas/autorizaciones (Control Antifraude)` | 12 | 49.13 ms | **60.26 ms** | 0.0% |
-| `GET /api/v1/tarjetas/parque (Parque Tarjetas EMV)` | 12 | 7.69 ms | **16.33 ms** | 0.0% |
+| `POST /api/v1/tarjetas/bloqueo (ATM Card Blocker Kiro)` | 12 | 11.19 ms | **18.11 ms** | 0.0% |
+| `POST /api/v1/tarjetas/autorizaciones (ISO-8583 MTI 0100)` | 12 | 11.56 ms | **18.35 ms** | 0.0% |
+| `POST /api/v1/tarjetas/disputas (Chargeback Visa/Mastercard)` | 12 | 11.82 ms | **20.16 ms** | 0.0% |
+| `POST /api/v1/tarjetas/autorizaciones (Control Antifraude)` | 12 | 51.16 ms | **60.12 ms** | 0.0% |
+| `GET /api/v1/tarjetas/parque (Parque Tarjetas EMV)` | 12 | 9.77 ms | **16.17 ms** | 0.0% |
 
 ## 3. Diagnóstico Cognitivo del Agente JMeter IA (Getnet QAOps)
 
-- Cumplimiento SLA Global Tarjetas Getnet: APROBADO (P95 = 50.62 ms frente al objetivo < 450.0 ms; Error Rate = 0.0%).
+- Cumplimiento SLA Global Tarjetas Getnet: APROBADO (P95 = 52.67 ms frente al objetivo < 450.0 ms; Error Rate = 0.0%).
 - Índice de satisfacción transaccional Apdex = 1.0 con caudal sostenido de 120.0 req/s (60 operaciones de tarjetas).
 - Verificación Post-Hotfix (GTN-INC-SYS-002 & GTN-INC-ATM-001): El servicio getnet-card-blocker-svc procesa bloqueos ATM con reverso EMV 0420 y lock Redis TTL=3000ms con 0% errores.

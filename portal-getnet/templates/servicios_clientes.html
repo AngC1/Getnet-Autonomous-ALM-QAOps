@@ -1229,6 +1229,62 @@
         Redis Lock TTL: <strong>{{ system_state.redis_lock_ttl_ms }} ms</strong>
       </div>
     </section>
+
+    <!-- NUEVA SECCIÓN: ECOSISTEMA COMPLETO DE 11 PRODUCTOS OFICIALES GETNET ESPAÑA (HARNESS · CONTEXT · LOOP · PROMPT ENGINEERING) -->
+    <section style="margin-top:44px;background:#FFFFFF;border:1.5px solid var(--getnet-sky-border);border-radius:16px;padding:30px;box-shadow:0 8px 28px rgba(15,23,42,0.06);" id="getnet-official-products-section" data-testid="getnet-official-products-section">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:22px;border-bottom:2px solid var(--getnet-sky);padding-bottom:18px;">
+        <div>
+          <span class="highlight-red">SOLUCIONES DE PAGO PARA EMPRESAS · CATÁLOGO OFICIAL GETNET.NET/ES</span>
+          <h2 style="font-size:1.55rem;color:var(--getnet-charcoal);margin-bottom:6px;">Casos de Incidencias, Pruebas y los 4 Pilares de Ingeniería Agéntica por Producto Getnet</h2>
+          <p style="font-size:0.92rem;color:var(--getnet-body);max-width:920px;">
+            Cobertura integral sobre los <strong>11 productos oficiales de Getnet España</strong> (<strong>Pagos en Persona TPV</strong>, <strong>Pagos Online</strong> y <strong>Gestión del Dinero</strong>) aplicando <strong>Harness Engineering</strong>, <strong>Context Engineering</strong>, <strong>Loop Engineering</strong> y <strong>Prompt Engineering</strong> sin Human-in-the-Loop.
+          </p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="btn-primary" id="btn-heal-all-products" data-testid="btn-heal-all-products" onclick="simulateAndHealGetnetProduct('ALL')">
+            ⚡ Ejecutar Ciclo Completo en los 11 Productos Getnet (GTN-TC-015..025)
+          </button>
+        </div>
+      </div>
+
+      <div id="product-engineering-live-banner" data-testid="product-engineering-live-banner" class="alert-box show alert-success" style="margin-bottom:22px;">
+        <strong>🧬 Estado del Ecosistema de Productos Getnet:</strong> 11 / 11 Productos Oficiales monitorizados (<code>GTN-INC-TPV-007</code> a <code>GTN-INC-FX-017</code>) · 11 / 11 Playbooks RAG indexados · 11 / 11 Pruebas <code>GTN-TC-015</code>..<code>GTN-TC-025</code> certificadas en Jira Xray. Pulsa en cualquier producto para simular su incidencia e inspeccionar su <strong>Harness, Context, Loop y Prompt Engineering</strong>.
+      </div>
+
+      <div class="services-grid" id="getnet-products-engineering-grid" data-testid="getnet-products-engineering-grid">
+        {% for prod in getnet_products %}
+        <article class="service-card" style="cursor:default;" id="card-{{ prod.productId }}" data-testid="product-card-{{ prod.productId }}">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">
+              <span class="c-tag-info" style="margin-bottom:0;">{{ prod.family }}</span>
+              <span class="badge badge-green" id="status-badge-{{ prod.productId }}">{{ prod.testCase.testKey }} · {{ prod.testCase.status }}</span>
+            </div>
+            <div class="service-card-header">
+              <div class="service-icon">{{ prod.icon }}</div>
+              <div>
+                <h3 style="font-size:1.05rem;">{{ prod.name }}</h3>
+                <a href="{{ prod.officialUrl }}" target="_blank" style="font-size:0.75rem;color:var(--getnet-red);font-weight:700;text-decoration:none;">🔗 Ver ficha oficial en getnet.net/es ↗</a>
+              </div>
+            </div>
+            <p style="margin-bottom:10px;font-size:0.84rem;">{{ prod.shortDescription }}</p>
+
+            <div style="background:var(--getnet-sky);border:1px solid var(--getnet-sky-border);border-radius:10px;padding:10px 12px;font-size:0.78rem;margin-bottom:10px;">
+              <div style="margin-bottom:4px;"><strong>🚨 Incidencia PRO (<code>{{ prod.incident.incidentKey }}</code>):</strong> {{ prod.incident.title }}</div>
+              <div style="margin-bottom:4px;"><strong>🧪 Test Harness (<code>{{ prod.testCase.testKey }}</code>):</strong> {{ prod.testCase.summary }}</div>
+              <div style="margin-bottom:4px;"><strong>📚 Context &amp; RAG:</strong> Playbook <code>{{ prod.contextEngineering.ragPlaybookId }}</code> · SDD <code>{{ prod.contextEngineering.sddSpecRef }}</code></div>
+              <div style="margin-bottom:4px;"><strong>🔄 Loop Zero-Touch:</strong> <code>{{ prod.loopEngineering.loopId }}</code> (MTTR: <strong>{{ prod.loopEngineering.mttrAutonomous }}</strong> vs {{ prod.loopEngineering.mttrManual }})</div>
+              <div><strong>🤖 Prompt Pattern:</strong> <code>{{ prod.promptEngineering.promptPattern }}</code></div>
+            </div>
+          </div>
+          <div class="service-card-footer" style="gap:8px;flex-wrap:wrap;">
+            <button type="button" class="chip-btn" data-testid="btn-simulate-{{ prod.productId }}" onclick="simulateAndHealGetnetProduct('{{ prod.productId }}')">
+              ⚡ Simular Incidencia &amp; Auto-Fix ({{ prod.testCase.testKey }})
+            </button>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
   </main>
 
   <!-- MEJORA USABILIDAD 4: Botón y Drawer Lateral de Telemetría MCP & Agentes en Vivo -->
@@ -1294,6 +1350,37 @@
         const anchor = document.getElementById('interactive-tabs-anchor');
         if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    }
+
+    function quickFillParque(prov, tipo, prog) {
+      document.getElementById('cm-provincia').value = prov;
+      document.getElementById('trj-tipo').value = tipo;
+      document.getElementById('trj-programa').value = prog;
+      buscarParqueTarjetas({ preventDefault: () => {} });
+      showToast('💳 Filtro rápido aplicado en Parque de Tarjetas');
+    }
+
+    async function simulateAndHealGetnetProduct(productId) {
+      const banner = document.getElementById('product-engineering-live-banner');
+      banner.className = 'alert-box show alert-warning';
+      banner.innerHTML = `⏳ Ejecutando pipeline <strong>Context + Prompt + Loop + Harness Engineering</strong> para <code>${productId}</code>...`;
+      const res = await fetch('/api/v1/products/simulate-and-heal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      const first = (data.results || [])[0] || {};
+      banner.className = 'alert-box show alert-success';
+      banner.innerHTML = `
+        <strong>✅ CICLO COMPLETADO (${data.totalProductsProcessed} producto(s) Getnet verificado(s) · Release <code>${data.deployedRelease}</code>):</strong><br/>
+        • <strong>Producto:</strong> ${first.productName} (Incidente <code>${first.incidentKey}</code> -> <strong>${first.incidentStatus}</strong>)<br/>
+        • <strong>1. Context Engineering:</strong> Playbook RAG <code>${first.contextLoaded.ragPlaybookId}</code> · Fuentes MCP: <code>${(first.contextLoaded.mcpSources || []).join(' | ')}</code><br/>
+        • <strong>2. Prompt Engineering:</strong> Patrón <code>${first.promptExecuted.pattern}</code> · Output JSON: <code>${JSON.stringify(first.promptExecuted.deterministicOutput)}</code><br/>
+        • <strong>3. Loop Engineering:</strong> <code>${first.remediation.loopId}</code> · Patch: <code>${JSON.stringify(first.remediation.configPatch)}</code> · MTTR: <strong>${first.remediation.mttrAutonomous}</strong> (vs ${first.remediation.mttrManual} manual)<br/>
+        • <strong>4. Harness Engineering:</strong> <code>${first.verification.harnessId}</code> · Caso Jira Xray <code>${first.verification.testKey}</code>: <strong>${first.verification.xrayStatus}</strong>
+      `;
+      showToast(`✅ ${first.verification.testKey} PASSED (${first.productName})`);
     }
 
     function quickFillAutorizacion(mode) {

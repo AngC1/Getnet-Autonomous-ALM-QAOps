@@ -44,6 +44,21 @@
       "key": "GTN-EP-06",
       "summary": "Ciclo ALM Autónomo Sin Human-in-the-Loop con Conectores MCP (Dynatrace + CloudWatch) y Motor RAG",
       "status": "DONE"
+    },
+    {
+      "key": "GTN-EP-07",
+      "summary": "Pagos en Persona (TPV Getnet): Get Smart, Get Tap on Phone, Get Automatic y Get Central (Harness, Context, Loop & Prompt)",
+      "status": "DONE"
+    },
+    {
+      "key": "GTN-EP-08",
+      "summary": "Pagos Online Getnet: Métodos de Pago Online, Get Checkout, Get Link & Pay y Get Social Selling",
+      "status": "DONE"
+    },
+    {
+      "key": "GTN-EP-09",
+      "summary": "Gestión del Dinero Getnet: Cuentas de Empresa (Liquidación T+0), Pagos Locales/Globales y FX Cambio de Divisas (DCC)",
+      "status": "DONE"
     }
   ],
   "userStories": [
@@ -78,7 +93,7 @@
     {
       "key": "GTN-US-105",
       "epicKey": "GTN-EP-05",
-      "summary": "Como agente Kiro-ATM-Vision, quiero detectar tarjetas retenidas en cajeros ATM, enmascarar el PAN (PCI-DSS) y emitir reverso MTI 0420",
+      "summary": "Como agente Getnet-ATM-Vision, quiero detectar tarjetas retenidas en cajeros ATM, enmascarar el PAN (PCI-DSS) y emitir reverso MTI 0420",
       "priority": "Blocker",
       "status": "DONE"
     },
@@ -88,13 +103,34 @@
       "summary": "Como CIO de Getnet, quiero que los 5 agentes autónomos conecten vía MCP con Dynatrace y CloudWatch, consulten la base RAG y reparen producción sin Human-in-the-Loop",
       "priority": "Blocker",
       "status": "DONE"
+    },
+    {
+      "key": "GTN-US-107",
+      "epicKey": "GTN-EP-07",
+      "summary": "Como comercio presencial de Getnet, quiero operar con Get Smart, Get Tap on Phone, Get Automatic y Get Central con auto-remediación Zero-Touch",
+      "priority": "Critical",
+      "status": "DONE"
+    },
+    {
+      "key": "GTN-US-108",
+      "epicKey": "GTN-EP-08",
+      "summary": "Como comercio e-commerce de Getnet, quiero cobrar con Métodos de Pago Online, Get Checkout, Get Link & Pay y Get Social Selling sin caídas ni fricción 3DS2",
+      "priority": "Critical",
+      "status": "DONE"
+    },
+    {
+      "key": "GTN-US-109",
+      "epicKey": "GTN-EP-09",
+      "summary": "Como director financiero de un comercio Getnet, quiero liquidación T+0 en Cuentas de Empresa, Pagos Locales/Globales idempotentes y FX (DCC) con tipo garantizado",
+      "priority": "Critical",
+      "status": "DONE"
     }
   ],
   "testPlan": {
     "key": "GTN-TP-2026",
-    "summary": "Plan Maestro QAOps & Autonomous ALM — Operativa de Tarjetas Bancarias Getnet",
-    "totalTests": 14,
-    "passed": 14,
+    "summary": "Plan Maestro QAOps & Autonomous ALM — Tarjetas Bancarias, TPV, Pagos Online y Gestión del Dinero Getnet",
+    "totalTests": 25,
+    "passed": 25,
     "failed": 0
   },
   "testCases": [
@@ -106,7 +142,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 255
+      "lastExecutionTimeMs": 330
     },
     {
       "key": "GTN-TC-002",
@@ -116,7 +152,7 @@
       "priority": "High",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 246
+      "lastExecutionTimeMs": 296
     },
     {
       "key": "GTN-TC-003",
@@ -126,7 +162,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 195
+      "lastExecutionTimeMs": 272
     },
     {
       "key": "GTN-TC-004",
@@ -136,7 +172,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 255
+      "lastExecutionTimeMs": 337
     },
     {
       "key": "GTN-TC-005",
@@ -146,7 +182,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 773
+      "lastExecutionTimeMs": 825
     },
     {
       "key": "GTN-TC-006",
@@ -156,7 +192,7 @@
       "priority": "High",
       "type": "API & Business Rule",
       "status": "PASSED",
-      "lastExecutionTimeMs": 44
+      "lastExecutionTimeMs": 45
     },
     {
       "key": "GTN-TC-007",
@@ -166,7 +202,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 273
+      "lastExecutionTimeMs": 310
     },
     {
       "key": "GTN-TC-008",
@@ -176,7 +212,7 @@
       "priority": "High",
       "type": "Negative E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 748
+      "lastExecutionTimeMs": 292
     },
     {
       "key": "GTN-TC-009",
@@ -186,7 +222,7 @@
       "priority": "Critical",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 684
+      "lastExecutionTimeMs": 258
     },
     {
       "key": "GTN-TC-010",
@@ -196,7 +232,7 @@
       "priority": "Medium",
       "type": "Functional E2E (Selenium)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 710
+      "lastExecutionTimeMs": 283
     },
     {
       "key": "GTN-TC-011",
@@ -206,7 +242,7 @@
       "priority": "High",
       "type": "Performance (JMeter AI)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 50
+      "lastExecutionTimeMs": 52
     },
     {
       "key": "GTN-TC-012",
@@ -226,7 +262,7 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (Getnet ATM + RAG)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 785
+      "lastExecutionTimeMs": 903
     },
     {
       "key": "GTN-TC-014",
@@ -236,7 +272,117 @@
       "priority": "Blocker",
       "type": "Autonomous ALM (Dynatrace + CloudWatch MCP)",
       "status": "PASSED",
-      "lastExecutionTimeMs": 19
+      "lastExecutionTimeMs": 31
+    },
+    {
+      "key": "GTN-TC-015",
+      "testLinkId": "TL-GTN-115",
+      "storyKey": "GTN-US-107",
+      "summary": "Get Smart (TPV táctil sin cables): Conmutación automática Wi-Fi -> 4G Dual-SIM con cola Store-and-Forward EMV e idempotencia ISO-8583 MTI 0100",
+      "priority": "Critical",
+      "type": "Product E2E + Harness Loop",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 125
+    },
+    {
+      "key": "GTN-TC-016",
+      "testLinkId": "TL-GTN-116",
+      "storyKey": "GTN-US-107",
+      "summary": "Get Tap on Phone (TPV en el móvil): Cobro Contactless NFC con tarjeta/wallet y renovación proactiva de atestación PCI MPoC",
+      "priority": "Critical",
+      "type": "Product E2E + Security Gate",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 135
+    },
+    {
+      "key": "GTN-TC-017",
+      "testLinkId": "TL-GTN-117",
+      "storyKey": "GTN-US-107",
+      "summary": "Get Automatic (TPV de cobro automático / Vending): Reverso automático ISO-8583 MTI 0420 ante fallo de dispensación MDB en quiosco desatendido",
+      "priority": "Critical",
+      "type": "Product E2E + Edge ATM/Vending",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 158
+    },
+    {
+      "key": "GTN-TC-018",
+      "testLinkId": "TL-GTN-118",
+      "storyKey": "GTN-US-107",
+      "summary": "Get Central (TPV conectado software de gestión): Conciliación automática Caja ECR <-> Pinpad EMV y cierre de lote MTI 0500 sin descuadres",
+      "priority": "High",
+      "type": "Product E2E + ERP Integration",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 129
+    },
+    {
+      "key": "GTN-TC-019",
+      "testLinkId": "TL-GTN-119",
+      "storyKey": "GTN-US-108",
+      "summary": "Métodos de pago online: Enrutamiento inteligente multi-método (Tarjeta EMV + Bizum + Apple/Google Pay) con failover < 150 ms",
+      "priority": "Critical",
+      "type": "Product E2E + Smart Routing",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 138
+    },
+    {
+      "key": "GTN-TC-020",
+      "testLinkId": "TL-GTN-120",
+      "storyKey": "GTN-US-108",
+      "summary": "Get Checkout (TPV virtual): Flujo Frictionless 3D-Secure 2.2 con exención TRA PSD2 y cobro One-Click con Token Card Vault",
+      "priority": "Critical",
+      "type": "Product E2E + PSD2 3DS2",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 149
+    },
+    {
+      "key": "GTN-TC-021",
+      "testLinkId": "TL-GTN-121",
+      "storyKey": "GTN-US-108",
+      "summary": "Get Link & Pay: Generación de enlace de pago firmado HMAC-SHA256 + QR, validación anti-replay y cobro con tarjeta EMV",
+      "priority": "High",
+      "type": "Product E2E + Crypto Link",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 124
+    },
+    {
+      "key": "GTN-TC-022",
+      "testLinkId": "TL-GTN-122",
+      "storyKey": "GTN-US-108",
+      "summary": "Get Social Selling: Cobro conversacional en redes sociales con cola asíncrona de webhooks y backoff exponencial sin pérdida de confirmaciones",
+      "priority": "High",
+      "type": "Product E2E + Social Webhook",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 131
+    },
+    {
+      "key": "GTN-TC-023",
+      "testLinkId": "TL-GTN-123",
+      "storyKey": "GTN-US-109",
+      "summary": "Cuentas de Empresa Getnet: Liquidación instantánea T+0 de ventas con tarjetas y cuadre contable exacto de tasas MDR (ROUND_HALF_EVEN)",
+      "priority": "Critical",
+      "type": "Product E2E + Settlement Ledger",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 144
+    },
+    {
+      "key": "GTN-TC-024",
+      "testLinkId": "TL-GTN-124",
+      "storyKey": "GTN-US-109",
+      "summary": "Pagos Locales y Globales: Dispersión Split Payment y SEPA Instant con bloqueo de idempotencia ISO-20022 EndToEndId (0 pagos duplicados)",
+      "priority": "Blocker",
+      "type": "Product E2E + Idempotency Gate",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 151
+    },
+    {
+      "key": "GTN-TC-025",
+      "testLinkId": "TL-GTN-125",
+      "storyKey": "GTN-US-109",
+      "summary": "FX Cambio de Divisas y DCC: Cobro con tarjeta internacional (USD/GBP -> EUR) con bloqueo garantizado de tipo de cambio (Rate Lock Token)",
+      "priority": "Critical",
+      "type": "Product E2E + FX DCC Engine",
+      "status": "PASSED",
+      "lastExecutionTimeMs": 136
     }
   ],
   "productionIncidents": [
@@ -250,7 +396,7 @@
       "rootCause": "Flag enable_emv_reversal_0420=False en card_lock_engine omite el envío del reverso MTI 0420 al bloquear preventivamente la tarjeta.",
       "autoFixApplied": "Activado enable_emv_reversal_0420=True, emitido reverso REV-EMV-2026 y aprovisionado token digital TOK-GTN-WALLET-9012.",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-18T06:43:42+00:00"
+      "resolvedAt": "2026-11-18T14:34:09+00:00"
     },
     {
       "key": "GTN-INC-SYS-002",
@@ -262,7 +408,7 @@
       "rootCause": "Ausencia de TTL en lock Redis de bloqueo de tarjetas provoca bloqueo indefinido de conexiones bajo ráfagas concurrentes.",
       "autoFixApplied": "Inyectado redis_lock_ttl_ms=3000, activado Circuit Breaker Resilience4j y redesplegada versión v2026.11.2-AUTONOMOUS-PRO (P95 = 42.5 ms).",
       "status": "RESOLVED (AUTO-REDEPLOYED)",
-      "resolvedAt": "2026-11-18T06:43:42+00:00"
+      "resolvedAt": "2026-11-18T14:34:09+00:00"
     }
   ],
   "defects": [

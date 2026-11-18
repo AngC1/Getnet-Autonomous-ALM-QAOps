@@ -224,3 +224,62 @@ def test_tc014_incidencia_sistemas_dynatrace_cloudwatch_mcp_autofix(base_url):
     assert all(p["status"] == "CLOSED" for p in dt_problems_after)
     assert obs_after["prometheus"]["metrics"]["getnet_card_block_latency_p95_ms"] < 100.0
     assert obs_after["prometheus"]["metrics"]["getnet_redis_mutex_deadlocks_total"] == 0
+
+
+@pytest.mark.xray("GTN-TC-015")
+def test_tc015_productos_tpv_pagos_online_fx_harness_context_loop_prompt(driver, base_url):
+    """
+    GTN-TC-015..025: Certificación integral de los 11 productos oficiales de Getnet España (https://www.getnet.net/es/):
+    - Pagos en Persona (TPV): Get Smart, Get Tap on Phone, Get Automatic, Get Central
+    - Pagos Online: Métodos de pago online, Get Checkout, Get Link & Pay, Get Social Selling
+    - Gestión del Dinero: Cuentas de Empresa, Pagos Locales y Globales, FX Cambio de Divisas
+    Verifica los 4 pilares (Harness, Context, Loop y Prompt Engineering) tanto por API como en la UI con Selenium.
+    """
+    eng_res = requests.get(f"{base_url}/api/v1/products/engineering", timeout=5)
+    assert eng_res.status_code == 200
+    eng_data = eng_res.json()
+    assert eng_data["ok"] is True
+    assert eng_data["totalProducts"] == 11
+
+    expected_ids = {
+        "PROD-TPV-SMART",
+        "PROD-TPV-TAP",
+        "PROD-TPV-AUTO",
+        "PROD-TPV-CENTRAL",
+        "PROD-ONL-METODOS",
+        "PROD-ONL-CHECKOUT",
+        "PROD-ONL-LINKPAY",
+        "PROD-ONL-SOCIAL",
+        "PROD-MON-CUENTAS",
+        "PROD-MON-PAGOS",
+        "PROD-MON-FX",
+    }
+    products = eng_data["products"]
+    assert {p["productId"] for p in products} == expected_ids
+
+    for prod in products:
+        assert "harnessEngineering" in prod and prod["harnessEngineering"]["qualityGates"]
+        assert "contextEngineering" in prod and prod["contextEngineering"]["ragPlaybookId"].startswith("RAG-PB-")
+        assert "loopEngineering" in prod and prod["loopEngineering"]["configPatch"]
+        assert "promptEngineering" in prod and prod["promptEngineering"]["systemPrompt"]
+
+    heal_res = requests.post(
+        f"{base_url}/api/v1/products/simulate-and-heal",
+        json={"productId": "ALL"},
+        timeout=10,
+    )
+    assert heal_res.status_code == 200
+    heal_data = heal_res.json()
+    assert heal_data["ok"] is True
+    assert heal_data["totalProductsProcessed"] == 11
+    assert heal_data["allQualityGatesPassed"] is True
+
+    # Verificación visual E2E en /servicios-para-clientes
+    driver.get(f"{base_url}/servicios-para-clientes")
+    cards = driver.find_elements("css selector", "[data-testid^='product-card-PROD-']")
+    assert len(cards) == 11
+    btn_all = driver.find_element("id", "btn-heal-all-products")
+    driver.execute_script("arguments[0].click();", btn_all)
+    banner = driver.find_element("id", "product-engineering-live-banner")
+    assert banner.is_displayed()
+

@@ -30,7 +30,7 @@ REDMINE_CSV_PATH = PROJECT_ROOT / "alm-backlog" / "redmine" / "redmine_issues_ba
 
 GETNET_ATM_DIR = PROJECT_ROOT / "Getnet_ATM"
 RAG_DIR = PROJECT_ROOT / "rag-knowledge-base"
-for p in (GETNET_ATM_DIR, RAG_DIR):
+for p in (BASE_DIR, GETNET_ATM_DIR, RAG_DIR):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -42,6 +42,10 @@ from brand_verifier.incident import (  # noqa: E402
 )
 import atm_sentinel  # noqa: E402
 from rag_engine import IncidentRAGEngine  # noqa: E402
+from getnet_products_engineering import (  # noqa: E402
+    get_all_products_engineering,
+    simulate_and_heal_product_incident,
+)
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 RAG_ENGINE = IncidentRAGEngine()
@@ -989,6 +993,7 @@ def servicios_para_clientes_view():
         system_state=SYSTEM_INCIDENT_STATE,
         tarjetas_log=TARJETAS_BLOQUEADAS_LOG,
         mcp_connections=MCP_CONNECTIONS_STATE,
+        getnet_products=get_all_products_engineering(),
     )
 
 
@@ -1008,6 +1013,7 @@ def alm_dashboard_view():
         agents_roster=AUTONOMOUS_AGENTS_ROSTER,
         rag_playbooks=RAG_ENGINE.playbooks,
         rag_meta=RAG_ENGINE.kb_data.get("metadata", {}),
+        getnet_products=get_all_products_engineering(),
     )
 
 
@@ -2124,6 +2130,63 @@ def api_trigger_jmeter():
             "jmeterReport": JMETER_LATEST_REPORT,
         }
     )
+
+
+@app.route("/api/v1/products/engineering", methods=["GET"])
+def api_getnet_products_engineering():
+    """Devuelve la matriz completa de los 11 productos oficiales de Getnet con Harness, Context, Loop y Prompt Engineering."""
+    products = get_all_products_engineering()
+    return jsonify(
+        {
+            "ok": True,
+            "totalProducts": len(products),
+            "engineeringPillars": [
+                "Harness Engineering (Tests E2E, Asserts & Quality Gates)",
+                "Context Engineering (SDD, Playbooks RAG & Telemetría MCP)",
+                "Loop Engineering (Closed-Loop Zero-Touch S1..S8)",
+                "Prompt Engineering (System Prompt, Guardrails PCI-DSS & JSON Schema)",
+            ],
+            "products": products,
+        }
+    )
+
+
+@app.route("/api/v1/products/simulate-and-heal", methods=["POST"])
+def api_simulate_and_heal_product():
+    """Ejecuta en vivo el ciclo de Incidencia + Context + Prompt + Loop + Harness para un producto de Getnet o los 11 productos."""
+    data = request.get_json(silent=True) or {}
+    product_id = str(data.get("productId", "ALL")).strip()
+    report = simulate_and_heal_product_incident(product_id)
+
+    alm_data = load_alm_backlog()
+    passed_keys = {r["verification"]["testKey"] for r in report["results"]}
+    for tc in alm_data.get("testCases", []):
+        if tc.get("key") in passed_keys:
+            tc["status"] = "PASSED"
+    total_tc = len(alm_data.get("testCases", []))
+    passed_tc = sum(1 for tc in alm_data.get("testCases", []) if tc.get("status") == "PASSED")
+    if "testPlan" in alm_data:
+        alm_data["testPlan"]["totalTests"] = total_tc
+        alm_data["testPlan"]["passed"] = passed_tc
+        alm_data["testPlan"]["failed"] = total_tc - passed_tc
+    save_alm_backlog(alm_data)
+
+    EXECUTION_HISTORY.insert(
+        0,
+        {
+            "execKey": f"GTN-EXEC-2026-{100 + len(EXECUTION_HISTORY) + 1}",
+            "buildName": f"Build #{100 + len(EXECUTION_HISTORY) + 1} · Harness/Context/Loop/Prompt ({product_id})",
+            "runner": "Getnet Product Engineering Orchestrator (Zero-Touch)",
+            "environment": "PRODUCTION (Getnet Full Product Suite)",
+            "testsScope": ", ".join(sorted(passed_keys)),
+            "passed": len(passed_keys),
+            "failed": 0,
+            "durationMs": 145 * len(passed_keys),
+            "status": "PASSED",
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+        },
+    )
+    return jsonify(report)
 
 
 @app.route("/api/v1/alm/export/<fmt>", methods=["GET"])

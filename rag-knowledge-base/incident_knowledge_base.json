@@ -4,9 +4,9 @@
     "version": "2026.11.2-RAG-PRO",
     "embeddingModel": "getnet-banking-incident-hybrid-v3 (TF-IDF Cosine + BM25 Telemetry Fingerprint)",
     "vectorDimensions": 384,
-    "domain": "Tarjetas Bancarias (Emisión, Bloqueo ATM, Autorización ISO-8583, 3D-Secure 2.2, Liquidación EMV)",
-    "totalDocuments": 8,
-    "lastIndexed": "2026-11-17T20:52:00Z"
+    "domain": "Ecosistema Getnet España: Tarjetas Bancarias EMV, TPV (Get Smart, Tap on Phone, Automatic, Central), Pagos Online (Checkout, Link & Pay, Social Selling) y Gestión del Dinero (Cuentas, Pagos, FX)",
+    "totalDocuments": 17,
+    "lastIndexed": "2026-11-18T14:30:00Z"
   },
   "playbooks": [
     {
@@ -301,6 +301,447 @@
         "slaCriteria": "HTTP 201 para disputas válidas y HTTP 400 determinista para importes fuera de rango o archivos .exe.",
         "mttrManual": "1h 30m",
         "mttrAutonomous": "4.2s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-TPV-007",
+      "title": "Get Smart (TPV Táctil sin Cables): Micro-corte Wi-Fi/4G con Trama EMV ISO-8583 MTI 0100 en Vuelo",
+      "category": "TPV_GET_SMART_ROAMING",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-TPV-007",
+      "linkedDefectId": "GTN-BUG-207",
+      "telemetrySources": ["Dynatrace SmartPOS Agent", "AWS CloudWatch IoT Fleet", "Prometheus MCP"],
+      "keywords": ["get smart", "tpv tactil", "sin cables", "roaming", "4g", "wifi", "store and forward", "mti 0100", "rrn", "recibo digital"],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-SMARTPOS-701: Socket reset during Wi-Fi to 4G handoff on Get Smart terminal",
+        "cloudwatchLogPattern": "WARN [GetSmart-Agent] Pending ACK for DE37 RRN-SMART-9012 after ARQC read"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Conmutación de red Wi-Fi a Dual-SIM 4G durante autorización de tarjeta chip EMV en TPV táctil Get Smart.",
+        "propagationPath": "Lectura ARQC -> Caída Wi-Fi -> Handoff 4G > 1500ms -> Cola Store-and-Forward requiere reintento idempotente por RRN.",
+        "businessImpact": "Retraso en impresión/envío de recibo digital en comercio físico."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-smartpos-connectivity-daemon",
+        "defectType": "SLOW_NETWORK_HANDOFF_TIMEOUT",
+        "explanation": "Temporizador de handoff Wi-Fi->4G fijado en 8000ms sin activación de Fast-Roaming idempotente."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent + Observability-MCP-Agent",
+        "steps": [
+          "1. Detectar caída de socket Wi-Fi en terminal Get Smart vía CloudWatch IoT.",
+          "2. Activar smartpos_fast_roaming_4g=True y handoff_timeout_ms=1200.",
+          "3. Reenviar trama ISO-8583 MTI 0100 con RRN idempotente y emitir recibo digital."
+        ],
+        "configPatch": { "smartpos_fast_roaming_4g": true, "handoff_timeout_ms": 1200, "store_and_forward_idempotent_rrn": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-015"],
+        "slaCriteria": "Conmutación Wi-Fi -> 4G < 350ms y 0 cargos duplicados.",
+        "mttrManual": "2h 30m",
+        "mttrAutonomous": "4.2s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-TAP-008",
+      "title": "Get Tap on Phone (TPV en el Móvil): Expiración de Atestación Criptográfica PCI MPoC en Cobro NFC",
+      "category": "TPV_GET_TAP_ON_PHONE_NFC",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-TAP-008",
+      "linkedDefectId": "GTN-BUG-208",
+      "telemetrySources": ["Dynatrace Mobile RUM", "AWS CloudWatch SoftPOS", "HSM Thales DUKPT"],
+      "keywords": ["tap on phone", "tpv en el movil", "softpos", "nfc", "mpoc", "cpoc", "attestation", "contactless", "pin on glass"],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-SOFTPOS-802: MPOC_ATTESTATION_EXPIRED spike on Android NFC readers",
+        "cloudwatchLogPattern": "ERROR [TapOnPhone-SDK] Device integrity token expired before NFC kernel L2 read"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Expiración del token de integridad PCI MPoC en el smartphone del comercio antes de iniciar lectura Contactless NFC.",
+        "propagationPath": "Tap de tarjeta/wallet -> Verificación MPoC -> Token caducado -> Rechazo preventivo.",
+        "businessImpact": "Imposibilidad temporal de cobrar con el móvil hasta renovar token criptográfico."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-tap-on-phone-attestation-svc",
+        "defectType": "MPOC_TOKEN_REFRESH_INTERVAL_TOO_LONG",
+        "explanation": "Intervalo de refresco configurado en 3600s en lugar de 900s con pre-calentamiento HSM."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Reducir intervalo mpoc_attestation_refresh_sec a 900s.",
+          "2. Activar pool pre-calentado de claves DUKPT PIN-on-Glass en HSM.",
+          "3. Certificar cobro NFC en Jira Xray (GTN-TC-016)."
+        ],
+        "configPatch": { "mpoc_attestation_refresh_sec": 900, "dukpt_pin_on_glass_warm_pool": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-016"],
+        "slaCriteria": "Atestación MPoC validada en < 120ms y cumplimiento PCI MPoC 100%.",
+        "mttrManual": "3h 10m",
+        "mttrAutonomous": "3.9s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-AUTO-009",
+      "title": "Get Automatic (TPV Autocobro & Vending): Retención de Pre-Autorización EMV tras Fallo MDB de Dispensación",
+      "category": "TPV_GET_AUTOMATIC_VENDING",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-AUTO-009",
+      "linkedDefectId": "GTN-BUG-209",
+      "telemetrySources": ["Getnet_ATM & Unattended Sentinel", "AWS CloudWatch", "Switch ISO-8583"],
+      "keywords": ["get automatic", "autocobro", "vending", "quiosco", "parking", "mdb", "preautorizacion", "mti 0420", "desatendido"],
+      "symptomSignature": {
+        "atmEvent": "MDB_VEND_FAILURE (0x04) en quiosco desatendido Get Automatic",
+        "cloudwatchLogPattern": "ERROR [GetAutomatic-MDB] Pre-Auth MTI 0100 not released after VEND_FAIL"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Fallo mecánico de entrega de producto en máquina de vending/parking tras pre-autorizar la tarjeta.",
+        "propagationPath": "Pre-Auth 25 EUR OK -> Fallo bus MDB -> Ausencia de reverso MTI 0420 -> Saldo retenido en tarjeta.",
+        "businessImpact": "Reclamación de titular por retención de saldo en máquina desatendida."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-unattended-mdb-bridge",
+        "defectType": "MISSING_AUTO_REVERSAL_ON_MDB_FAIL",
+        "explanation": "El puente MDB no disparaba automáticamente la trama MTI 0420 al recibir 0x04 VEND_FAIL."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Getnet-ATM-Vision-Agent + Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Enmascarar PAN con redact_pan y detectar evento MDB_VEND_FAILURE.",
+          "2. Activar mdb_vend_fail_auto_reversal_0420=True y emitir reverso MTI 0420.",
+          "3. Certificar liberación de saldo con GTN-TC-017."
+        ],
+        "configPatch": { "mdb_vend_fail_auto_reversal_0420": true, "preauth_orphan_ttl_sec": 30 },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-017"],
+        "slaCriteria": "Emisión de reverso MTI 0420 < 1.5s tras fallo MDB.",
+        "mttrManual": "4h 00m",
+        "mttrAutonomous": "4.8s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-CENT-010",
+      "title": "Get Central (TPV Conectado Software de Gestión): Desincronización de Cierre de Lote MTI 0500 con ERP/ECR",
+      "category": "TPV_GET_CENTRAL_ERP",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-CENT-010",
+      "linkedDefectId": "GTN-BUG-210",
+      "telemetrySources": ["Dynatrace PurePath ECR", "Prometheus MCP"],
+      "keywords": ["get central", "software de gestion", "erp", "ecr", "caja", "pms", "pinpad", "mti 0500", "cierre de lote", "conciliacion"],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-ECR-1004: WebSocket ACK timeout between Get Central Pinpad and ERP POS",
+        "prometheusMetric": "getnet_ecr_batch_settlement_mismatch_total = 1"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Timeout local al devolver el ACK de cobro aprobado desde el Pinpad Get Central hacia el software de caja ERP.",
+        "propagationPath": "Cobro EMV aprobado -> Pérdida de ACK local -> Ticket abierto en ERP -> Descuadre en cierre de lote MTI 0500.",
+        "businessImpact": "Descuadre contable de caja al cierre del día en tienda."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-ecr-local-bridge",
+        "defectType": "ECR_ACK_WITHOUT_OUTBOX_REPLAY",
+        "explanation": "Ausencia de patrón Transactional Outbox para reenviar confirmaciones firmadas al ERP."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Activar ecr_outbox_replay_enabled=True y consultar estado por X-Getnet-ECR-Ticket-Id.",
+          "2. Sincronizar estado APPROVED en el ERP y cuadrar lote MTI 0500.",
+          "3. Certificar GTN-TC-018 en Jira Xray."
+        ],
+        "configPatch": { "ecr_outbox_replay_enabled": true, "auto_query_tx_status_on_timeout": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-018"],
+        "slaCriteria": "Descuadre de cierre de lote MTI 0500 == 0,00 EUR.",
+        "mttrManual": "1h 50m",
+        "mttrAutonomous": "3.5s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-ONL-011",
+      "title": "Métodos de Pago Online (Tarjetas, Bizum, Wallets, PayPal): Latencia en Smart-Routing Multimétodo",
+      "category": "PAGOS_ONLINE_METODOS",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-ONL-011",
+      "linkedDefectId": "GTN-BUG-211",
+      "telemetrySources": ["Dynatrace APM Smartscape", "AWS CloudWatch", "Prometheus MCP"],
+      "keywords": ["metodos de pago online", "bizum", "apple pay", "google pay", "paypal", "bnpl", "smart routing", "wallet"],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-ONLINE-1101: High P95 latency on Multi-Method Payment Orchestrator",
+        "cloudwatchAlarm": "CW-ALARM-GTN-ONLINE-METHODS-P95 = ALARM"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Degradación de latencia (>600ms) en un nodo del orquestador de métodos de pago online (Tarjetas + Bizum + Wallets).",
+        "propagationPath": "Checkout carga métodos -> Nodo lento retrasa token de sesión -> Riesgo de abandono de carrito.",
+        "businessImpact": "Impacto en tasa de conversión de comercios online."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-online-methods-router",
+        "defectType": "SMART_ROUTING_EJECTION_THRESHOLD_HIGH",
+        "explanation": "Umbral de expulsión de nodo lento configurado en 2500ms en lugar de 400ms."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Observability-MCP-Agent + Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Ajustar smart_routing_latency_eject_ms=400 y activar failover activo-activo.",
+          "2. Verificar disponibilidad de Tarjeta EMV, Bizum y Apple/Google Pay con GTN-TC-019."
+        ],
+        "configPatch": { "smart_routing_latency_eject_ms": 400, "apm_active_active_failover": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-019"],
+        "slaCriteria": "Failover Smart-Routing < 150ms y conversión >= 99.5%.",
+        "mttrManual": "2h 15m",
+        "mttrAutonomous": "4.1s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-CHK-012",
+      "title": "Get Checkout (TPV Virtual): Optimización Frictionless 3D-Secure 2.2 con Exención PSD2 TRA y Card Vault",
+      "category": "PAGOS_ONLINE_GET_CHECKOUT",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-CHK-012",
+      "linkedDefectId": "GTN-BUG-212",
+      "telemetrySources": ["Dynatrace 3DS2 Funnel", "AWS CloudWatch MPI", "Prometheus MCP"],
+      "keywords": ["get checkout", "tpv virtual", "pasarela de pago", "3ds2", "frictionless", "psd2", "tra", "one click", "tokenizacion"],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-CHK-1205: Drop in 3DS2 Frictionless ratio on tokenized One-Click cards",
+        "prometheusMetric": "getnet_checkout_3ds2_frictionless_ratio < 0.85"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Envío innecesario a Challenge 3DS2 de compras de bajo importe (<30 EUR) con tarjetas ya tokenizadas en Get Checkout.",
+        "propagationPath": "Compra One-Click bajo riesgo -> Sin flag de exención TRA -> Challenge ACS lento -> Abandono en checkout.",
+        "businessImpact": "Pérdida de conversión en compras recurrentes de bajo riesgo."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-checkout-3ds2-mpi",
+        "defectType": "PSD2_TRA_EXEMPTION_DISABLED_ON_VAULT",
+        "explanation": "El motor MPI no inyectaba el indicador de exención PSD2 TRA en tokens de red verificados."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent + QAOps-Xray-Certifier-Agent",
+        "steps": [
+          "1. Activar psd2_tra_frictionless_enabled=True para operaciones con score antifraude < 15 e importe <= 30 EUR.",
+          "2. Certificar flujo Frictionless y tokenización Card Vault con GTN-TC-020."
+        ],
+        "configPatch": { "psd2_tra_frictionless_enabled": true, "low_value_exemption_limit_eur": 30.0, "vault_network_token_cryptogram": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-020"],
+        "slaCriteria": "Autorización Frictionless 3DS 2.2 < 250ms cumpliendo PSD2 SCA.",
+        "mttrManual": "3h 00m",
+        "mttrAutonomous": "4.5s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-LNK-013",
+      "title": "Get Link & Pay (Link de Pago Online): Deriva de Reloj en Firma HMAC-SHA256 y Protección Anti-Replay",
+      "category": "PAGOS_ONLINE_LINK_AND_PAY",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-LNK-013",
+      "linkedDefectId": "GTN-BUG-213",
+      "telemetrySources": ["AWS CloudWatch Logs", "Dynatrace Link Funnel"],
+      "keywords": ["get link and pay", "link de pago", "qr", "sms", "email", "hmac", "firma", "clock skew", "anti-replay"],
+      "symptomSignature": {
+        "cloudwatchLogPattern": "ERROR [LinkAndPay] HTTP 403 LINK_SIGNATURE_TIMESTAMP_DRIFT on newly generated payment link"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Desfase de milisegundos NTP entre el contenedor que genera el link de pago y el que valida la firma al abrir el enlace.",
+        "propagationPath": "Envío de Link por SMS/Email -> Cliente abre al instante -> Timestamp parece futuro por 800ms -> Rechazo 403.",
+        "businessImpact": "Fallo al abrir enlaces de pago recién enviados."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-link-and-pay-validator",
+        "defectType": "ZERO_CLOCK_SKEW_TOLERANCE",
+        "explanation": "Tolerancia de deriva de reloj fijada en 0s entre nodos."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Configurar hmac_clock_skew_tolerance_sec=30 y nonce de uso único en Redis.",
+          "2. Certificar generación y cobro de enlace con GTN-TC-021."
+        ],
+        "configPatch": { "hmac_clock_skew_tolerance_sec": 30, "enforce_single_use_nonce": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-021"],
+        "slaCriteria": "100% enlaces válidos aceptados y bloqueados tras primer uso (Single-Use).",
+        "mttrManual": "2h 00m",
+        "mttrAutonomous": "3.7s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-SOC-014",
+      "title": "Get Social Selling (Social Commerce): Throttling 429 en Webhooks Conversacionales de Confirmación de Pago",
+      "category": "PAGOS_ONLINE_SOCIAL_SELLING",
+      "severity": "MEDIUM",
+      "linkedIncidentId": "GTN-INC-SOC-014",
+      "linkedDefectId": "GTN-BUG-214",
+      "telemetrySources": ["Prometheus MCP", "AWS CloudWatch SQS"],
+      "keywords": ["get social selling", "social commerce", "whatsapp", "instagram", "tiktok", "redes sociales", "webhook", "429", "chatbot"],
+      "symptomSignature": {
+        "prometheusMetric": "getnet_social_selling_webhook_429_total > 10",
+        "cloudwatchLogPattern": "WARN [SocialSelling-Webhook] HTTP 429 rate limit delivering payment receipt to conversational bot"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Pico de pagos simultáneos durante campañas de Live Shopping en Instagram/WhatsApp.",
+        "propagationPath": "Pago con tarjeta aprobado -> Envío síncrono a API de mensajería -> HTTP 429 -> Retraso de recibo en chat.",
+        "businessImpact": "Demora en la confirmación visual del pedido dentro del chat."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-social-selling-webhook-dispatcher",
+        "defectType": "SYNC_WEBHOOK_WITHOUT_TOKEN_BUCKET",
+        "explanation": "Ausencia de cola asíncrona con control de tasa Token Bucket y backoff exponencial."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Activar social_webhook_async_queue=True con backoff exponencial y redact_pan.",
+          "2. Certificar entrega garantizada con GTN-TC-022."
+        ],
+        "configPatch": { "social_webhook_async_queue": true, "webhook_backoff_initial_ms": 250, "max_retry_attempts": 8 },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-022"],
+        "slaCriteria": "100% de recibos entregados en canal conversacional con 0 datos PCI.",
+        "mttrManual": "1h 45m",
+        "mttrAutonomous": "4.0s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-CTA-015",
+      "title": "Cuentas de Empresa Getnet: Bloqueo de Liquidación Instantánea T+0 por Redondeo de Tasa MDR de Tarjetas",
+      "category": "GESTION_DINERO_CUENTAS_EMPRESA",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-CTA-015",
+      "linkedDefectId": "GTN-BUG-215",
+      "telemetrySources": ["Dynatrace Settlement Ledger", "AWS CloudWatch"],
+      "keywords": ["cuentas de empresa", "liquidacion", "t+0", "mdr", "interchange", "conciliacion", "redondeo", "tesoreria"],
+      "symptomSignature": {
+        "cloudwatchLogPattern": "ERROR [Merchant-Settlement-T0] Batch paused in PENDING_FEE_RECONCILIATION (sub-cent float delta 0.001 EUR)"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Cálculo de comisiones MDR e Interchange++ sobre miles de transacciones de tarjeta usando coma flotante binaria.",
+        "propagationPath": "Agregación de lote T+0 -> Diferencia de 0,001 EUR -> Pausa preventiva de abono en Cuenta de Empresa.",
+        "businessImpact": "Retraso en la disponibilidad inmediata de fondos T+0 para el comercio."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-merchant-accounts-settlement",
+        "defectType": "IEEE754_FLOAT_IN_MDR_CALCULATION",
+        "explanation": "Uso de float binario en lugar de Decimal bancario ROUND_HALF_EVEN."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Forzar settlement_decimal_rounding='ROUND_HALF_EVEN' y recalcular lote T+0.",
+          "2. Liberar abono instantáneo en Cuenta de Empresa y certificar GTN-TC-023."
+        ],
+        "configPatch": { "settlement_decimal_rounding": "ROUND_HALF_EVEN", "instant_t0_payout_enabled": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-023"],
+        "slaCriteria": "Liquidación T+0 abonada al céntimo exacto (0 descuadres).",
+        "mttrManual": "3h 30m",
+        "mttrAutonomous": "4.6s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-PAY-016",
+      "title": "Pagos Locales y Globales (SEPA Instant & Split Payments): Bloqueo de Idempotencia ISO-20022 EndToEndId",
+      "category": "GESTION_DINERO_PAGOS_GLOBALES",
+      "severity": "CRITICAL",
+      "linkedIncidentId": "GTN-INC-PAY-016",
+      "linkedDefectId": "GTN-BUG-216",
+      "telemetrySources": ["Dynatrace Global Payouts", "AWS CloudWatch", "Prometheus MCP"],
+      "keywords": ["pagos locales", "pagos globales", "sepa instant", "split payment", "marketplace", "idempotencia", "iso-20022", "pacs.008"],
+      "symptomSignature": {
+        "dynatraceEvent": "DT-PAYOUT-1602: Duplicate ISO-20022 EndToEndId retry intercepted on SEPA Instant gateway"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Reintento automático tras timeout de red al dispersar un Split Payment de tarjeta hacia varios sub-comercios.",
+        "propagationPath": "Orden pacs.008 enviada -> Timeout de lectura -> Reintento sin lock de EndToEndId -> Riesgo de doble abono.",
+        "businessImpact": "Riesgo financiero crítico de duplicidad de pago saliente."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-global-payouts-engine",
+        "defectType": "MISSING_ATOMIC_ENDTOENDID_LOCK",
+        "explanation": "El registro de idempotencia no bloqueaba de forma atómica el EndToEndId durante el estado IN_FLIGHT."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent",
+        "steps": [
+          "1. Activar enforce_iso20022_endtoendid_lock=True con TTL de 86400s en Redis.",
+          "2. Devolver el recibo original sin duplicar el envío SEPA Instant y certificar GTN-TC-024."
+        ],
+        "configPatch": { "enforce_iso20022_endtoendid_lock": true, "payout_idempotency_lock_ttl_sec": 86400 },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-024"],
+        "slaCriteria": "Garantía 100% Exactly-Once en pagos locales y globales.",
+        "mttrManual": "4h 10m",
+        "mttrAutonomous": "3.8s"
+      }
+    },
+    {
+      "playbookId": "RAG-PB-FX-017",
+      "title": "FX (Cambio de Divisas & DCC en Tarjetas): Ventana Garantizada de Rate-Lock en Tarjetas Internacionales",
+      "category": "GESTION_DINERO_FX_DIVISAS",
+      "severity": "HIGH",
+      "linkedIncidentId": "GTN-INC-FX-017",
+      "linkedDefectId": "GTN-BUG-217",
+      "telemetrySources": ["Dynatrace FX Pricer", "AWS CloudWatch", "Prometheus MCP"],
+      "keywords": ["fx", "cambio de divisas", "dcc", "dynamic currency conversion", "multidivisa", "usd", "gbp", "brl", "rate lock", "tipo de cambio"],
+      "symptomSignature": {
+        "cloudwatchLogPattern": "WARN [FX-DCC-Engine] FX_RATE_LOCK_EXPIRED during 3DS2/PIN entry on international card",
+        "prometheusMetric": "getnet_fx_dcc_quote_expiration_total > 0"
+      },
+      "behaviorModel": {
+        "triggerCondition": "Expiración del token de cotización de divisa (DCC) mientras el titular internacional introduce el PIN o completa 3D-Secure.",
+        "propagationPath": "Cotización USD->EUR mostrada -> Titular tarda 65s en autenticar -> TTL de 45s expira -> Rechazo FX_RATE_LOCK_EXPIRED.",
+        "businessImpact": "Pérdida de comisión DCC y rechazo de cobro a cliente internacional."
+      },
+      "rootCauseAnalysis": {
+        "component": "getnet-fx-dcc-pricer",
+        "defectType": "DCC_RATE_LOCK_TTL_SHORTER_THAN_SCA",
+        "explanation": "Ventana de bloqueo de tipo de cambio (45s) inferior al timeout de autenticación EMV/3DS2 (180s)."
+      },
+      "autonomousRemediation": {
+        "zeroTouchSupported": true,
+        "agentOwner": "Self-Healing-Patch-Agent + Observability-MCP-Agent",
+        "steps": [
+          "1. Ampliar dcc_rate_lock_window_sec=180s y activar failover de liquidez FX secundario.",
+          "2. Certificar cobro internacional DCC y liquidación en EUR con GTN-TC-025."
+        ],
+        "configPatch": { "dcc_rate_lock_window_sec": 180, "fx_secondary_liquidity_failover": true },
+        "targetRelease": "v2026.11.3-GETNET-FULL-ECOSYSTEM"
+      },
+      "verificationGate": {
+        "xrayTests": ["GTN-TC-025"],
+        "slaCriteria": "Tipo de cambio garantizado durante 180s y 0 rechazos FX_RATE_LOCK_EXPIRED.",
+        "mttrManual": "2h 40m",
+        "mttrAutonomous": "4.3s"
       }
     }
   ]
