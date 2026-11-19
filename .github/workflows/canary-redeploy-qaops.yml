@@ -60,4 +60,5 @@ jobs:
           echo "- **MCP Server**: \`getnet-github-actions-cicd-mcp\` (JSON-RPC 2.0)" >> $GITHUB_STEP_SUMMARY
           echo "- **Canary Strategy**: \`10% Canary Traffic -> 50% Validation -> 100% Production Promotion\`" >> $GITHUB_STEP_SUMMARY
           echo "- **RAG Knowledge Base**: \`17/17 Banking & TPV Playbooks Verified (TF-IDF + BM25)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backstage.io Software Catalog & Re-Fixed Code**: \`catalog-info.yaml\` · \`backstage/Dockerfile (node:24-bookworm-slim)\` · \`backstage/refixed-code/*.py\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Jira Xray Matrix**: \`25/25 Test Cases PASSED (GTN-TC-001 .. GTN-TC-025)\`" >> $GITHUB_STEP_SUMMARY

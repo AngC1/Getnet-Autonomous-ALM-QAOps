@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getnet · Backstage.io Software Catalog, Plantillas API & Código Re-Fixeado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gtn-red: #EC0000;
+      --gtn-red-dark: #B80000;
+      --bs-teal: #36BAA2;
+      --bs-navy: #0F172A;
+      --bg-page: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --text-main: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --green: #059669;
+      --green-bg: #ECFDF5;
+      --blue: #0284C7;
+      --blue-bg: #F0F9FF;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+      --purple: #6D28D9;
+      --purple-bg: #F5F3FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .topbar {
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      border-bottom: 3px solid var(--gtn-red);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      background: var(--gtn-red);
+      color: #fff;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 6px;
+      letter-spacing: 0.4px;
+      font-size: 13px;
+    }
+    .bs-badge {
+      background: rgba(54, 186, 162, 0.18);
+      color: #5EEAD4;
+      border: 1px solid rgba(54, 186, 162, 0.45);
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      text-decoration: none;
+      color: #F8FAFC;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.16); }
+    .nav-btn.primary {
+      background: var(--gtn-red);
+      border-color: var(--gtn-red);
+    }
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 28px 60px;
+    }
+    .hero-banner {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      color: #FFFFFF;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 22px;
+      border-left: 6px solid var(--bs-teal);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    }
+    .hero-banner h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .hero-banner p {
+      color: #CBD5E1;
+      font-size: 13.5px;
+      max-width: 880px;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.4px;
+    }
+    .kpi-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 4px 0;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 600;
+    }
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .pill-green { background: var(--green-bg); color: var(--green); border: 1px solid #A7F3D0; }
+    .pill-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid #BAE6FD; }
+    .pill-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid #DDD6FE; }
+    .pill-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid #FDE68A; }
+
+    .module-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .module-tab-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #CBD5E1;
+      background: #F8FAFC;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .module-tab-btn.active {
+      background: var(--gtn-red);
+      color: #FFFFFF;
+      border-color: var(--gtn-red);
+    }
+    .refix-meta-bar {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .code-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 1100px) {
+      .code-grid-3 { grid-template-columns: 1fr; }
+    }
+    .code-box {
+      background: #0F172A;
+      color: #F8FAFC;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+    .code-box-header {
+      background: #1E293B;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    pre.code-pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 14px;
+      overflow-x: auto;
+      max-height: 390px;
+      white-space: pre;
+      color: #E2E8F0;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #CBD5E1;
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .btn-action {
+      background: var(--gtn-red);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-action:hover { background: var(--gtn-red-dark); }
+    .btn-secondary {
+      background: #0F172A;
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    table.catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table.catalog-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #F1F5F9;
+      color: #334155;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #CBD5E1;
+    }
+    table.catalog-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #E2E8F0;
+      vertical-align: top;
+    }
+    a.ext-link {
+      color: #0284C7;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    a.ext-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">GETNET SPAIN</span>
+      <span class="bs-badge">BACKSTAGE.IO DEVELOPER PORTAL · DOCKER NODE 24</span>
+      <strong style="font-size: 14px;">Software Catalog, Scaffolder API Templates & Self-Healing Re-Fixed Code</strong>
+    </div>
+    <nav class="nav-links">
+      <a href="/alm-dashboard" class="nav-btn">← Volver al Cuadro de Mando ALM</a>
+      <a href="/servicios-para-clientes" class="nav-btn">Portal Tarjetas & TPV Getnet</a>
+      <a href="https://backstage.io/docs/deployment/docker" target="_blank" rel="noopener" class="nav-btn">Guía Docker Backstage.io ↗</a>
+      <a href="{{ data.githubRepoUrl }}" target="_blank" rel="noopener" class="nav-btn primary">Repositorio GitHub (Código Re-Fixeado) ↗</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero-banner">
+      <div>
+        <h1>Backstage.io Software Catalog, Plantillas de Componentes API & Código Re-Fixeado</h1>
+        <p>
+          Conectado con la imagen oficial de contenedor <strong>Backstage Developer Platform (<code>FROM node:24-bookworm-slim</code> · Puerto <code>7007</code>)</strong> según
+          <a href="https://backstage.io/docs/deployment/docker" target="_blank" rel="noopener" style="color:#5EEAD4;text-decoration:underline;">Building a Docker image | Backstage.io</a>.
+          Genera como plantilla los componentes API y sincroniza el <strong>código que se re-fixea (Self-Healing Hotfixes)</strong> tanto en el repositorio GitHub como en la imagen de Backstage.
+        </p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <span class="pill pill-green" id="bs-connection-pill">● MCP Server: {{ data.serverName }} ({{ data.status }})</span>
+        <span style="font-size:12px;color:#CBD5E1;font-family:'JetBrains Mono',monospace;">{{ data.dockerImageSpec.imageTag }}</span>
+      </div>
+    </section>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Componentes en Catálogo (kind: Component)</div>
+        <div class="kpi-val" id="kpi-components-count">{{ data.components|length }}</div>
+        <div class="kpi-sub">System: getnet-autonomous-alm-ecosystem</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Contratos OpenAPI 3.0 (kind: API)</div>
+        <div class="kpi-val">{{ data.apis|length }}</div>
+        <div class="kpi-sub">Tarjetas EMV 0420 · TPV Get Smart · Checkout FX</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Plantillas Scaffolder (kind: Template)</div>
+        <div class="kpi-val">{{ data.templates|length }}</div>
+        <div class="kpi-sub">Generador API + Self-Healing Re-Fix Patch</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Módulos Re-Fixeados en Repo & Backstage</div>
+        <div class="kpi-val">{{ data.refixedModules|length }}</div>
+        <div class="kpi-sub">Sincronizados en /backstage/refixed-code/*.py</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Imagen Docker Backstage</div>
+        <div class="kpi-val" style="font-size:17px;margin-top:8px;">node:24-bookworm-slim</div>
+        <div class="kpi-sub">Puerto 7007 · --no-node-snapshot</div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 1: VISOR DE CÓDIGO QUE SE RE-FIXEA (REPOSITORIO GITHUB + IMAGEN BACKSTAGE) -->
+    <section class="section-card" id="section-refixed-code-viewer">
+      <div class="section-header">
+        <div class="section-title">
+          <span>1. Visor de Código que se Re-Fixea (Sincronizado en Repositorio GitHub y en Imagen Backstage)</span>
+          <span class="pill pill-green">Visible en GitHub & Backstage Image</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a href="{{ data.refixedCodeFolderUrl }}" target="_blank" rel="noopener" class="ext-link">Ver carpeta backstage/refixed-code en GitHub ↗</a>
+          <button class="btn-action" id="btn-verify-refix" onclick="verifyActiveRefixModule()">⚡ Ejecutar & Verificar Código Re-Fixeado en Vivo</button>
+        </div>
+      </div>
+
+      <div class="module-tabs">
+        {% for mod in data.refixedModules %}
+        <button
+          type="button"
+          class="module-tab-btn {% if loop.first %}active{% endif %}"
+          id="tab-btn-{{ mod.id }}"
+          onclick="selectRefixedModule('{{ mod.id }}')"
+        >
+          {{ mod.title }}
+        </button>
+        {% endfor %}
+      </div>
+
+      {% for mod in data.refixedModules %}
+      <div class="refix-module-panel" id="panel-{{ mod.id }}" style="{% if not loop.first %}display:none;{% endif %}">
+        <div class="refix-meta-bar">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;">Entidad Backstage & Incidencia</div>
+            <div style="font-weight:800;color:#0F172A;margin-top:2px;"><code>{{ mod.backstageEntityRef }}</code> · <span class="pill pill-purple">{{ mod.incidentId }}</span></div>
+            <div style="font-size:12px;color:#334155;margin-top:4px;">{{ mod.summary }}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;">Ubicación Dual (Repositorio GitHub + Imagen Docker Backstage)</div>
+            <div style="margin-top:4px;font-size:12.5px;">
+              📦 <strong>GitHub Repo:</strong> <a href="{{ mod.repoBlobUrl }}" target="_blank" rel="noopener" class="ext-link">{{ mod.filePath }} ↗</a>
+            </div>
+            <div style="margin-top:4px;font-size:12.5px;">
+              🐳 <strong>Backstage Image (<code>:7007</code>):</strong> <code>{{ mod.backstageDockerPath }}</code>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;">Telemetría Antes vs Después del Re-Fix</div>
+            <div style="margin-top:4px;font-size:12.5px;">
+              ⏱️ <strong>Latencia P95:</strong> <span style="color:#DC2626;text-decoration:line-through;">{{ mod.metricsComparison.beforeP95Ms }} ms</span> → <strong style="color:#059669;">{{ mod.metricsComparison.afterP95Ms }} ms</strong>
+            </div>
+            <div style="margin-top:4px;font-size:12.5px;">
+              🛡️ <strong>Tasa Error / Apdex:</strong> <span style="color:#DC2626;">{{ mod.metricsComparison.beforeErrorRatePct }}%</span> → <strong style="color:#059669;">{{ mod.metricsComparison.afterErrorRatePct }}% (Apdex {{ mod.metricsComparison.apdexAfter }})</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-grid-3">
+          <div class="code-box">
+            <div class="code-box-header">
+              <span style="color:#FCA5A5;">❌ ANTES DEL RE-FIX (Código con Degradación en PRO) + GIT DIFF UNIFICADO</span>
+              <span class="pill pill-amber">Diff Automático Self-Healing</span>
+            </div>
+            <pre class="code-pre">{{ mod.beforeCode }}
+--------------------------------------------------------------------------------
+{{ mod.gitDiff }}</pre>
+          </div>
+
+          <div class="code-box">
+            <div class="code-box-header">
+              <span style="color:#6EE7B7;">✅ CÓDIGO RE-FIXEADO EN REPOSITORIO Y BACKSTAGE ({{ mod.filePath }})</span>
+              <a href="{{ mod.repoBlobUrl }}" target="_blank" rel="noopener" style="color:#38BDF8;text-decoration:none;font-size:11.5px;">Abrir en GitHub ↗</a>
+            </div>
+            <pre class="code-pre" id="after-code-{{ mod.id }}">{{ mod.afterCode }}</pre>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <div id="refix-live-output" style="display:none;background:#ECFDF5;border:1px solid #10B981;border-radius:8px;padding:12px 16px;font-size:13px;color:#065F46;margin-top:10px;"></div>
+    </section>
+
+    <!-- SECCIÓN 2: GENERADOR DE PLANTILLAS DE SOFTWARE BACKSTAGE (SCAFFOLDER: COMPONENTES API Y CÓDIGO) -->
+    <section class="section-card" id="section-backstage-scaffolder">
+      <div class="section-header">
+        <div class="section-title">
+          <span>2. Plantillas de Software Backstage (<code>kind: Template</code>) — Generador de Componentes API y Código Re-Fixeado</span>
+          <span class="pill pill-blue">Backstage Scaffolder v1beta3</span>
+        </div>
+        <a href="{{ data.githubRepoUrl }}/tree/main/backstage/templates" target="_blank" rel="noopener" class="ext-link">Ver YAML de Plantillas en GitHub ↗</a>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="scaffold-template-select">Plantilla Backstage (`kind: Template`)</label>
+          <select id="scaffold-template-select">
+            {% for tpl in data.templates %}
+            <option value="{{ tpl.name }}">{{ tpl.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="scaffold-component-id">Identificador del Componente (`component_id`)</label>
+          <input type="text" id="scaffold-component-id" value="getnet-tap-on-phone-softpos-api" />
+        </div>
+        <div class="form-group">
+          <label for="scaffold-domain">Dominio de Producto Getnet</label>
+          <select id="scaffold-domain">
+            <option value="tpv-inperson-smartpos">Pagos en Persona TPV (Get Smart / Tap on Phone / Automatic / Central)</option>
+            <option value="tarjetas-bancarias-atm">Tarjetas Bancarias & Reverso EMV ISO-8583 0420</option>
+            <option value="pagos-online-checkout">Pagos Online (Get Checkout 3DS2 / Link & Pay / Social Selling)</option>
+            <option value="gestion-dinero-fx">Gestión del Dinero (Cuentas / SEPA Instant / FX Multi-Divisa)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="scaffold-endpoint">Ruta del Endpoint OpenAPI 3.0</label>
+          <input type="text" id="scaffold-endpoint" value="/api/v1/tpv/softpos-attestation" />
+        </div>
+        <div class="form-group">
+          <label for="scaffold-ttl">Redis Lock TTL Auto-Remediado (ms)</label>
+          <input type="number" id="scaffold-ttl" value="3000" />
+        </div>
+        <div class="form-group">
+          <label for="scaffold-cb">Circuit Breaker Timeout (ms)</label>
+          <input type="number" id="scaffold-cb" value="1800" />
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;">
+        <button type="button" class="btn-action" id="btn-run-scaffolder" onclick="runBackstageScaffolder()">
+          🚀 Generar Componente API + Código desde Plantilla Backstage
+        </button>
+        <span style="font-size:12.5px;color:#475569;">
+          Genera el código Python en <code>backstage/scaffolded-components/</code> y registra la entidad <code>kind: Component</code> y <code>kind: API</code> en Backstage.
+        </span>
+      </div>
+
+      <div id="scaffolder-output-container" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="code-box">
+          <div class="code-box-header">
+            <span>📄 Código Python Generado por Plantilla Backstage (<code>backstage/scaffolded-components/</code>)</span>
+            <span class="pill pill-green" id="scaffold-status-pill">PLANTILLA LISTA</span>
+          </div>
+          <pre class="code-pre" id="scaffold-generated-code">{% if data.scaffoldedComponents %}{{ data.scaffoldedComponents[0].code }}{% endif %}</pre>
+        </div>
+        <div class="code-box">
+          <div class="code-box-header">
+            <span>🗂️ Descriptor de Entidad Generado (<code>catalog-info.yaml</code> · <code>kind: Component</code>)</span>
+            <a href="{{ data.catalogDescriptorUrl }}" target="_blank" rel="noopener" style="color:#38BDF8;text-decoration:none;font-size:11.5px;">Ver catalog-info.yaml ↗</a>
+          </div>
+          <pre class="code-pre" id="scaffold-generated-yaml">{{ data.catalogYamlRaw }}</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: CATÁLOGO DE COMPONENTES Y CONTRATOS OPENAPI EN BACKSTAGE -->
+    <section class="section-card" id="section-backstage-catalog-table">
+      <div class="section-header">
+        <div class="section-title">
+          <span>3. Software Catalog de Backstage.io — Componentes (<code>kind: Component</code>) y Contratos API (<code>kind: API</code>)</span>
+          <span class="pill pill-purple">catalog-info.yaml</span>
+        </div>
+        <a href="{{ data.catalogDescriptorUrl }}" target="_blank" rel="noopener" class="ext-link">Abrir catalog-info.yaml en GitHub ↗</a>
+      </div>
+
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th>Entidad Backstage</th>
+            <th>Tipo / Lifecycle</th>
+            <th>APIs Provistas (<code>kind: API</code>)</th>
+            <th>Incidencia / Playbook RAG</th>
+            <th>Código Re-Fixeado (Repo GitHub & Backstage)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for comp in data.components %}
+          <tr>
+            <td>
+              <strong>{{ comp.name }}</strong>
+              <div style="font-size:11.5px;color:#64748B;font-family:'JetBrains Mono',monospace;">{{ comp.entityRef }}</div>
+              <div style="font-size:12px;color:#334155;margin-top:3px;">{{ comp.description }}</div>
+            </td>
+            <td>
+              <span class="pill pill-blue">{{ comp.type }}</span>
+              <span class="pill pill-green">{{ comp.lifecycle }}</span>
+            </td>
+            <td>
+              {% for api_name in comp.providesApis %}
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0F172A;">• api:default/{{ api_name }}</div>
+              {% endfor %}
+            </td>
+            <td>
+              <span class="pill pill-purple">{{ comp.incidentId }}</span>
+              <div style="font-size:11.5px;color:#475569;margin-top:4px;">Playbook: <code>{{ comp.playbookId }}</code></div>
+            </td>
+            <td>
+              <a href="{{ comp.repoBlobUrl }}" target="_blank" rel="noopener" class="ext-link">{{ comp.refixedCodePath }} ↗</a>
+              <div style="font-size:11.5px;color:#059669;margin-top:3px;">✔ Sincronizado en contenedor Backstage</div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECCIÓN 4: IMAGEN DOCKER OFICIAL DE BACKSTAGE (NODE 24 BOOKWORM SLIM) -->
+    <section class="section-card" id="section-backstage-docker">
+      <div class="section-header">
+        <div class="section-title">
+          <span>4. Imagen Docker de Backstage.io (<code>backstage/Dockerfile</code> · <code>node:24-bookworm-slim</code>)</span>
+          <span class="pill pill-green">Cumple Guía Oficial Backstage Docker</span>
+        </div>
+        <div style="display:flex;gap:14px;">
+          <a href="https://backstage.io/docs/deployment/docker" target="_blank" rel="noopener" class="ext-link">Documentación Oficial Backstage Docker ↗</a>
+          <a href="{{ data.dockerFileRepoUrl }}" target="_blank" rel="noopener" class="ext-link">Ver backstage/Dockerfile en GitHub ↗</a>
+        </div>
+      </div>
+
+      <div class="code-grid-3">
+        <div class="code-box">
+          <div class="code-box-header">
+            <span>🐳 <code>backstage/Dockerfile</code> (Node 24 Bookworm Slim · Puerto 7007)</span>
+            <span class="pill pill-blue">{{ data.dockerImageSpec.baseImage }}</span>
+          </div>
+          <pre class="code-pre">{{ data.dockerImageSpec.dockerfileContent }}</pre>
+        </div>
+        <div class="code-box">
+          <div class="code-box-header">
+            <span>📜 Contrato OpenAPI 3.0 en Backstage (<code>backstage/apis/openapi-getnet-tarjetas-tpv.yaml</code>)</span>
+            <span class="pill pill-purple">kind: API (openapi)</span>
+          </div>
+          <pre class="code-pre">{{ data.openApiYamlRaw }}</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let activeRefixModuleId = "card_lock_engine_refixed";
+
+    function selectRefixedModule(modId) {
+      activeRefixModuleId = modId;
+      document.querySelectorAll('.refix-module-panel').forEach(el => {
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('.module-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const targetPanel = document.getElementById('panel-' + modId);
+      if (targetPanel) targetPanel.style.display = 'block';
+      const targetBtn = document.getElementById('tab-btn-' + modId);
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    async function verifyActiveRefixModule() {
+      const out = document.getElementById('refix-live-output');
+      out.style.display = 'block';
+      out.innerHTML = '⏳ Ejecutando y verificando módulo re-fixeado en Backstage y Repositorio...';
+      try {
+        const res = await fetch('/api/v1/backstage/refix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ module_key: activeRefixModuleId })
+        });
+        const data = await res.json();
+        out.innerHTML = `<strong>✔ Código Re-Fixeado Verificado (${data.status}):</strong> Entidad <code>${data.visibility.backstageEntityRef}</code> · Función <code>${data.liveVerification.function}</code> → Estado: <strong>${data.liveVerification.status}</strong> (Latencia P95: <strong>${data.liveVerification.latency_p95_ms} ms</strong>) · Sincronizado en <a href="${data.visibility.githubRepositoryUrl}" target="_blank" class="ext-link">GitHub Repo ↗</a> y en <code>${data.visibility.backstageContainerPath}</code>.`;
+      } catch (e) {
+        out.innerHTML = 'Error al verificar el módulo re-fixeado: ' + e;
+      }
+    }
+
+    async function runBackstageScaffolder() {
+      const payload = {
+        template_name: document.getElementById('scaffold-template-select').value,
+        component_id: document.getElementById('scaffold-component-id').value,
+        product_domain: document.getElementById('scaffold-domain').value,
+        api_endpoint_path: document.getElementById('scaffold-endpoint').value,
+        redis_lock_ttl_ms: parseInt(document.getElementById('scaffold-ttl').value || '3000', 10),
+        circuit_breaker_timeout_ms: parseInt(document.getElementById('scaffold-cb').value || '1800', 10)
+      };
+      const pill = document.getElementById('scaffold-status-pill');
+      pill.textContent = 'EJECUTANDO PLANTILLA...';
+      try {
+        const res = await fetch('/api/v1/backstage/scaffold', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById('scaffold-generated-code').textContent = data.generatedCode;
+        document.getElementById('scaffold-generated-yaml').textContent = data.catalogDescriptorSnippet;
+        pill.textContent = 'SCAFFOLDED: ' + data.componentEntityRef;
+      } catch (e) {
+        pill.textContent = 'ERROR SCAFFOLDER';
+      }
+    }
+  </script>
+</body>
+</html>

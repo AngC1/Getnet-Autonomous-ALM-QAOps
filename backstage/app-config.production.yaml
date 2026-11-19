@@ -1,0 +1,17 @@
+app:
+  baseUrl: http://127.0.0.1:7007
+
+backend:
+  baseUrl: http://127.0.0.1:7007
+  listen:
+    port: 7007
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+
+catalog:
+  locations:
+    - type: url
+      target: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/blob/main/catalog-info.yaml
+      rules:
+        - allow: [System, Component, API, Location, Template]

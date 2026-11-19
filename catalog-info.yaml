@@ -1,0 +1,217 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: getnet-autonomous-alm-ecosystem
+  title: "Getnet España (Grupo Santander) — Ecosistema de Tarjetas EMV, Red ATM, TPV y Autonomous ALM"
+  description: "Plataforma de Pagos para Empresas, Tarjetas Bancarias EMV, Cajeros Getnet ATM y Terminales TPV con Auto-Remediación Zero Human-in-the-Loop."
+  annotations:
+    github.com/project-slug: AngC1/Getnet-Autonomous-ALM-QAOps
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - getnet
+    - santander
+    - pci-dss-4-0
+    - iso-8583
+    - autonomous-alm
+    - node-24
+spec:
+  owner: group:getnet-qaops-architecture
+  domain: payments-and-banking-cards
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: getnet-card-blocker-svc
+  title: "Getnet Card Blocker & EMV Reversal Service"
+  description: "Microservicio core de bloqueo preventivo de tarjetas bancarias, reverso automático ISO-8583 MTI 0420 y mutex distribuido Redis con Circuit Breaker."
+  annotations:
+    github.com/project-slug: AngC1/Getnet-Autonomous-ALM-QAOps
+    github.com/workflows: canary-redeploy-qaops.yml
+    dynatrace.com/monitored-entity: SERVICE-GETNET-CARD-BLOCKER
+    aws.amazon.com/cloudwatch-log-group: /aws/ecs/getnet-card-blocker-svc
+    getnet.io/refixed-code-path: backstage/refixed-code/card_lock_engine_refixed.py
+  tags:
+    - python
+    - iso-8583
+    - redis
+    - pci-dss
+    - refixed-in-pro
+  links:
+    - url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/blob/main/backstage/refixed-code/card_lock_engine_refixed.py
+      title: "Código Re-Fixeado en Repositorio (card_lock_engine_refixed.py)"
+      icon: code
+    - url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions
+      title: "GitHub Actions Canary Release (Node 24)"
+      icon: github
+spec:
+  type: service
+  lifecycle: production
+  owner: group:getnet-core-cards
+  system: getnet-autonomous-alm-ecosystem
+  providesApis:
+    - getnet-tarjetas-emv-iso8583-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: getnet-atm-sentinel-edge
+  title: "Getnet ATM Sentinel Vision & PCI-DSS Redaction Engine"
+  description: "Motor funcional de cajeros ATM (Getnet_ATM) con detección de retención mecánica de tarjetas (CARD_TRAPPING) y truncado determinista de PAN (redact_pan)."
+  annotations:
+    github.com/project-slug: AngC1/Getnet-Autonomous-ALM-QAOps
+    getnet.io/refixed-code-path: backstage/refixed-code/card_lock_engine_refixed.py
+  tags:
+    - getnet-atm
+    - pci-dss-redact-pan
+    - bedrock-sonnet
+    - vision-edge
+spec:
+  type: service
+  lifecycle: production
+  owner: group:getnet-atm-security
+  system: getnet-autonomous-alm-ecosystem
+  providesApis:
+    - getnet-tarjetas-emv-iso8583-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: getnet-tpv-smartpos-gateway
+  title: "Getnet TPV Presencial Gateway (Get Smart · Tap on Phone · Automatic · Central)"
+  description: "Pasarela de terminales TPV presenciales de Getnet España con inyección de incidencias en vivo, telemetría EMV/NFC y parches OTA auto-remediados."
+  annotations:
+    github.com/project-slug: AngC1/Getnet-Autonomous-ALM-QAOps
+    getnet.io/refixed-code-path: backstage/refixed-code/tpv_firmware_gateway_refixed.py
+  tags:
+    - tpv
+    - get-smart
+    - tap-on-phone
+    - get-automatic
+    - get-central
+    - refixed-in-pro
+  links:
+    - url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/blob/main/backstage/refixed-code/tpv_firmware_gateway_refixed.py
+      title: "Código Re-Fixeado TPV en Repositorio (tpv_firmware_gateway_refixed.py)"
+      icon: code
+spec:
+  type: service
+  lifecycle: production
+  owner: group:getnet-pos-terminals
+  system: getnet-autonomous-alm-ecosystem
+  providesApis:
+    - getnet-tpv-and-products-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: getnet-ecommerce-checkout-fx
+  title: "Getnet Pagos Online & Gestión del Dinero (Checkout · Link & Pay · Social · Cuentas T+0 · FX)"
+  description: "Motor de pagos online 3DS 2.2, enlaces HMAC-SHA256, webhooks Social Selling, liquidación bancaria T+0 (ROUND_HALF_EVEN) y bloqueo de divisa FX DCC."
+  annotations:
+    github.com/project-slug: AngC1/Getnet-Autonomous-ALM-QAOps
+    getnet.io/refixed-code-path: backstage/refixed-code/online_checkout_fx_refixed.py
+  tags:
+    - ecommerce
+    - get-checkout
+    - link-and-pay
+    - social-selling
+    - fx-dcc
+    - refixed-in-pro
+  links:
+    - url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/blob/main/backstage/refixed-code/online_checkout_fx_refixed.py
+      title: "Código Re-Fixeado Online/FX en Repositorio (online_checkout_fx_refixed.py)"
+      icon: code
+spec:
+  type: service
+  lifecycle: production
+  owner: group:getnet-digital-commerce
+  system: getnet-autonomous-alm-ecosystem
+  providesApis:
+    - getnet-tpv-and-products-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: getnet-autonomous-alm-orchestrator
+  title: "Getnet Autonomous Production ALM & MCP Server Hub"
+  description: "Orquestador de 5 Agentes IA, Máquina de 8 Estados, Base RAG (17 Playbooks) y Conectores MCP (Dynatrace, CloudWatch, Prometheus, Getnet ATM, GitHub Actions CI/CD y Backstage)."
+  annotations:
+    github.com/project-slug: AngC1/Getnet-Autonomous-ALM-QAOps
+    github.com/workflows: canary-redeploy-qaops.yml,ayesa-qaops-pipeline.yml
+  tags:
+    - mcp-server
+    - rag-engine
+    - jira-xray
+    - zero-human-in-the-loop
+spec:
+  type: service
+  lifecycle: production
+  owner: group:getnet-qaops-architecture
+  system: getnet-autonomous-alm-ecosystem
+  providesApis:
+    - getnet-autonomous-alm-mcp-cicd-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: getnet-tarjetas-emv-iso8583-api
+  title: "Getnet Tarjetas Bancarias EMV, Autorizaciones ISO-8583 & Bloqueo ATM API"
+  description: "Contrato OpenAPI 3.0 para consulta de parque de tarjetas, autorizaciones MTI 0100/0110, disputas/chargebacks y bloqueo preventivo en cajeros ATM con reverso MTI 0420."
+  tags:
+    - openapi
+    - iso-8583
+    - pci-dss
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:getnet-core-cards
+  system: getnet-autonomous-alm-ecosystem
+  definition:
+    $text: ./backstage/apis/openapi-getnet-tarjetas-tpv.yaml
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: getnet-tpv-and-products-api
+  title: "Getnet TPV Presencial, Pagos Online & Harness/Context/Loop/Prompt Engineering API"
+  description: "API REST para inyección de incidencias TPV, simulación de cobro con tarjeta EMV/NFC y auto-remediación de los 11 productos oficiales de Getnet España."
+  tags:
+    - openapi
+    - tpv
+    - harness-engineering
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:getnet-pos-terminals
+  system: getnet-autonomous-alm-ecosystem
+  definition:
+    $text: ./backstage/apis/openapi-getnet-tarjetas-tpv.yaml
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: getnet-autonomous-alm-mcp-cicd-api
+  title: "Getnet Autonomous ALM, Motor RAG, MCP Connectors & Backstage Scaffolder API"
+  description: "API de observabilidad híbrida (Dynatrace, CloudWatch, Prometheus), Motor RAG, Re-Deploy Canary en GitHub Actions (Node 24) y generación de plantillas Backstage."
+  tags:
+    - openapi
+    - mcp
+    - github-actions
+    - backstage
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:getnet-qaops-architecture
+  system: getnet-autonomous-alm-ecosystem
+  definition:
+    $text: ./backstage/apis/openapi-getnet-tarjetas-tpv.yaml
+---
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: getnet-scaffolder-templates-location
+  description: "Plantillas Software Scaffolder de Backstage.io para generar Componentes API, Microservicios de Pagos y Parches de Código Re-Fixeado en Getnet."
+spec:
+  targets:
+    - ./backstage/templates/getnet-api-component-template/template.yaml
+    - ./backstage/templates/getnet-refix-hotfix-template/template.yaml

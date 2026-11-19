@@ -1,0 +1,40 @@
+app:
+  title: Getnet España (Grupo Santander) — Backstage Software Catalog & Developer Platform
+  baseUrl: http://127.0.0.1:7007
+
+organization:
+  name: PagoNxt Merchant Solutions, S.L. (Getnet Europe · Grupo Santander)
+
+backend:
+  baseUrl: http://127.0.0.1:7007
+  listen:
+    port: 7007
+  cors:
+    origin: http://127.0.0.1:8080
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location, Template, Group, Domain]
+  locations:
+    - type: file
+      target: ../catalog-info.yaml
+      rules:
+        - allow: [System, Component, API, Location]
+    - type: file
+      target: ./templates/getnet-api-component-template/template.yaml
+      rules:
+        - allow: [Template]
+    - type: file
+      target: ./templates/getnet-refix-hotfix-template/template.yaml
+      rules:
+        - allow: [Template]

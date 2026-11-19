@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  getnet-backstage-portal:
+    build:
+      context: .
+      dockerfile: backstage/Dockerfile
+    image: ghcr.io/angc1/getnet-backstage-catalog:v2026.11-node24
+    container_name: getnet-backstage-developer-portal
+    ports:
+      - "7007:7007"
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: "--no-node-snapshot"
+      GITHUB_REPO_URL: "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps"
+      GETNET_ALM_BACKEND_URL: "http://host.docker.internal:8080"
+    restart: unless-stopped

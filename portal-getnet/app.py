@@ -51,6 +51,11 @@ from getnet_products_engineering import (  # noqa: E402
     simulate_and_heal_product_incident,
     trigger_github_actions_canary_redeploy,
 )
+from backstage_integration import (  # noqa: E402
+    apply_and_view_refixed_code,
+    get_backstage_portal_data,
+    scaffold_from_backstage_template,
+)
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 RAG_ENGINE = IncidentRAGEngine()
@@ -130,6 +135,19 @@ MCP_CONNECTIONS_STATE: Dict[str, Dict[str, Any]] = {
         "canaryStrategy": "Canary 10% -> 50% -> 100% (Zero-Touch Auto-Promotion)",
         "status": "CONNECTED",
         "latencyMs": 24,
+        "lastSync": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+    },
+    "backstage": {
+        "provider": "Backstage.io Software Catalog, API Scaffolder & Re-Fixed Code Docker MCP",
+        "serverName": "getnet-backstage-catalog-mcp",
+        "transport": "JSON-RPC 2.0 over stdio / Backstage Catalog API (:7007)",
+        "dockerBaseImage": "node:24-bookworm-slim",
+        "dockerDocsUrl": "https://backstage.io/docs/deployment/docker",
+        "endpointUrl": "http://127.0.0.1:8080/backstage",
+        "catalogFile": "catalog-info.yaml",
+        "refixedCodeRepoUrl": "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/tree/main/backstage/refixed-code",
+        "status": "CONNECTED",
+        "latencyMs": 15,
         "lastSync": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     },
 }
@@ -1018,6 +1036,7 @@ def servicios_para_clientes_view():
         getnet_products=get_all_products_engineering(),
         tpv_state=get_tpv_live_state(),
         cicd_harness=get_cicd_canary_harness_state(),
+        backstage_data=get_backstage_portal_data(),
     )
 
 
@@ -1040,6 +1059,15 @@ def alm_dashboard_view():
         getnet_products=get_all_products_engineering(),
         tpv_state=get_tpv_live_state(),
         cicd_harness=get_cicd_canary_harness_state(),
+        backstage_data=get_backstage_portal_data(),
+    )
+
+
+@app.route("/backstage")
+def backstage_portal_view():
+    return render_template(
+        "backstage_portal.html",
+        data=get_backstage_portal_data(),
     )
 
 
@@ -1705,6 +1733,15 @@ def api_mcp_connect_and_test():
             target_scope="ALL (Core Tarjetas + ATM + 11 Productos Getnet)",
             triggered_by="MCP Modal Handshake (getnet-github-actions-cicd-mcp)",
         )
+    elif provider in ("backstage", "backstage_catalog"):
+        provider = "backstage"
+        tool_name = "backstage_sync_catalog_and_refixed_code"
+        tool_args = {
+            "catalog_descriptor": "catalog-info.yaml",
+            "docker_base_image": "node:24-bookworm-slim",
+            "query": custom_query or "kind:Component,API,Template + backstage/refixed-code/*.py",
+        }
+        result_payload = get_backstage_portal_data()
     else:
         tool_name = "getnet_atm_inspect_incident"
         tool_args = {"atm_id": "ATM-GTN-MAD-0042"}
@@ -2330,6 +2367,31 @@ def api_tpv_charge():
     terminal_id = str(data.get("terminalId", "")).strip()
     resp, code = process_tpv_payment(product_id, pan, amount_eur, terminal_id)
     return jsonify(resp), code
+
+
+@app.route("/api/v1/backstage/catalog", methods=["GET"])
+def api_backstage_catalog():
+    """Devuelve el Software Catalog de Backstage.io, Contratos API OpenAPI, Plantillas Scaffolder, Dockerfile Node 24 y Código Re-Fixeado."""
+    return jsonify({"ok": True, **get_backstage_portal_data()})
+
+
+@app.route("/api/v1/backstage/scaffold", methods=["POST"])
+def api_backstage_scaffold():
+    """Ejecuta una Plantilla de Software de Backstage (kind: Template) generando el Componente API y su código Python auto-remediado."""
+    payload = request.get_json(silent=True) or {}
+    res = scaffold_from_backstage_template(payload)
+    MCP_CONNECTIONS_STATE["backstage"]["lastSync"] = res["timestamp"]
+    return jsonify({"ok": True, **res})
+
+
+@app.route("/api/v1/backstage/refix", methods=["POST"])
+def api_backstage_refix():
+    """Verifica y sincroniza un módulo de código re-fixeado tanto en el repositorio GitHub como en la imagen Docker de Backstage."""
+    payload = request.get_json(silent=True) or {}
+    module_key = str(payload.get("module_key") or "card_lock_engine_refixed").strip()
+    res = apply_and_view_refixed_code(module_key)
+    MCP_CONNECTIONS_STATE["backstage"]["lastSync"] = res["timestamp"]
+    return jsonify({"ok": True, **res})
 
 
 @app.route("/api/v1/alm/export/<fmt>", methods=["GET"])

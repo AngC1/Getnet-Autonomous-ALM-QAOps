@@ -393,4 +393,55 @@ def test_tc016_panel_inyeccion_incidencias_tpv_y_autofix(driver, base_url):
     gha_card = driver.find_element("id", "card-mcp-github-actions")
     assert gha_card.is_displayed()
 
+    # 7. Verificar integración con imagen Docker Backstage.io (node:24-bookworm-slim), Plantillas API y Código Re-Fixeado
+    bs_section = driver.find_element("id", "section-backstage-portal")
+    assert bs_section.is_displayed()
+    bs_card = driver.find_element("id", "card-mcp-backstage")
+    assert bs_card.is_displayed()
+
+    bs_cat_res = requests.get(f"{base_url}/api/v1/backstage/catalog", timeout=5)
+    assert bs_cat_res.status_code == 200
+    bs_cat = bs_cat_res.json()
+    assert bs_cat["ok"] is True
+    assert bs_cat["dockerImageSpec"]["baseImage"] == "node:24-bookworm-slim"
+    assert len(bs_cat["components"]) == 5
+    assert len(bs_cat["apis"]) == 3
+    assert len(bs_cat["templates"]) == 2
+    assert len(bs_cat["refixedModules"]) == 3
+
+    bs_scaf_res = requests.post(
+        f"{base_url}/api/v1/backstage/scaffold",
+        json={
+            "template_name": "template-getnet-payment-api-component",
+            "component_id": "getnet-tap-on-phone-softpos-api",
+            "product_domain": "tpv-inperson-smartpos",
+            "api_endpoint_path": "/api/v1/tpv/softpos-attestation",
+            "redis_lock_ttl_ms": 3000,
+            "circuit_breaker_timeout_ms": 1800,
+        },
+        timeout=5,
+    )
+    assert bs_scaf_res.status_code == 200
+    bs_scaf = bs_scaf_res.json()
+    assert bs_scaf["ok"] is True
+    assert bs_scaf["status"] == "SCAFFOLDED"
+
+    bs_refix_res = requests.post(
+        f"{base_url}/api/v1/backstage/refix",
+        json={"module_key": "card_lock_engine_refixed"},
+        timeout=5,
+    )
+    assert bs_refix_res.status_code == 200
+    bs_refix = bs_refix_res.json()
+    assert bs_refix["ok"] is True
+    assert bs_refix["status"] == "REFIXED_AND_SYNCED"
+    assert "backstage/refixed-code/card_lock_engine_refixed.py" in bs_refix["visibility"]["githubRepositoryUrl"]
+
+    driver.get(f"{base_url}/backstage")
+    refix_viewer = driver.find_element("id", "section-refixed-code-viewer")
+    assert refix_viewer.is_displayed()
+    scaffolder_sec = driver.find_element("id", "section-backstage-scaffolder")
+    assert scaffolder_sec.is_displayed()
+
+
 

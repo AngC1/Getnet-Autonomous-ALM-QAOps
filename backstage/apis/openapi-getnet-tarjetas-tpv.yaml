@@ -1,0 +1,88 @@
+openapi: 3.0.3
+info:
+  title: Getnet España (Grupo Santander) — Tarjetas Bancarias EMV, Red ATM, TPV & Autonomous ALM API
+  version: "2026.11.3"
+  description: |
+    Especificación OpenAPI 3.0 registrada en el Software Catalog de **Backstage.io** (`getnet-tarjetas-emv-iso8583-api`, `getnet-tpv-and-products-api`, `getnet-autonomous-alm-mcp-cicd-api`).
+    Incluye los endpoints de operativa de tarjetas, terminales TPV, Motor RAG, Conectores MCP, Canary Re-Deploy en GitHub Actions (Node 24) y Código Re-Fixeado.
+  contact:
+    name: Getnet QAOps & Autonomous ALM Architecture (Ayesa Digital)
+    url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps
+servers:
+  - url: http://127.0.0.1:8080
+    description: Servidor Local Getnet Autonomous ALM & Portal Operativo
+paths:
+  /api/v1/tarjetas/parque:
+    get:
+      summary: Consulta el parque de tarjetas bancarias EMV y red de cajeros ATM 24h
+      tags: [Tarjetas Bancarias EMV]
+      parameters:
+        - name: provincia
+          in: query
+          schema: { type: string }
+        - name: tipoTarjeta
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Lista de nodos emisores y tarjetas activas
+  /api/v1/tarjetas/autorizaciones:
+    post:
+      summary: Solicita autorización online ISO-8583 (MTI 0100/0110) con validación de PAN y antifraude
+      tags: [Tarjetas Bancarias EMV]
+      responses:
+        "201":
+          description: Autorización concedida o derivada a revisión de riesgos
+  /api/v1/tarjetas/bloqueo:
+    post:
+      summary: Procesa bloqueo preventivo de tarjeta en cajero ATM (Getnet_ATM + redact_pan + Reverso MTI 0420)
+      tags: [Getnet ATM & PCI-DSS]
+      responses:
+        "201":
+          description: Bloqueo preventivo completado con reverso EMV 0420 y token digital
+        "409":
+          description: Retención funcional de tarjeta sin reverso (Incidencia GTN-INC-ATM-001)
+  /api/v1/tpv/inject-incident:
+    post:
+      summary: Inyecta una incidencia de producción en una TPV de Getnet (Get Smart, Tap on Phone, Automatic, Central)
+      tags: [TPV Presencial Getnet]
+      responses:
+        "200":
+          description: Incidencia inyectada en vivo sobre la terminal TPV
+  /api/v1/tpv/charge:
+    post:
+      summary: Ejecuta un cobro con tarjeta EMV/Contactless en TPV (HTTP 409 si hay incidencia activa, HTTP 200 si está operativa)
+      tags: [TPV Presencial Getnet]
+      responses:
+        "200":
+          description: Cobro aprobado y conciliado con PAN enmascarado
+        "409":
+          description: Cobro rechazado por incidencia activa en TPV
+  /api/v1/cicd/canary-redeploy:
+    post:
+      summary: Dispara el workflow Canary Release (10% -> 50% -> 100%) vía MCP Server de GitHub Actions (Node 24)
+      tags: [CI/CD GitHub Actions MCP]
+      responses:
+        "200":
+          description: Canary Release promocionado al 100% y certificado en Jira Xray
+  /api/v1/backstage/catalog:
+    get:
+      summary: Devuelve el catálogo completo de Backstage.io (Components, APIs, Templates, Docker Image y Código Re-Fixeado)
+      tags: [Backstage.io Developer Portal]
+      responses:
+        "200":
+          description: Estado del Software Catalog de Backstage y registro de código Re-Fixeado
+  /api/v1/backstage/scaffold:
+    post:
+      summary: Genera desde plantilla Backstage Scaffolder un nuevo Componente API + Código + Pipeline CI/CD Node 24
+      tags: [Backstage.io Developer Portal]
+      responses:
+        "201":
+          description: Componente y código generados y registrados en el repositorio y en Backstage
+  /api/v1/backstage/refix:
+    post:
+      summary: Ejecuta y sincroniza el código Re-Fixeado (Self-Healing Hotfix Diff) entre el repositorio GitHub y la imagen Backstage
+      tags: [Backstage.io Developer Portal]
+      responses:
+        "200":
+          description: Código Re-Fixeado actualizado y disponible en el repositorio y en Backstage

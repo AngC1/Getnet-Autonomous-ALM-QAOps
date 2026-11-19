@@ -1,0 +1,90 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: template-getnet-payment-api-component
+  title: "Plantilla Getnet: Microservicio API de Pagos, Tarjetas EMV o TPV (OpenAPI + PCI-DSS + Node 24 CI/CD)"
+  description: "Genera un componente de producción para Getnet España (Grupo Santander) con contrato OpenAPI 3.0, guardrail PCI-DSS 4.0 (redact_pan), Playbook RAG, Conector MCP y workflow Canary Release en GitHub Actions (Node 24)."
+  tags:
+    - getnet
+    - openapi
+    - python
+    - node-24
+    - pci-dss
+    - canary-release
+spec:
+  owner: group:getnet-qaops-architecture
+  type: service
+  parameters:
+    - title: "1. Metadatos del Componente y Producto Oficial Getnet"
+      required:
+        - component_name
+        - getnet_product_family
+        - owner_team
+      properties:
+        component_name:
+          title: "Nombre del Componente (slug)"
+          type: string
+          description: "Identificador único en Backstage y GitHub (ej. getnet-tap-on-phone-auth-svc)"
+          default: "getnet-smartpos-settlement-svc"
+        getnet_product_family:
+          title: "Familia de Producto Getnet España (getnet.net/es)"
+          type: string
+          default: "Pagos en Persona (TPV: Get Smart / Tap on Phone / Automatic / Central)"
+          enum:
+            - "Pagos en Persona (TPV: Get Smart / Tap on Phone / Automatic / Central)"
+            - "Pagos Online (Get Checkout / Get Link & Pay / Get Social Selling)"
+            - "Gestión del Dinero (Cuentas T+0 / Pagos SEPA-SWIFT / FX DCC)"
+            - "Core Tarjetas Bancarias EMV & Cajeros Getnet ATM"
+        owner_team:
+          title: "Equipo Propietario en Backstage"
+          type: string
+          default: "group:getnet-pos-terminals"
+    - title: "2. Especificación API, Guardrail PCI-DSS y Harness QAOps"
+      required:
+        - api_endpoint_path
+        - rag_playbook_id
+      properties:
+        api_endpoint_path:
+          title: "Ruta Base del Endpoint API REST"
+          type: string
+          default: "/api/v1/tpv/smartpos-settlement"
+        rag_playbook_id:
+          title: "Playbook RAG Asociado para Auto-Remediación"
+          type: string
+          default: "RAG-PB-TPV-007"
+        enable_pci_redact_pan:
+          title: "Activar Guardrail PCI-DSS 4.0 (brand_verifier.incident.redact_pan)"
+          type: boolean
+          default: true
+  steps:
+    - id: fetch-base-skeleton
+      name: "1. Generar Código del Microservicio, Contrato OpenAPI y Entidad Backstage"
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          component_name: ${{ parameters.component_name }}
+          getnet_product_family: ${{ parameters.getnet_product_family }}
+          owner_team: ${{ parameters.owner_team }}
+          api_endpoint_path: ${{ parameters.api_endpoint_path }}
+          rag_playbook_id: ${{ parameters.rag_playbook_id }}
+    - id: publish-github
+      name: "2. Publicar Código y Workflow Node 24 en AngC1/Getnet-Autonomous-ALM-QAOps"
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        repoUrl: github.com?owner=AngC1&repo=Getnet-Autonomous-ALM-QAOps
+        defaultBranch: main
+    - id: register-backstage-catalog
+      name: "3. Registrar Componente y API en el Software Catalog de Backstage.io"
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl }}
+        catalogInfoPath: "/catalog-info.yaml"
+  output:
+    links:
+      - title: "Ver en Repositorio GitHub"
+        url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps
+      - title: "Abrir Entidad en Backstage Catalog"
+        icon: catalog
+        entityRef: ${{ steps['register-backstage-catalog'].output.entityRef }}

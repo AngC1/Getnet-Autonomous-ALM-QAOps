@@ -1,0 +1,60 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: template-getnet-autonomous-refix-patch
+  title: "Plantilla Getnet: Generación y Sincronización de Código Re-Fixeado (Self-Healing Hotfix)"
+  description: "Plantilla Backstage para sintetizar, auditar y publicar código Re-Fixeado (Before/After + Git Diff) por Self-Healing-Patch-Agent tanto en el repositorio GitHub como en la imagen Docker de Backstage."
+  tags:
+    - getnet
+    - self-healing
+    - refix
+    - hotfix
+    - rag
+    - backstage
+spec:
+  owner: group:getnet-qaops-architecture
+  type: service
+  parameters:
+    - title: "Selección de Incidencia y Módulo a Re-Fixear"
+      required:
+        - target_module
+        - incident_key
+        - rag_playbook_id
+      properties:
+        target_module:
+          title: "Módulo de Código en Producción"
+          type: string
+          default: "backstage/refixed-code/card_lock_engine_refixed.py"
+          enum:
+            - "backstage/refixed-code/card_lock_engine_refixed.py"
+            - "backstage/refixed-code/tpv_firmware_gateway_refixed.py"
+            - "backstage/refixed-code/online_checkout_fx_refixed.py"
+        incident_key:
+          title: "Clave de Incidencia Jira Xray"
+          type: string
+          default: "GTN-INC-ATM-001 + GTN-INC-SYS-002"
+        rag_playbook_id:
+          title: "Playbook RAG Aplicado"
+          type: string
+          default: "RAG-PB-ATM-001 + RAG-PB-SYS-002"
+  steps:
+    - id: synthesize-refix-code
+      name: "1. Sintetizar Código Re-Fixeado con Guardrail PCI-DSS (Self-Healing-Patch-Agent)"
+      action: getnet:alm:refix-code
+      input:
+        target_module: ${{ parameters.target_module }}
+        incident_key: ${{ parameters.incident_key }}
+        rag_playbook_id: ${{ parameters.rag_playbook_id }}
+    - id: trigger-canary-node24
+      name: "2. Lanzar Canary Release (10% -> 50% -> 100%) en GitHub Actions (Node 24)"
+      action: github:actions:dispatch
+      input:
+        workflowId: canary-redeploy-qaops.yml
+        repoUrl: github.com?owner=AngC1&repo=Getnet-Autonomous-ALM-QAOps
+        branchOrTagName: main
+  output:
+    links:
+      - title: "Ver Código Re-Fixeado en Repositorio GitHub"
+        url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/tree/main/backstage/refixed-code
+      - title: "Ver Pipeline Canary en GitHub Actions"
+        url: https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions

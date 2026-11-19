@@ -289,6 +289,26 @@ class ObservabilityMcpController:
         res = requests.get(f"{self.base_url}/api/v1/cicd/status", timeout=5)
         return res.json()
 
+    def backstage_sync_catalog_and_refixed_code(self, module_key: str = "card_lock_engine_refixed") -> Dict[str, Any]:
+        """Consulta el Software Catalog de Backstage.io (node:24-bookworm-slim) y verifica el código re-fixeado en el repositorio y en Backstage."""
+        cat = requests.get(f"{self.base_url}/api/v1/backstage/catalog", timeout=5).json()
+        refix = requests.post(
+            f"{self.base_url}/api/v1/backstage/refix",
+            json={"module_key": module_key},
+            timeout=5,
+        ).json()
+        return {
+            "ok": bool(cat.get("ok") and refix.get("ok")),
+            "serverName": cat.get("serverName"),
+            "dockerBaseImage": cat.get("dockerImageSpec", {}).get("baseImage"),
+            "componentsCount": len(cat.get("components", [])),
+            "apisCount": len(cat.get("apis", [])),
+            "templatesCount": len(cat.get("templates", [])),
+            "refixedModulesCount": len(cat.get("refixedModules", [])),
+            "verifiedModule": refix.get("module", {}).get("filePath"),
+            "repoBlobUrl": refix.get("visibility", {}).get("githubRepositoryUrl"),
+        }
+
 
 MCP_TOOLS_SCHEMA = [
     {
@@ -391,6 +411,16 @@ MCP_TOOLS_SCHEMA = [
         "description": "Consulta el estado del MCP Server de CI/CD GitHub Actions y los 4 stages del Canary Release Harness (10% -> 50% -> 100%).",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    {
+        "name": "backstage_sync_catalog_and_refixed_code",
+        "description": "Conecta con el Software Catalog de Backstage.io (node:24-bookworm-slim), plantillas API y verifica el código re-fixeado en el repositorio GitHub y en la imagen Docker de Backstage.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "module_key": {"type": "string", "default": "card_lock_engine_refixed"},
+            },
+        },
+    },
 ]
 
 
@@ -452,6 +482,10 @@ def handle_mcp_request(controller: ObservabilityMcpController, req: Dict[str, An
                 )
             elif name == "github_actions_get_canary_harness_status":
                 out = controller.github_actions_get_canary_harness_status()
+            elif name == "backstage_sync_catalog_and_refixed_code":
+                out = controller.backstage_sync_catalog_and_refixed_code(
+                    module_key=args.get("module_key", "card_lock_engine_refixed")
+                )
             else:
                 raise ValueError(f"Herramienta MCP desconocida: {name}")
 
@@ -523,6 +557,7 @@ def run_selftest(base_url: str) -> int:
 
     cycle_out = controller.execute_autonomous_alm_cycle(inject_first=True)
     cicd_out = controller.github_actions_trigger_canary_redeploy()
+    bs_out = controller.backstage_sync_catalog_and_refixed_code()
     elapsed_ms = int((time.perf_counter() - t0) * 1000)
     print(
         f"6. Ciclo Completo ALM Sin Human-in-the-Loop: {cycle_out.get('status')} "
@@ -534,7 +569,13 @@ def run_selftest(base_url: str) -> int:
         f"Run {cicd_out.get('run', {}).get('runId')} ({cicd_out.get('run', {}).get('trafficSplit')}) | "
         f"URL: {cicd_out.get('actionsUrl')}"
     )
-    return 0 if (cycle_out.get("ok") and cicd_out.get("ok")) else 1
+    print(
+        f"8. Backstage.io Docker & Re-Fixed Code MCP ({bs_out.get('dockerBaseImage')}): "
+        f"{bs_out.get('componentsCount')} Components, {bs_out.get('apisCount')} APIs, "
+        f"{bs_out.get('templatesCount')} Templates, {bs_out.get('refixedModulesCount')} Re-Fixed Modules | "
+        f"Repo: {bs_out.get('repoBlobUrl')}"
+    )
+    return 0 if (cycle_out.get("ok") and cicd_out.get("ok") and bs_out.get("ok")) else 1
 
 
 if __name__ == "__main__":

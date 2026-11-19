@@ -512,6 +512,8 @@
       <button class="btn btn-blue" onclick="openMcpModal('cloudwatch')" id="btn-open-mcp-cloudwatch">☁️ Ventana MCP AWS CloudWatch</button>
       <button class="btn" onclick="openMcpModal('getnet_atm')" id="btn-open-mcp-kiro">🏧 Ventana MCP Getnet ATM</button>
       <button class="btn btn-green" onclick="openMcpModal('github_actions')" id="btn-open-mcp-github-actions" data-testid="btn-open-mcp-github-actions">⚙️ Ventana MCP GitHub Actions CI/CD</button>
+      <button class="btn btn-blue" onclick="openMcpModal('backstage')" id="btn-open-mcp-backstage" data-testid="btn-open-mcp-backstage">🗂️ Ventana MCP Backstage.io</button>
+      <a class="btn btn-purple" href="/backstage" id="link-open-backstage-portal" data-testid="link-open-backstage-portal">🐳 Portal Backstage.io &amp; Código Re-Fixeado</a>
       <a class="btn" href="/servicios-para-clientes">💳 Portal Operativo Tarjetas &amp; TPV</a>
       <a class="btn" href="/presentacion">📽️ Presentación CIO</a>
       <a class="btn btn-red" href="/api/v1/alm/export/jira-xray">⬇ Exportar Xray JSON</a>
@@ -525,11 +527,12 @@
       <strong style="font-size:0.8rem;color:var(--getnet-red);text-transform:uppercase;letter-spacing:0.5px;">🧭 Ir a Sección:</strong>
       <a class="btn" href="#section-tpv-incident-injector">🏪 1. Inyección Incidencias TPV</a>
       <a class="btn" href="#section-visual-agent-flow">🔄 2. Estados S1..S8 y 5 Agentes</a>
-      <a class="btn" href="#section-mcp-connectors">🔌 3. Conectores MCP (5)</a>
+      <a class="btn" href="#section-mcp-connectors">🔌 3. Conectores MCP (6)</a>
       <a class="btn" href="#section-cicd-canary-harness">🚀 4. Harness Re-Deploy Canary (GitHub Actions MCP)</a>
-      <a class="btn" href="#section-rag-knowledge-base">🧠 5. Motor RAG (17 Playbooks)</a>
-      <a class="btn" href="#section-getnet-products-engineering">🧬 6. Ingeniería 11 Productos</a>
-      <a class="btn" href="#section-xray-matrix">🧪 7. Matriz Jira Xray (25 Tests)</a>
+      <a class="btn" href="#section-backstage-portal">🐳 5. Backstage.io Docker, Plantillas API &amp; Código Re-Fixeado</a>
+      <a class="btn" href="#section-rag-knowledge-base">🧠 6. Motor RAG (17 Playbooks)</a>
+      <a class="btn" href="#section-getnet-products-engineering">🧬 7. Ingeniería 11 Productos</a>
+      <a class="btn" href="#section-xray-matrix">🧪 8. Matriz Jira Xray (25 Tests)</a>
     </nav>
 
     <!-- BANNER DE SIMULACIÓN EN VIVO PARA EL CIO DE GETNET -->
@@ -785,6 +788,26 @@
           </div>
           <button class="btn btn-green" onclick="openMcpModal('github_actions')" id="btn-card-mcp-github-actions">⚙️ Abrir Ventana MCP GitHub Actions CI/CD</button>
         </div>
+
+        <!-- Conector 6: Backstage.io Software Catalog, API Scaffolder & Re-Fixed Code Docker MCP -->
+        <div class="mcp-conn-card dynatrace" id="card-mcp-backstage" data-testid="card-mcp-backstage">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="color:#191919;font-size:0.98rem;">🐳 Backstage.io Catalog, Plantillas API &amp; Re-Fixed Code MCP</strong>
+              <span class="status-pill status-passed">{{ mcp_connections.backstage.status }} ({{ mcp_connections.backstage.latencyMs }}ms)</span>
+            </div>
+            <div style="font-size:0.84rem;color:#334155;margin-bottom:10px;display:grid;gap:4px;">
+              <div><strong>Imagen Docker:</strong> <code>{{ mcp_connections.backstage.dockerBaseImage }}</code> (<a href="https://backstage.io/docs/deployment/docker" target="_blank" style="color:#0284C7;font-weight:700;">Docs Docker ↗</a>)</div>
+              <div><strong>Servidor MCP:</strong> <code>{{ mcp_connections.backstage.serverName }}</code></div>
+              <div><strong>Descriptor:</strong> <code>{{ mcp_connections.backstage.catalogFile }}</code> (5 Components · 3 APIs · 2 Templates)</div>
+              <div><strong>Código Re-Fixeado:</strong> <a href="{{ mcp_connections.backstage.refixedCodeRepoUrl }}" target="_blank" style="color:#EC0000;font-weight:700;">backstage/refixed-code ↗</a></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-purple" onclick="openMcpModal('backstage')" id="btn-card-mcp-backstage">🔌 Handshake MCP Backstage</button>
+            <a class="btn btn-red" href="/backstage">🐳 Abrir Portal Backstage ↗</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -817,6 +840,45 @@
 
       <div id="cicd-canary-live-output" data-testid="cicd-canary-live-output" style="padding:14px 18px;background:#ECFDF5;border:1.5px solid #10B981;border-radius:10px;font-size:0.86rem;color:#065F46;">
         <strong>⚙️ Última Ejecución Certificada en GitHub Actions CI/CD MCP:</strong> Run <code>{{ cicd_harness.lastRunId }}</code> · Release <code>{{ cicd_harness.currentRelease }}</code> · Estrategia <code>{{ cicd_harness.canaryStrategy }}</code> · Repo: <a href="{{ cicd_harness.actionsUrl }}" target="_blank" style="color:#EC0000;font-weight:800;">{{ cicd_harness.actionsUrl }} ↗</a>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2C: BACKSTAGE.IO DOCKER IMAGE, PLANTILLAS DE COMPONENTES API Y CÓDIGO RE-FIXEADO (VISIBLE EN REPO Y EN BACKSTAGE) -->
+    <div class="card" id="section-backstage-portal" data-testid="section-backstage-portal" style="border-top:4px solid #0284C7;">
+      <h2>
+        <span>🐳 Backstage.io Software Catalog, Plantillas de Componentes API y Código Re-Fixeado (<code>{{ backstage_data.dockerImageSpec.baseImage }}</code>)</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span class="status-pill status-passed">{{ backstage_data.components|length }} Components · {{ backstage_data.apis|length }} APIs · {{ backstage_data.refixedModules|length }} Módulos Re-Fixeados</span>
+          <a class="btn btn-purple" href="/backstage" id="btn-goto-backstage-full" data-testid="btn-goto-backstage-full">🐳 Abrir Portal Interactivo Backstage (/backstage)</a>
+          <a class="btn btn-red" href="{{ backstage_data.refixedCodeFolderUrl }}" target="_blank" id="link-github-refixed-code" data-testid="link-github-refixed-code">📦 Ver Código Re-Fixeado en GitHub Repo ↗</a>
+          <a class="btn" href="https://backstage.io/docs/deployment/docker" target="_blank">📘 Guía Docker Backstage.io ↗</a>
+        </div>
+      </h2>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:14px;">
+        Conectado con la imagen Docker de <strong>Backstage Developer Platform (<code>backstage/Dockerfile</code> sobre <code>node:24-bookworm-slim</code> · Puerto <code>7007</code>)</strong>.
+        Permite generar como plantilla (<code>kind: Template</code>) los componentes API y su código, así como inspeccionar el <strong>código que se re-fixea (Self-Healing Hotfixes)</strong> tanto en el repositorio GitHub (<a href="{{ backstage_data.refixedCodeFolderUrl }}" target="_blank" style="color:#EC0000;font-weight:700;">backstage/refixed-code/*.py</a>) como dentro de la imagen de Backstage.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:14px;">
+        {% for mod in backstage_data.refixedModules %}
+        <div style="background:var(--getnet-sky);border:1.5px solid var(--getnet-sky-border);border-left:5px solid #0284C7;border-radius:12px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span class="status-pill status-purple">{{ mod.incidentId }}</span>
+            <code>{{ mod.backstageEntityRef }}</code>
+          </div>
+          <h4 style="font-size:0.95rem;font-weight:800;margin-bottom:6px;">{{ mod.title }}</h4>
+          <p style="font-size:0.82rem;color:#334155;margin-bottom:8px;">{{ mod.summary }}</p>
+          <div style="font-size:0.8rem;display:grid;gap:4px;margin-bottom:10px;">
+            <div>📦 <strong>Repositorio GitHub:</strong> <a href="{{ mod.repoBlobUrl }}" target="_blank" style="color:#EC0000;font-weight:700;">{{ mod.filePath }} ↗</a></div>
+            <div>🐳 <strong>Imagen Docker Backstage:</strong> <code>{{ mod.backstageDockerPath }}</code></div>
+            <div>⚡ <strong>Mejora P95:</strong> <span style="text-decoration:line-through;color:#DC2626;">{{ mod.metricsComparison.beforeP95Ms }} ms</span> &rarr; <strong style="color:#059669;">{{ mod.metricsComparison.afterP95Ms }} ms (Apdex {{ mod.metricsComparison.apdexAfter }})</strong></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="btn btn-blue" style="font-size:0.76rem;padding:5px 11px;" href="/backstage#section-refixed-code-viewer">🔍 Ver Diff y Código en Backstage</a>
+            <a class="btn" style="font-size:0.76rem;padding:5px 11px;" href="{{ mod.repoBlobUrl }}" target="_blank">📄 Ver en GitHub ↗</a>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
 
@@ -1199,6 +1261,14 @@
         token: "ghs_GETNET_AUTONOMOUS_ALM_CICD_MCP_****************",
         entity: "AngC1/Getnet-Autonomous-ALM-QAOps (.github/workflows/canary-redeploy-qaops.yml)",
         query: "workflow_dispatch --workflow canary-redeploy-qaops.yml --canary-split 10->50->100 --run-qaops-harness"
+      },
+      backstage: {
+        title: "🐳 Ventana de Conexión MCP Server — Backstage.io Software Catalog, Plantillas API & Código Re-Fixeado",
+        subtitle: "Servidor MCP: getnet-backstage-catalog-mcp · Docker: node:24-bookworm-slim (https://backstage.io/docs/deployment/docker)",
+        endpoint: "http://127.0.0.1:8080/backstage (Container Port 7007 · catalog-info.yaml)",
+        token: "backstage_DOCKER_NODE24_CATALOG_TOKEN",
+        entity: "system:default/getnet-autonomous-alm-ecosystem · backstage/refixed-code/*.py",
+        query: "catalog:sync --entities Component,API,Template --verify-refixed-code backstage/refixed-code/"
       }
     };
 
