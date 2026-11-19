@@ -1043,8 +1043,9 @@ GITHUB_ACTIONS_CICD_HARNESS: Dict[str, Any] = {
     "actionsUrl": "https://github.com/AngC1/Getnet-Autonomous-ALM-QAOps/actions",
     "workflowFile": ".github/workflows/canary-redeploy-qaops.yml",
     "workflowName": "Getnet Canary Release Re-Deploy & QAOps Harness (CI/CD MCP)",
+    "runnerRuntime": "ubuntu-24.04 LTS · Node.js 24 Native (actions/checkout@v6, actions/setup-node@v6, actions/setup-python@v6) · Python 3.12",
     "branch": "main",
-    "status": "SUCCESS · 100% PROMOTED IN PRODUCTION",
+    "status": "SUCCESS · 100% PROMOTED IN PRODUCTION (NODE 24 LTS)",
     "canaryStrategy": "Canary 10% -> 50% -> 100% (Zero-Touch Auto-Promotion)",
     "currentRelease": "v2026.11.3-CANARY-PRO",
     "lastRunId": "GHA-RUN-2026-99412",
@@ -1053,10 +1054,10 @@ GITHUB_ACTIONS_CICD_HARNESS: Dict[str, Any] = {
     "stages": [
         {
             "stageId": "STAGE-1-SAST-PCI",
-            "name": "1. Build, SAST Guardrail PCI-DSS 4.0 (redact_pan) & Motor RAG (17 Playbooks)",
+            "name": "1. Build (Node 24 · Ubuntu 24.04), SAST PCI-DSS 4.0 (redact_pan) & Motor RAG (17 Playbooks)",
             "status": "PASSED",
             "durationMs": 420,
-            "gateCheck": "0 PAN leaks · 17/17 Playbooks TF-IDF + BM25 indexados",
+            "gateCheck": "Node 24 LTS (0 Warnings) · 0 PAN leaks · 17/17 Playbooks TF-IDF + BM25",
         },
         {
             "stageId": "STAGE-2-CANARY-10",

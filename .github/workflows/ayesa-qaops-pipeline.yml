@@ -7,27 +7,37 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   getnet-autonomous-alm-qaops:
-    runs-on: ubuntu-latest
+    name: "Getnet Autonomous ALM & QAOps Suite (Node 24 · Ubuntu 24.04 LTS)"
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: "Checkout Repository (Node 24 Native · actions/checkout@v6)"
+        uses: actions/checkout@v6
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - name: "Set up Node.js 24 LTS (actions/setup-node@v6)"
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: "Set up Python 3.12 (Node 24 Native · actions/setup-python@v6)"
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: Install Dependencies
+      - name: "Install Dependencies"
         run: |
+          node --version
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run RAG Engine Self-Test
+      - name: "Run RAG Engine Self-Test"
         run: |
           python rag-knowledge-base/rag_engine.py --selftest
 
-      - name: Run Complete Autonomous ALM & Bank Card QAOps Suite
+      - name: "Run Complete Autonomous ALM & Bank Card QAOps Suite"
         run: |
           python run_qaops_suite.py
